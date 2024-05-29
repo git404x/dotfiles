@@ -50,6 +50,13 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+  # Nix features config  
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];    
+  };
+
   # Enable Bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = false;
