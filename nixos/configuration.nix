@@ -35,7 +35,11 @@
   #   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;
+  services.xserver = {
+    enable = true;
+    desktopManager.gnome.enable = true;
+    displayManager.gdm.enable = true;
+  };
 
 
  
@@ -60,6 +64,9 @@
     packages = with pkgs; [
       firefox
       tree
+      tdesktop
+      git
+      gh
     ];
   };
 
@@ -68,6 +75,8 @@
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
+    htop
+    neofetch
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
