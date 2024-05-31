@@ -19,7 +19,7 @@
       ./users.nix
       ./services.nix
       ./packages.nix
-      ./gnome.nix
+      ./hyprland.nix
       ./internationalisation.nix
     ];
 
