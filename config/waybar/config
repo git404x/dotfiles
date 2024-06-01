@@ -12,7 +12,7 @@
     },
 
     "clock": {
-        "format": "  {: %F (%a) %H:%M:%S}",
+        "format": "<b>󰃭 {:%d/%m (%a) 󰥔 %H:%M}</b>",
 	"interval": 1, 
     },
     
