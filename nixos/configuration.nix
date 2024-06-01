@@ -18,6 +18,7 @@
       ./time.nix
       ./users.nix
       ./services.nix
+      ./fonts.nix
       ./packages.nix
       ./hyprland.nix
       ./internationalisation.nix
