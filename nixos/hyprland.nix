@@ -21,7 +21,9 @@
     pyprland
     hyprpaper
     hyprpicker
-
+    hyprlock
+    hypridle
+    hyprcursor
     rofi-wayland
     cinnamon.nemo
     kitty
