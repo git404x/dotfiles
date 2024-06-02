@@ -23,6 +23,17 @@
   # waybar
   programs.waybar.enable = true;
 
+  # cross desktop grouping (sandbox apps)
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-wlr
+      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
+    ];
+  };
+
   # Some system packages
   environment.systemPackages = with pkgs; [
     hyprland
