@@ -10,6 +10,7 @@
   
   let
     system = "x86_64-linux";
+    lib = nixpkgs.lib;
     pkgs = import nixpkgs {
       inherit system;
       config = {
@@ -21,8 +22,8 @@
 
   {
     nixosConfigurations = {
-      itz_levi_404 = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit system; };
+      nix = lib.nixosSystem {
+        inherit system;
         modules = [
           ./nixos/configuration.nix # Your system configuration.
           chaotic.nixosModules.default # OUR DEFAULT MODULE
