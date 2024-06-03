@@ -53,17 +53,26 @@
 
   # Some system packages
   environment.systemPackages = (with pkgs; [
-    hyprland
-    waybar
-    pyprland
-    hyprpaper
-    hyprpicker
-    rofi-wayland
-    cinnamon.nemo
-    kitty
-    neovim
-    helix
+    hyprland # window manager
+    pyprland # hypr plugin system
+    hyprpaper # wallpaper
+    hyprpicker # color picker
+    waybar # toolbar
+    dunst # notification daemon
+    brightnessctl # brightness control
+    cinnamon.nemo-with-extensions # files
+    kitty # term
+    starship # prompt for shell
+    mpv # media player
+    imv # image viewer
+    zathura # pdf viewer
+    onlyoffice-bin # office
 
+    # menu
+    rofi-wayland
+    wofi
+
+    # security
     gnome.gnome-keyring
   
   ]) ++ (with pkgs-unstable; [
