@@ -26,6 +26,9 @@
     enable = true;
   };
   
+  # Theme (universal)
+  catppuccin.flavor = "macchiato";
+
   # security
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.login.enableGnomeKeyring = true;
