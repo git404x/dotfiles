@@ -59,6 +59,7 @@
     hyprpicker # color picker
     waybar # toolbar
     dunst # notification daemon
+    avizo # noti daemon
     brightnessctl # brightness control
     cinnamon.nemo-with-extensions # files
     kitty # term
