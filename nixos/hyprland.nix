@@ -16,6 +16,20 @@
     xwayland.enable = true;
   };
 
+  # Dbus
+  services.dbus = {
+    enable = true;
+    packages = [ pkgs.dconf ];
+  };
+
+  programs.dconf = {
+    enable = true;
+  };
+  
+  # security
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+
   # Hint Electon apps to use wayland
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   # mouse/touchpad cursor
@@ -49,6 +63,8 @@
     kitty
     neovim
     helix
+
+    gnome.gnome-keyring
   ];
 
 }
