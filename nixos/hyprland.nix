@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
 
 {
   
@@ -49,15 +49,12 @@
   };
 
   # Some system packages
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     hyprland
     waybar
     pyprland
     hyprpaper
     hyprpicker
-    hyprlock
-    hypridle
-    hyprcursor
     rofi-wayland
     cinnamon.nemo
     kitty
@@ -65,6 +62,14 @@
     helix
 
     gnome.gnome-keyring
-  ];
+  
+  ]) ++ (with pkgs-unstable; [
+
+  # pkgs from unstable branch
+  hyprlock
+  hypridle
+  hyprcursor
+
+  ]);
 
 }
