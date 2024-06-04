@@ -73,6 +73,16 @@
     rofi-wayland
     wofi
 
+    # tools
+    wl-screenrec
+    wl-clipboard
+    wl-clip-persist
+    grim
+    grimblast
+    slurp
+    cliphist
+    obs-studio
+
     # security
     gnome.gnome-keyring
   
