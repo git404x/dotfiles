@@ -50,14 +50,16 @@ window#waybar.empty #window {
 }
 #workspaces {
     background-color: @crust;
-    border-radius: 90px;
-
+    border-radius: 12px;
+    padding: 2px 6px;
+    margin: 3px 3px 3px 3px;
+    background-clip: padding-box;
 }
 
 #workspaces button  {
     background-color: @crust;
-    padding: 4px;
-    border-radius: 9px;
+    padding: 3px;
+    border-radius: 12px;
     min-width: 20px;
     color: @subtext0;
 }
@@ -66,13 +68,17 @@ window#waybar.empty #window {
     color: @text;
     background: @teal;
     border-bottom: 3px solid @sky;
+    padding: 3px;
 }
 
 #workspaces button.active{
     background-color: @surface1;
     border: 2px solid @mauve;
+    margin: 1px 0 1px 0;
     border-radius: 12px;
+    background-clip: padding-box;
     color: @subtext1;
+    padding: 3px;
 }
 #workspaces button.urgent{
     background-color: @red;
