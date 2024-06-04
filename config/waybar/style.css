@@ -68,7 +68,7 @@ window#waybar.empty #window {
     color: @text;
     background: @teal;
     border-bottom: 3px solid @sky;
-    padding: 3px;
+    padding: 0px;
 }
 
 #workspaces button.active{
