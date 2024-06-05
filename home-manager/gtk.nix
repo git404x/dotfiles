@@ -15,8 +15,8 @@ in
     cursorTheme.package = pkgs.bibata-cursors;
     cursorTheme.name = "Bibata-Modern-Ice";
 
-    theme.package = pkgs.adw-gtk3;
-    theme.name = "adw-gtk3";
+    theme.package = pkgs.whitesur-gtk-theme;
+    theme.name = "WhiteSur-Dark";
 
     iconTheme.package = pkg-kora-icons;
     iconTheme.name = "kora";
