@@ -19,12 +19,9 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    catppuccin.url = "github:catppuccin/nix";
-
-
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, chaotic, home-manager, home-manager-unstable, catppuccin, ... }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, chaotic, home-manager, home-manager-unstable, ... }@inputs:
   
   let
     system = "x86_64-linux";
@@ -43,9 +40,8 @@
         inherit inputs;
         };
         modules = [
-          ./nixos/configuration.nix # Your system configuration.
+          ./system/configuration.nix # Your system configuration.
           chaotic.nixosModules.default # OUR DEFAULT MODULE
-          catppuccin.nixosModules.catppuccin # catppuccin theme
         ];
       };
     };
@@ -58,8 +54,7 @@
         inherit inputs;
         };
         modules = [
-          ./home-manager/home.nix
-          catppuccin.homeManagerModules.catppuccin # catppuccin theme
+          ./user/home.nix
         ];
       };
     };

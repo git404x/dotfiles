@@ -6,23 +6,30 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+    [ # Include modular nix configs
       
-      # Include modular nix configs
-      ./bootloader.nix
-      ./networking.nix
-      ./nix-settings.nix
-      ./bluetooth.nix
-      ./sound.nix
-      ./opengl.nix
-      ./time.nix
-      ./users.nix
-      ./services.nix
-      ./fonts.nix
-      ./packages.nix
-      ./hyprland.nix
-      ./internationalisation.nix
+      # Include the results of the hardware scan.
+      ./hardware/hardware-configuration.nix
+      
+      # hardware related nix modules
+      ./hardware/bluetooth.nix
+      ./hardware/bootloader.nix
+      ./hardware/kernel.nix
+      ./hardware/services.nix
+      ./hardware/sound.nix
+      ./hardware/opengl.nix
+      ./hardware/time.nix
+
+      # Other Nix Modules
+      ./modules/networking.nix
+      ./modules/nix-settings.nix
+      ./modules/internationalisation.nix
+      ./modules/users.nix
+      ./modules/packages.nix
+
+      # GUI nix modules
+      ./gui/fonts.nix
+      ./gui/hyprland.nix
     ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,

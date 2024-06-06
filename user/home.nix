@@ -4,15 +4,16 @@
 
   imports = [
     # import nix modules
-    ./gtk.nix
-    ./qt.nix
+    ./style/gtk.nix
+    ./style/qt.nix
   ];
 
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
-  home.username = "itz_levi_404";
-  home.homeDirectory = "/home/itz_levi_404";
-
+  # Home Manager needs a bit of info about paths it should manage.
+  home = {
+    username = "itz_levi_404";
+    homeDirectory = "/home/itz_levi_404";
+  };
+  
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.

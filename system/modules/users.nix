@@ -9,12 +9,9 @@
     extraGroups = [ "wheel" "networkmanager" "input"  "video" "audio" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       firefox-wayland
-      tree
-      tdesktop
-      git
-      gh
-      ani-cli
       vscodium
+      tdesktop
+      ani-cli
     ];
   };
 
