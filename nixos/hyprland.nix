@@ -85,6 +85,11 @@
 
     # security
     gnome.gnome-keyring
+
+    # GPU stuff
+    amdvlk
+    rocm-opencl-icd
+    glaxnimate
   
   ]) ++ (with pkgs-unstable; [
 

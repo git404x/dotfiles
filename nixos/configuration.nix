@@ -15,6 +15,7 @@
       ./nix-settings.nix
       ./bluetooth.nix
       ./sound.nix
+      ./opengl.nix
       ./time.nix
       ./users.nix
       ./services.nix
