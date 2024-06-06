@@ -4,6 +4,7 @@
 
   imports = [
     # import nix modules
+    ./shell/sh.nix
     ./style/gtk.nix
     ./style/qt.nix
   ];

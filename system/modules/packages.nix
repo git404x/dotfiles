@@ -31,6 +31,7 @@
     openssh
     tmate
     tmux
+    zsh
 
     # System stuff
     networkmanager
