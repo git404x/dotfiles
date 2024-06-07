@@ -1,0 +1,7 @@
+import = [
+  # uncomment the flavour you want below:
+  # "~/dotfiles/config/alacritty/themes/catppuccin-latte.toml"
+  # "~/dotfiles/config/alacritty/themes/catppuccin-frappe.toml"
+  # "~/dotfiles/config/alacritty/themes/catppuccin-macchiato.toml"
+  "~/dotfiles/config/alacritty/themes/catppuccin-mocha.toml"
+]
