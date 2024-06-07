@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ userConfig, pkgs, ... }:
 
 let
 
@@ -7,8 +7,8 @@ let
     ls = "eza --icons -l -T -L=1";
     ll = "ls -l";
     flake-update = "nix flake update";
-    nix-switch = "sudo nixos-rebuild switch --flake ~/dotfiles";
-    home-switch = "home-manager switch --flake ~dotfiles";
+    nix-switch = "sudo nixos-rebuild switch --flake ${userConfig.dotfilesDir}";
+    home-switch = "home-manager switch --flake ${userConfig.dotfilesDir}";
   };
 
 in

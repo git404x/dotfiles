@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, userConfig, ... }:
 
 let
 
@@ -12,11 +12,11 @@ in
   gtk = {
     enable = true;
 
-    cursorTheme.package = pkgs.bibata-cursors;
-    cursorTheme.name = "Bibata-Modern-Ice";
+    cursorTheme.package = userConfig.themeConfig.cursorPkg;
+    cursorTheme.name = userConfig.themeConfig.cursor;
 
-    theme.package = pkgs.whitesur-gtk-theme;
-    theme.name = "WhiteSur-Dark";
+    theme.package = userConfig.themeConfig.themePkg;
+    theme.name = userConfig.themeConfig.theme;
 
     iconTheme.package = pkg-kora-icons;
     iconTheme.name = "kora";

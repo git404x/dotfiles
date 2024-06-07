@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, userConfig, ... }:
 
 {
 
@@ -11,8 +11,8 @@
 
   # Home Manager needs a bit of info about paths it should manage.
   home = {
-    username = "itz_levi_404";
-    homeDirectory = "/home/itz_levi_404";
+    username = userConfig.username;
+    homeDirectory = "/home/"+userConfig.username;
   };
   
   # This value determines the Home Manager release that your configuration is
@@ -74,7 +74,7 @@
   #
   # or
   #
-  #  /etc/profiles/per-user/itz_levi_404/etc/profile.d/hm-session-vars.sh
+  #  /etc/profiles/per-user/userConfig.usernameetc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
     # EDITOR = "emacs";

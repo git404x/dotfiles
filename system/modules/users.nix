@@ -1,11 +1,11 @@
-{ pkgs, ... }:
+{ pkgs, userConfig, ... }:
 
 {
   
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.itz_levi_404 = {
+  users.users.${userConfig.username} = {
     isNormalUser = true;
-    description = "Levi";
+    description = userConfig.name;
     useDefaultShell = true;
     extraGroups = [ "wheel" "networkmanager" "input"  "video" "audio" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
