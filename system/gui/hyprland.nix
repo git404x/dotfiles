@@ -73,6 +73,7 @@
  
     # security
     gnome.gnome-keyring
+    polkit_gnome # auth dialog 
 
   ]) ++ (with pkgs-unstable; [
 
