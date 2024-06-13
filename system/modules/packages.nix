@@ -31,7 +31,11 @@
     openssh
     tmate
     tmux
+    neovim
+    neovide
+    gcc
     zsh
+    oh-my-zsh   
 
     # System stuff
     networkmanager
