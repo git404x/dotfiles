@@ -48,6 +48,9 @@
     hyprpicker # color picker
     waybar # toolbar
     dunst # notification daemon
+    libnotify 
+    notify-desktop
+    jq # json processor
     avizo # noti daemon
     brightnessctl # brightness control
     cinnamon.nemo-with-extensions # files
