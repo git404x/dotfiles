@@ -7,6 +7,7 @@
     ./shell/sh.nix
     ./style/gtk.nix
     ./style/qt.nix
+    # ./fonts/fonts.nix
   ];
 
   # Home Manager needs a bit of info about paths it should manage.
