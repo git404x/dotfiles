@@ -27,8 +27,8 @@
         cursorPkg = pkgs.bibata-cursors;
         cursor = "Bibata-Modern-Ice";
 
-        themePkg = pkgs.nordic;
-        theme = "nordic";
+        themePkg = pkgs.adw-gtk3;
+        theme = "adw-gtk3-dark";
       };
 
     };
