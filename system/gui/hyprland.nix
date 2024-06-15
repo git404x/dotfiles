@@ -70,6 +70,10 @@
     slurp
     cliphist
 
+    # theming
+    adw-gtk3
+    nwg-look
+
     # Qt 
     libsForQt5.qtstyleplugin-kvantum
     libsForQt5.qt5ct
