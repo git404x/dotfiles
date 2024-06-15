@@ -13,7 +13,8 @@
         ripgrep
         rustup
         nodePackages.npm
-        python3  
+        python3
+        gnumake
       ];
 
     GREETING = "Welcome to shell env !";
