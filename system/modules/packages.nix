@@ -33,7 +33,7 @@
     tmux
     neovim
     neovide
-    gcc
+    fzf
     zsh
     oh-my-zsh   
 
