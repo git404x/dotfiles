@@ -55,6 +55,7 @@
     brightnessctl # brightness control
     cinnamon.nemo-with-extensions # files
     kitty # hypr default term
+    wlogout # power menu 
 
     # menu
     rofi-bluetooth # bluetooth menu
