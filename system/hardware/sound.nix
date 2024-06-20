@@ -20,7 +20,13 @@
   };
 
   environment.systemPackages = with pkgs; [
-    pamixer
-    pavucontrol
+
+    # Sound ------------------------------------------------------------ #
+    pipewire                           # audio/video server
+    pwvucontrol                        # Pipewire volume control
+    wireplumber                        # pipewire session manager
+    pavucontrol                        # pulseaudio volume control
+    pamixer                            # pulseaudio cli mixer
+
   ];
 }
