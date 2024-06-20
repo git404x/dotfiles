@@ -41,54 +41,58 @@
 
   # Some system packages
   environment.systemPackages = (with pkgs; [
-    
-    hyprland # wl-roots based wayland window manager
-    xwayland # An X server for interfacing X11 apps with the Wayland protocol
-    hyprpaper # wallpaper
-    hyprpicker # color picker
-    waybar # toolbar
-    dunst # notification daemon
-    libnotify 
-    notify-desktop
-    jq # json processor
-    avizo # noti daemon
-    brightnessctl # brightness control
-    cinnamon.nemo-with-extensions # files
-    kitty # hypr default term
-    wlogout # power menu 
 
-    # menu
-    rofi-bluetooth # bluetooth menu
-    rofi-wayland
-    wofi
+    # Window Manager --------------------------------------------------- #
+    hyprland                           # wlroots-based wayland compositor
+    xwayland                           # interface X11 apps with Wayland protocol
+    kdePackages.dolphin                # kde file manager
+    kdePackages.ark                    # kde file archiver
+    dunst                              # notification daemon
+    rofi-wayland                       # application launcher
+    waybar                             # system bar
+    swww                               # wallpaper
+    swaylock-effects                   # lock screen
+    wlogout                            # logout menu
+    grimblast                          # screenshot tool
+    hyprpicker                         # color picker
+    slurp                              # region select for screenshot/screenshare
+    swappy                             # screenshot editor
+    cliphist                           # clipboard manager
 
-    # tools
-    wl-screenrec
-    wl-clipboard
-    wl-clip-persist
-    grim
-    grimblast
-    slurp
-    cliphist
+    # Dependencies ----------------------------------------------------- #
+    polkit_gnome                       # authentication agent
+    gnome.gnome-keyring                # store pass, keys, etc
+    xdg-desktop-portal-hyprland        # xdg desktop portal for hyprland
+    xdg-desktop-portal-gtk             # xdg desktop portal for gtk
+    parallel                           # for parallel processing
+    jq                                 # for json processing
+    imagemagick                        # for image processing
+    libsForQt5.qt5.qtimageformats      # for dolphin image thumbnails
+    kdePackages.ffmpegthumbs           # for dolphin video thumbnails
+    kde-cli-tools                      # for dolphin file type defaults
+    libnotify                          # for notifications
+    notify-desktop                     # for sending desktop notifications
 
-    # theming
-    adw-gtk3
-    nwg-look
-
-    # Qt 
-    libsForQt5.qtstyleplugin-kvantum
-    libsForQt5.qt5ct
- 
-    # security
-    gnome.gnome-keyring
-    polkit_gnome # auth dialog 
+    # Theming ---------------------------------------------------------- #
+    nwg-look                           # gtk configuration tool
+    libsForQt5.qt5ct                   # qt5 configuration tool
+    kdePackages.qt6ct                  # qt6 configuration tool
+    libsForQt5.qtstyleplugin-kvantum   # svg based qt5 theme engine
+    kdePackages.qtstyleplugin-kvantum  # svg based qt6 theme engine
+    libsForQt5.qt5.qtwayland           # wayland support in qt5
+    kdePackages.qtwayland              # wayland support in qt6
+    adw-gtk3                           # adwaita gtk3 theme
 
   ]) ++ (with pkgs-unstable; [
 
     # pkgs from unstable branch
+    hyprpaper
     hyprlock
     hypridle
     hyprcursor
+
+    wl-clipboard
+    wl-clip-persist
 
   ]);
 
