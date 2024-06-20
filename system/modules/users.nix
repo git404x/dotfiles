@@ -9,8 +9,6 @@
     useDefaultShell = true;
     extraGroups = [ "wheel" "networkmanager" "input"  "video" "audio" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
-      firefox-wayland
-      vscodium
       tdesktop
       ani-cli
     ];
