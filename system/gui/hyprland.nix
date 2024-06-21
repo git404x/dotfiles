@@ -45,7 +45,7 @@
     # Window Manager --------------------------------------------------- #
     hyprland                           # wlroots-based wayland compositor
     xwayland                           # interface X11 apps with Wayland protocol
-    kdePackages.dolphin                # kde file manager
+    cinnamon.nemo                      # file manager
     kdePackages.ark                    # kde file archiver
     dunst                              # notification daemon
     rofi-wayland                       # application launcher
@@ -53,6 +53,8 @@
     swww                               # wallpaper
     swaylock-effects                   # lock screen
     wlogout                            # logout menu
+    avizo                              # brightness & volume daemon
+    grim                               # grab image tool
     grimblast                          # screenshot tool
     hyprpicker                         # color picker
     slurp                              # region select for screenshot/screenshare
@@ -67,9 +69,6 @@
     parallel                           # for parallel processing
     jq                                 # for json processing
     imagemagick                        # for image processing
-    libsForQt5.qt5.qtimageformats      # for dolphin image thumbnails
-    kdePackages.ffmpegthumbs           # for dolphin video thumbnails
-    kde-cli-tools                      # for dolphin file type defaults
     libnotify                          # for notifications
     notify-desktop                     # for sending desktop notifications
 
