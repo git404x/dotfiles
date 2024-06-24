@@ -57,6 +57,7 @@
     swaylock-effects                   # lock screen
     wlogout                            # logout menu
     avizo                              # brightness & volume daemon
+    playerctl                          # media control
     grim                               # grab image tool
     grimblast                          # screenshot tool
     hyprpicker                         # color picker
