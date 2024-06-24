@@ -5,7 +5,10 @@
   # Enable display manager
   services.xserver = {
     enable = true;
-    displayManager.gdm.enable = true;
+    displayManager = {
+      sddm.enable = true;
+      sddm.package = pkgs.kdePackages.sddm;
+    };
   };
 
   # Enable hyprland and related stuff
@@ -60,6 +63,13 @@
     slurp                              # region select for screenshot/screenshare
     swappy                             # screenshot editor
     cliphist                           # clipboard manager
+
+    # Display Manager -------------------------------------------------- #
+    kdePackages.sddm                   # display manager for KDE plasma
+    libsForQt5.sddm                    # alt pkg of sddm 
+    libsForQt5.qt5.qtquickcontrols     # for sddm theme ui elements
+    libsForQt5.qt5.qtquickcontrols2    # for sddm theme ui elements
+    libsForQt5.qt5.qtgraphicaleffects  # for sddm theme effects
 
     # Dependencies ----------------------------------------------------- #
     polkit_gnome                       # authentication agent
