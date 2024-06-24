@@ -10,25 +10,22 @@
     # ".screenrc".source = dotfiles/screenrc;
     
     # Alacritty config
-    ".config/alacritty/alacritty.toml".source = ../config/alacritty/alacritty.toml;
+    ".config/alacritty".source = ../config/alacritty;
 
     # Avizo config
-    ".config/avizo/config.ini".source = ../config/avizo/config.ini;
+    ".config/avizo".source = ../config/avizo;
 
     # Dunst notification daemon
-    ".config/dunst/dunstrc".source = ../config/dunst/dunstrc;
+    ".config/dunst".source = ../config/dunst;
     
     # fastfetch config
-    ".config/fastfetch/config.jsonc".source = ../config/fastfetch/config.jsonc;
+    ".config/fastfetch".source = ../config/fastfetch;
 
     # hypr config
-    ".config/hypr/hyprland.conf".source = ../config/hypr/hyprland.conf;
-    ".config/hypr/hyprpaper.conf".source = ../config/hypr/hyprpaper.conf;
-    ".config/hypr/hypridle.conf".source = ../config/hypr/hypridle.conf;
-    ".config/hypr/hyprlock.conf".source = ../config/hypr/hyprlock.conf;
+    ".config/hypr".source = ../config/hypr;
 
     # neofetch config
-    ".config/neofetch/config.conf".source = ../config/neofetch/config.conf;
+    ".config/neofetch".source = ../config/neofetch;
 
     # neovim config
     ".config/nvim".source = ../config/nvim;
@@ -37,15 +34,13 @@
     ".config/tmux".source = ../config/tmux;
 
     # rofi config
-    ".config/rofi/config.rasi".source = ../config/rofi/config.rasi;
+    ".config/rofi".source = ../config/rofi;
 
     # waybar config
-    ".config/waybar/config".source = ../config/waybar/config;
-    ".config/waybar/style.css".source = ../config/waybar/style.css;
+    ".config/waybar".source = ../config/waybar;
 
     # wlogout config
-    ".config/wlogout/layout".source = ../config/wlogout/layout;
-    ".config/wlogout/style.css".source = ../config/wlogout/style.css;
+    ".config/wlogout".source = ../config/wlogout;
 
     # # You can also set the file content immediately.
     # ".gradle/gradle.properties".text = ''
