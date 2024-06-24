@@ -5,3 +5,12 @@ import = [
   # "~/dotfiles/config/alacritty/themes/catppuccin-macchiato.toml"
   "~/dotfiles/config/alacritty/themes/catppuccin-mocha.toml"
 ]
+
+[font]
+size = 9
+builtin_box_drawing = true
+normal = { family = "JetBrains Mono", style = "Regular" }
+bold = { family = "JetBrains Mono", style = "bold" }
+italic = { family = "JetBrains Mono", style = "italic" }
+bold_italic = { family = "JetBrains Mono", style = "bold_italic" }
+
