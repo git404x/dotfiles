@@ -3,12 +3,12 @@
 {
 
   # Enable display manager
-  services.xserver = {
-    enable = true;
-    displayManager = {
-      sddm.enable = true;
-      sddm.package = pkgs.kdePackages.sddm;
-    };
+  services.displayManager = {
+      sddm = {
+        enable = true;
+        wayland.enable = true; # experimental Wayland support
+        package = pkgs.kdePackages.sddm;
+      };
   };
 
   # Enable hyprland and related stuff
