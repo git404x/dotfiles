@@ -1,17 +1,17 @@
 configuration{
     modi: "run,drun,window";
-    icon-theme: "Oranchelo";
+    icon-theme: "Tela-circle";
     show-icons: true;
-    terminal: "kitty";
+    terminal: "alacritty";
     drun-display-format: "{icon} {name}";
     location: 0;
     disable-history: false;
     hide-scrollbar: true;
     display-drun: "   Apps ";
     display-run: "   Run ";
-    display-window: " 﩯  Window";
+    display-window: "  Window";
     display-Network: " 󰤨  Network";
     sidebar-mode: true;
 }
 
-@theme "~/dotfiles/config/rofi/themes/catppuccin-macchiato.rasi"
+@theme "~/dotfiles/config/rofi/themes/catppuccin-mocha.rasi"
