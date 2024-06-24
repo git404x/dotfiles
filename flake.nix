@@ -22,6 +22,7 @@
       name = "Levi"; # name/identifier
       email = "udaybindal@gmail.com"; # email (used for certain configurations)
       dotfilesDir = "~/dotfiles"; # absolute path of the local repo
+      dotfilesDirName = "dotfiles"; # name for dotfiles dir
       
       themeConfig = {
         cursorPkg = pkgs.bibata-cursors;
