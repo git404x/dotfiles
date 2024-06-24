@@ -1,11 +1,5 @@
 { config, pkgs, userConfig, ... }:
 
-let
-
-  pkg-kora-icons = import ./kora-icons.nix { inherit pkgs; };
-
-in
-
 {
 
   # GTK 
@@ -18,9 +12,8 @@ in
     theme.package = userConfig.themeConfig.themePkg;
     theme.name = userConfig.themeConfig.theme;
 
-    iconTheme.package = pkg-kora-icons;
-    iconTheme.name = "kora";
-    # Kora has kora , kora-light , kora-light-panel , kora-pgrey variants
+    iconTheme.package = userConfig.themeConfig.iconPkg;
+    iconTheme.name = userConfig.themeConfig.icon;
 
   };
 

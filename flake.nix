@@ -30,6 +30,9 @@
 
         themePkg = pkgs.adw-gtk3;
         theme = "adw-gtk3-dark";
+
+        iconPkg = pkgs.tela-circle-icon-theme;
+        icon = "Tela-circle";
       };
 
     };
