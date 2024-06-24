@@ -10,42 +10,42 @@
     # ".screenrc".source = dotfiles/screenrc;
     
     # Alacritty config
-    "~/.config/alacritty/alacritty.toml".source = userConfig.dotfilesDirName+"/config/alacritty/alacritty.toml";
+    ".config/alacritty/alacritty.toml".source = ../config/alacritty/alacritty.toml;
 
     # Avizo config
-    "~/.config/avizo/config.ini".source = userConfig.dotfilesDirName+"/config/avizo/config.ini";
+    ".config/avizo/config.ini".source = ../config/avizo/config.ini;
 
     # Dunst notification daemon
-    "~/.config/dunst/dunstrc".source = userConfig.dotfilesDirName+"/config/dunst/dunstrc";
+    ".config/dunst/dunstrc".source = ../config/dunst/dunstrc;
     
     # fastfetch config
-    "~/.config/fastfetch/config.jsonc".source = userConfig.dotfilesDirName+"/config/fastfetch/config.jsonc";
+    ".config/fastfetch/config.jsonc".source = ../config/fastfetch/config.jsonc;
 
     # hypr config
-    "~/.config/hypr/hyprland.conf".source = userConfig.dotfilesDirName+"/config/hypr/hyprland.conf";
-    "~/.config/hypr/hyprpaper".source = userConfig.dotfilesDirName+"/config/hypr/hyprpaper.conf";
-    "~/.config/hypr/hypridle.conf".source = userConfig.dotfilesDirName+"/config/hypr/hypridle.conf";
-    "~/.config/hypr/hyprlock.conf".source = userConfig.dotfilesDirName+"/config/hypr/hyprlock.conf";
+    ".config/hypr/hyprland.conf".source = ../config/hypr/hyprland.conf;
+    ".config/hypr/hyprpaper.conf".source = ../config/hypr/hyprpaper.conf;
+    ".config/hypr/hypridle.conf".source = ../config/hypr/hypridle.conf;
+    ".config/hypr/hyprlock.conf".source = ../config/hypr/hyprlock.conf;
 
     # neofetch config
-    "~/.config/neofetch/config.conf".source = userConfig.dotfilesDirName+"/config/neofetch/config.conf";
+    ".config/neofetch/config.conf".source = ../config/neofetch/config.conf;
 
     # neovim config
-    "~/.config/nvim".source = userConfig.dotfilesDirName+"/config/nvim";
+    ".config/nvim".source = ../config/nvim;
 
     # tmux config 
-    "~/.config/tmux".source = userConfig.dotfilesDirName+"/config/tmux";
+    ".config/tmux".source = ../config/tmux;
 
     # rofi config
-    "~/.config/rofi/config.rasi".source = userConfig.dotfilesDirName+"/config/rofi/config.rasi";
+    ".config/rofi/config.rasi".source = ../config/rofi/config.rasi;
 
     # waybar config
-    "~/.config/waybar/config".source = userConfig.dotfilesDirName+"/config/waybar/config";
-    "~/.config/waybar/style.css".source = userConfig.dotfilesDirName+"/config/waybar/style.css";
+    ".config/waybar/config".source = ../config/waybar/config;
+    ".config/waybar/style.css".source = ../config/waybar/style.css;
 
     # wlogout config
-    "~/.config/wlogout/layout".source = userConfig.dotfilesDirName+"/config/wlogout/layout";
-    "~/.config/wlogout/style.css".source = userConfig.dotfilesDirName+"/config/wlogout/style.css";
+    ".config/wlogout/layout".source = ../config/wlogout/layout;
+    ".config/wlogout/style.css".source = ../config/wlogout/style.css;
 
     # # You can also set the file content immediately.
     # ".gradle/gradle.properties".text = ''
