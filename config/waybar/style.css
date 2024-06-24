@@ -1,5 +1,5 @@
 /* Import color theme */
-@import "~/dotfiles/config/waybar/themes/macchiato.css";
+@import "themes/macchiato.css";
 
 * {
     /*all: initial; Ignore gtk theme*/ 
