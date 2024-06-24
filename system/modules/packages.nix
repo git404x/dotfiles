@@ -33,6 +33,7 @@
     lsd                                # file lister for fish
     starship                           # customizable shell prompt
     fastfetch                          # system information fetch tool
+    imagemagick                        # for custom fetch logo
     krabby                             # display pokemon sprites
     cava                               # cli audio visualizer
     yt-dlp                             # cli utility for yt
