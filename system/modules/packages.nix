@@ -67,6 +67,12 @@
     neovide                            # GUI for neovim
     vscodium                           # ide text editor
 
+  ]) ++ (with pkgs.vscode-extensions; [
+    # vscodium extensions
+    catppuccin.catppuccin-vsc
+    catppuccin.catppuccin-vsc-icons
+    wmaurer.change-case
+
   ]) ++ (with pkgs-unstable; [ 
 
     # pkgs from unstable branch
