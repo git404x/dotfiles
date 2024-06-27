@@ -12,6 +12,9 @@
         yarn
         ripgrep
         rustup
+        cargo
+        cmake
+        nodePackages.nodejs
         nodePackages.npm
         python3
         gnumake
