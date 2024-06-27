@@ -1,76 +1,49 @@
 /* Import color theme */
-@import "themes/macchiato.css";
+@import "themes/mocha.css";
 
 * {
     /*all: initial; Ignore gtk theme*/ 
     border: none;
     border-radius: 2px;
     /* `otf-font-awesome` is required to be installed for icons */
-    font-family: "FantasqueSansM Nerd Font","Roboto", "Helvetica", "Arial", "sans-serif";
+    font-family: "Liberation Sans","Roboto", "Helvetica", "Arial", "sans-serif";
     font-size: 14px;
     min-height: 0;
-    /* opacity: 0.0; */
     /* reference the color by using @color-name */
     color: @text;
 }
 
+/* window module --------------------------------------- */
 window#waybar {
     background-color: @base;
-    border-radius: 8px;
+    border-radius: 9px;
     color: @base;
     transition-property: background-color;
     transition-duration: .4s;
-    /* opacity: 0.9; */
+    opacity: 1;
 }
 
 window#waybar.empty #window {
 	background: transparent;
 }
 
-#tags button  {
-    background-color: @base;
-    /* padding: 3px; */
-    border-radius: 10px;
-    min-width: 20px;
-    color: @flamingo;
-    }
-
-#tags button.occupied  {
-    background-color: @mantle;
-    color: @crust;
-}
-#tags button.focused{
-    background-color: @flamingo; 
-    color: @crust;
-}
-
-
-#window {
-    color: @mauve;
-}
-#workspaces {
-    background-color: @crust;
-    border-radius: 12px;
-    padding: 2px 4px;
-    margin: 3px 3px 3px 3px;
-    background-clip: padding-box;
-}
-
+/* workspaces module ------------------------------------ */
 #workspaces button  {
-    background-color: @crust;
-    padding: 3px;
-    border-radius: 12px;
-    min-width: 20px;
+    padding: 0 1px 0 1px;
+    margin: 0 2px 0 2px;
+    min-width: 12px;
     color: @subtext0;
 }
 
 #workspaces button.focused {
-    color: @text;
+    background-color: @red;
+    color: @teal;
     background: @teal;
-    border-bottom: 3px solid @sky;
+    border: 4px solid @red;
     padding: 0px;
 }
 
+/* 
 #workspaces button.active{
     background-color: @surface1;
     border: 2px solid @mauve;
@@ -80,20 +53,44 @@ window#waybar.empty #window {
     color: @subtext1;
     padding: 3px;
 }
+
+
 #workspaces button.urgent{
     background-color: @red;
     color: @text;
 }
+*/
 
 #workspaces button.hidden{
     background-color: @base; 
     color: @flamingo;
 }
 
-#window {
-    color: @mauve;
+/* App Taskbar ----------------------------------------- */
+#taskbar button {
+    box-shadow: none; 
+	text-shadow: none;
+    border-radius: 9px;
+    margin: 2px; 
+    padding: 2px 3px 2px 3px;
+    animation: tb_normal 20s ease-in-out .5;
 }
 
+#taskbar button.active {
+    background: @overlay2;
+    margin: 2px;
+    padding: 2px 8px 2px 8px;
+    animation: tb_active 20s ease-in-out .5;
+    transition: all 0.4s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+#taskbar button:hover {
+    background: @overlay2;
+    animation: tb_hover 20s ease-in-out .5;
+    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
+}
+
+/* tags button ----------------------------------------- */
 #tags button{
     background-color: @base;
     padding: 3px;
@@ -103,7 +100,8 @@ window#waybar.empty #window {
 }
 
 #tags button.occupied{
-    background-color: @overlay1;
+    background-color: @mantle;
+    color: @crust;
     padding: 3px;
     border-radius: 10px;
     min-width: 20px;
@@ -120,14 +118,13 @@ window#waybar.empty #window {
     color: @colfg;
 }
 
-#window {
-     background: @crust; 
-     padding: 0 10px;
-     margin: 3px 3px 3px 3px;
-     border-radius: 90px;
-     background-clip: padding-box;
-}
+/* ----------------------------------------------------- */
 
+/* Common CSS ------------------------------------------ */
+#window,
+#workspaces,
+#taskbar,
+#custom-nix,
 #battery,
 #clock,
 #cpu,
@@ -139,16 +136,15 @@ window#waybar.empty #window {
 {
   background: @crust; 
   padding: 0 10px;
-  margin: 3px 3px 3px 3px;
+  margin: 4px 2px 4px 2px;
   border-radius: 90px;
   background-clip: padding-box;
 }
+/* ----------------------------------------------------- */
 
+/* Modules Coloring ------------------------------------ */
 #custom-nix {
-   padding-left: 8px;
-   padding-right: 3px;
-   background-color: transparent;
-   color: @sky;
+   color: @teal;
 }
 
 #battery {
@@ -174,3 +170,7 @@ window#waybar.empty #window {
 #pulseaudio {
     color: @yellow;
 }
+#window {
+    color: @sky;
+}
+/* ----------------------------------------------------- */
