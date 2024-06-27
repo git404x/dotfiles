@@ -1,39 +1,50 @@
 {
 
     "layer":"top",
-    // "position": "bottom",
-    "margin-top": 6,
-    "margin-left": 0,
-    "margin-right": 0,
-    // "margin-bottom": 8,
+    "position": "bottom",
+    "height": 35,
+    "mod": "dock",
+    "exclusive": "true",
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "reload_style_on_change": true,
+
+    "margin-top": 2,
+    "margin-left": 9,
+    "margin-right": 9,
+    "margin-bottom": 2,
 
     "modules-left": [
       "custom/nix",
       "hyprland/workspaces",
-      "hyprland/window"
+      "wlr/taskbar",
+      "hyprland/window",
     ],
 
-    "modules-center": ["clock"],
+    "modules-center": [
+      "clock" 
+    ],
 
     "modules-right": [
-      "network",
       "memory",
       "cpu",
       "temperature#cpu",
       "pulseaudio",
       "battery",
+      "network",
       "tray"
     ],
 
     "custom/nix": {
-      "format": "❄️",
-      "on-click": "neofetch"
+      "format": " ",
+      "on-click": "",
+      "icon-size": 25,
     },
 
 
     "temperature#cpu":{
       "format": " {}°C",
-      "interval":5,
+      "interval": 5,
     },
 
     "battery": {
@@ -53,26 +64,27 @@
     },
 
     "clock": {
-      "format": "󰃭 {:%I:%M %p - %a, %d %b}",
-      "interval": 1, 
+      "format": "  {:%I:%M %p  󰃭  %a, %d %b}",
+      "interval": 4, 
     },
     
     "cpu": {
       "interval": 5,
-      "format": "   {}% ",
+      "format": "  {}% ",
       "max-length": 10,
       "icon-size": 25,
     },
 
     "memory": {
       "interval": 5,
-      "format": "  {used:0.1f}G",
+      "format": "  {used:0.1f}G",
+      "tooltip-format": "{used:0.1f}G / {total:0.1f}G",
       "max-length": 10,
     },
 
     "pulseaudio": {
       "format": "{icon} {volume}%",
-      "format-muted": "󰝟",
+      "format-muted": "󰝟 muted",
       "format-bluetooth": "󰂰 {volume}%",
       "on-click": "pavucontrol -t 3",
       "scroll-step": 4,
@@ -81,10 +93,10 @@
         "headphone": " ",
         "hands-free": " ",
         "headset": " ",
-        "phone": "",
-        "portable": "",
-        "car": "",
-        "default": ["", "", "󰕾", "󰕾", "󰕾", " ", " ", " "]
+        "phone": " ",
+        "portable": " ",
+        "car": " ",
+        "default": [" ", " ", "󰕾 ", "󰕾 ", "󰕾 ", "  ", "  ", "  "]
       },
     },
 
@@ -94,28 +106,32 @@
       "format-wifi": "{icon} {essid}",
       "format-icons": ["󰤯 ","󰤟 ","󰤢 ","󰤥 ","󰤨 "],
       "format-ethernet": " 󰈁 {ifname} ",
-      "format-disconnected": "󰤮", //An empty format will hide the module.
-      "format-disconnected": "",
+      "format-disconnected": "󰤮 ", //An empty format will hide the module.
+      "format-disconnected": "󰣼 ",
       "tooltip-format": "{ifname}",
-      "tooltip-format-wifi": "  {essid} ({signalStrength}%)  ",
-      "tooltip-format-ethernet": " 󰈁 {ifname} ",
+      "tooltip-format-wifi": "   {essid} ({signalStrength}%)  ",
+      "tooltip-format-ethernet": "󰈀 {ifname} ",
       "tooltip-format-disconnected": "Disconnected",
       "max-length": 50,
       "interval": 5,
     },
 
-    
-    "wlr/taskbar": {
-      "all-outputs": false,
-      "current-only": true,
-      "format": "{icon}",
-      "icon-size": 9,
-      "icon-theme": "Papirus",
-      "tooltip-format": "{title}",
-      "on-click": "activate",
-      "on-click-middle": "close",
-      "on-click-right": "fullscreen"
-    },
+	"wlr/taskbar": {
+		"format": "{icon}",
+		"rotate": 0,
+		"icon-size": 18,
+		"icon-theme": "Tela-circle",
+        "spacing": 0,
+		"tooltip-format": "{title}",
+		"on-click": "activate",
+		"on-click-middle": "close",
+		"ignore-list": [
+			"Alacritty"
+		],
+		"app_ids-mapping": {
+			"firefoxdeveloperedition": "firefox-developer-edition"
+		}
+	},
 
     "wlr/workspaces": {
       "all-outputs": true,
@@ -143,7 +159,7 @@
    
     "tray": {
       "icon-size": 15,
-      "spacing": 10
+      "spacing": 3
     },
 
 }
