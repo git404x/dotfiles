@@ -35,15 +35,27 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
--- Setup lazy.nvim
-require("lazy").setup({
-  spec = {
-    -- add your plugins here
+local plugins = {
+
+  {
+    "catppuccin/nvim", name = "catppuccin", priority = 1000
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { "habamax" } },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
+
+}
+
+local opts = {}
+
+-- Setup lazy.nvim
+require("lazy").setup(plugins, opts)
+
+-- Setup colorscheme
+require("catppuccin").setup({
+  flavour = "auto", -- latte, frappe, macchiato, mocha
+  background = { -- :h background
+    light = "latte",
+    dark = "mocha",
+  },
 })
 
+-- setup must be called before loading
+vim.cmd("colorscheme catppuccin")
