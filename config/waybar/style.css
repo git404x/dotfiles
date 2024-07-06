@@ -10,8 +10,20 @@
     font-size: 14px;
     min-height: 0;
     /* reference the color by using @color-name */
-    color: @text;
+    /* color: @text; */
 }
+
+/* Tooltip --------------------------------------------- */
+tooltip {
+    background-color: @mantle;
+    color: @crust;
+    border-radius: 9px;
+    border-width: 0px;
+    opacity: 0.95;
+    box-shadow: 1px 1px 1px 1px @surface0;
+}
+
+/* ----------------------------------------------------- */
 
 /* window module --------------------------------------- */
 window#waybar {
@@ -26,45 +38,42 @@ window#waybar {
 window#waybar.empty #window {
 	background: transparent;
 }
+/* ----------------------------------------------------- */
 
 /* workspaces module ------------------------------------ */
 #workspaces button  {
-    padding: 0 1px 0 1px;
-    margin: 0 2px 0 2px;
-    min-width: 12px;
-    color: @subtext0;
+    color: @text;
+    padding: 2px 2px 2px 2px;
+    margin: 2px;
+    min-width: 10px;
+    border-radius: 4px;
 }
 
-#workspaces button.focused {
-    background-color: @red;
-    color: @teal;
-    background: @teal;
-    border: 4px solid @red;
-    padding: 0px;
+#workspaces button:hover {
+    background-color: @surface2;
+    color: @sky;
 }
 
-/* 
 #workspaces button.active{
-    background-color: @surface1;
-    border: 2px solid @mauve;
-    margin: 1px 0 1px 0;
-    border-radius: 12px;
-    background-clip: padding-box;
-    color: @subtext1;
-    padding: 3px;
+    color: @sapphire;
+    background-color: @base;
+    border-bottom: 2px groove @sapphire;
+    padding: 2px;
+    border-radius: 2px;
 }
-
 
 #workspaces button.urgent{
-    background-color: @red;
-    color: @text;
+    background-color: @surface0;
+    color: @red;
+    border-bottom: 2px solid @red;
+    border-radius: 2px;
 }
-*/
 
 #workspaces button.hidden{
     background-color: @base; 
     color: @flamingo;
 }
+/* ----------------------------------------------------- */
 
 /* App Taskbar ----------------------------------------- */
 #taskbar button {
@@ -77,9 +86,11 @@ window#waybar.empty #window {
 }
 
 #taskbar button.active {
-    background: @overlay2;
+    background: @surface0;
     margin: 2px;
     padding: 2px 8px 2px 8px;
+    border-bottom: 2px ridge @sapphire;
+    border-radius: 3px;
     animation: tb_active 20s ease-in-out .5;
     transition: all 0.4s cubic-bezier(.55,-0.68,.48,1.682);
 }
@@ -89,6 +100,21 @@ window#waybar.empty #window {
     animation: tb_hover 20s ease-in-out .5;
     transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
 }
+
+taskbar#waybar.empty {
+	background: transparent;
+}
+/* ----------------------------------------------------- */
+
+/* tray ------------------------------------------------ */
+#tray menu * {
+    min-height: 16px
+}
+
+#tray menu separator {
+    min-height: 10px
+}
+/* ----------------------------------------------------- */
 
 /* tags button ----------------------------------------- */
 #tags button{
@@ -117,7 +143,6 @@ window#waybar.empty #window {
     background-color: @colred;
     color: @colfg;
 }
-
 /* ----------------------------------------------------- */
 
 /* Common CSS ------------------------------------------ */
@@ -158,19 +183,24 @@ window#waybar.empty #window {
 #cpu {
     color: @sapphire;
 }
+
 #temperature.cpu {
     color: @red;
 }
+
 #memory {
     color: @mauve; 
 }
+
 #network {
     color: @rosewater; 
 }
+
 #pulseaudio {
     color: @yellow;
 }
+
 #window {
-    color: @sky;
+    color: @rosewater;
 }
 /* ----------------------------------------------------- */
