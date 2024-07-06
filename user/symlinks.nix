@@ -24,15 +24,6 @@
     # hypr config
     ".config/hypr".source = ../config/hypr;
 
-    # neofetch config
-    ".config/neofetch".source = ../config/neofetch;
-
-    # neovim config
-    ".config/nvim".source = ../config/nvim;
-
-    # tmux config 
-    ".config/tmux".source = ../config/tmux;
-
     # rofi config
     ".config/rofi".source = ../config/rofi;
 
