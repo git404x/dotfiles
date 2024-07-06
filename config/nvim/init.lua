@@ -40,6 +40,13 @@ local plugins = {
   {
     "catppuccin/nvim", name = "catppuccin", priority = 1000
   },
+  {
+    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+    dependencies = { 'nvim-lua/plenary.nvim' }
+  },
+  {
+    "nvim-treesitter/nvim-treesitter", build= ":TSUpdate"
+  },
 
 }
 
@@ -59,3 +66,16 @@ require("catppuccin").setup({
 
 -- setup must be called before loading
 vim.cmd("colorscheme catppuccin")
+
+-- Setup telescope.builtin
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+
+-- Setup treesitter
+local config = require("nvim-treesitter.configs")
+config.setup({
+  ensure_installed = {"lua", "javascript", "json", "css", "html"},
+  highlight = { enable = true },
+  indent = { enable = true }
+})
