@@ -8,6 +8,8 @@ return {
   },
   config = function()
     -- setup neo-tree.nvim
-    vim.keymap.set('n', '<leader>n', ':Neotree filesystem reveal left<CR>', {})
+    local keymap = vim.keymap -- for conciseness
+
+    keymap.set("n", "<leader>ee", ":Neotree source=filesystem toggle position=left<CR>", { desc = "Toggle file explorer" }) -- toggle file explorer
   end,
 }
