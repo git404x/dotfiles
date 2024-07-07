@@ -1,5 +1,5 @@
   let
-    nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-24.05";
+    nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
     pkgs = import nixpkgs { config = {}; overlays = []; };
 
   in
@@ -9,6 +9,7 @@
         cowsay
         lolcat
         libgcc
+        gcc
         yarn
         ripgrep
         rustup

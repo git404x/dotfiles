@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, ... }:
+{ config, pkgs, pkgs-stable, ... }:
 
 {
 
@@ -69,6 +69,12 @@
     slurp                              # region select for screenshot/screenshare
     swappy                             # screenshot editor
     cliphist                           # clipboard manager
+    wl-clipboard                       # clipboard 
+    wl-clip-persist                    # clipboard-persist
+    hyprpaper                          # wallpaper daemon
+    hyprlock                           # lock utility
+    hypridle                           # idle utility
+    hyprcursor                         # cursor
 
     # Display Manager -------------------------------------------------- #
     greetd.greetd                      # login manager daemon
@@ -76,7 +82,7 @@
 
     # Dependencies ----------------------------------------------------- #
     polkit_gnome                       # authentication agent
-    gnome.gnome-keyring                # store pass, keys, etc
+    gnome-keyring                      # store pass, keys, etc
     xdg-desktop-portal-hyprland        # xdg desktop portal for hyprland
     xdg-desktop-portal-gtk             # xdg desktop portal for gtk
     parallel                           # for parallel processing
@@ -95,16 +101,9 @@
     kdePackages.qtwayland              # wayland support in qt6
     adw-gtk3                           # adwaita gtk3 theme
 
-  ]) ++ (with pkgs-unstable; [
+  ]) ++ (with pkgs-stable; [
 
-    # pkgs from unstable branch
-    hyprpaper
-    hyprlock
-    hypridle
-    hyprcursor
-
-    wl-clipboard
-    wl-clip-persist
+    # pkgs from stable branch
 
   ]);
 
