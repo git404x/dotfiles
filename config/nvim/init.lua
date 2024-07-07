@@ -47,6 +47,15 @@ local plugins = {
   {
     "nvim-treesitter/nvim-treesitter", build= ":TSUpdate"
   },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    }
+  },
 
 }
 
@@ -66,6 +75,9 @@ require("catppuccin").setup({
 
 -- setup must be called before loading
 vim.cmd("colorscheme catppuccin")
+
+-- setup neo-tree.nvim
+vim.keymap.set('n', '<leader>n', ':Neotree filesystem reveal left<CR>', {})
 
 -- Setup telescope.builtin
 local builtin = require('telescope.builtin')
