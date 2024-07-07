@@ -17,7 +17,7 @@
       ./hardware/kernel.nix
       ./hardware/services.nix
       ./hardware/sound.nix
-      ./hardware/opengl.nix
+      ./hardware/graphic.nix
       ./hardware/time.nix
 
       # Other Nix Modules

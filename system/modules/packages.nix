@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgs-unstable, ... }:
+{ config, lib, pkgs, pkgs-stable, ... }:
 
 {
 
@@ -17,7 +17,6 @@
     usbtop
     neofetch
     nix-index
-    nix-universal-prefetch
     nix-prefetch-git
     zip
     unzip
@@ -73,10 +72,10 @@
     catppuccin.catppuccin-vsc-icons
     wmaurer.change-case
 
-  ]) ++ (with pkgs-unstable; [ 
+  ]) ++ (with pkgs-stable; [
 
-    # pkgs from unstable branch
-    
+    # pkgs from stable branch
+
   ]);
 
 }
