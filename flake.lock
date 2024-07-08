@@ -386,6 +386,19 @@
         "type": "github"
       }
     },
+    "private-stuff": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1720436438,
+        "narHash": "sha256-l0tIRIzdUz3UGpwodByRz4ZpYPe5LD6qEmZ9ldCn0Es=",
+        "path": "/home/itz_levi_404/dotfiles/.private",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/itz_levi_404/dotfiles/.private",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "chaotic": "chaotic",
@@ -393,7 +406,8 @@
         "home-manager-stable": "home-manager-stable",
         "hyprland": "hyprland",
         "nixpkgs": "nixpkgs_3",
-        "nixpkgs-stable": "nixpkgs-stable"
+        "nixpkgs-stable": "nixpkgs-stable",
+        "private-stuff": "private-stuff"
       }
     },
     "systems": {
