@@ -8,6 +8,7 @@
               chaotic,
               home-manager,
               home-manager-stable,
+              private-stuff,
               hyprland,
               ...
             }@inputs:
@@ -108,6 +109,7 @@
         };
         modules = [
           ./user/home.nix
+          "${private-stuff}/userdata.nix" # pvt stuff
           hyprland.homeManagerModules.default # hyprland hm module
         ];
       };
@@ -134,6 +136,11 @@
     };
 
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+
+    private-stuff = {
+        url = "path:/home/itz_levi_404/dotfiles/.private";
+        flake = false;
+    };
 
   };
 
