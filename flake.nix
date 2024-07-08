@@ -1,7 +1,16 @@
 {
   description = "Levi's nixos configuration";
 
-  outputs = { self, nixpkgs, nixpkgs-stable, chaotic, home-manager, home-manager-unstable, ... }@inputs:
+  outputs = {
+              self,
+              nixpkgs,
+              nixpkgs-stable,
+              chaotic,
+              home-manager,
+              home-manager-stable,
+              hyprland,
+              ...
+            }@inputs:
   
   let
 
@@ -39,24 +48,51 @@
 
     system = systemConfig.system;
     lib = nixpkgs.lib;
-    pkgs = nixpkgs.legacyPackages.${system};
-    pkgs-stable = nixpkgs-stable.legacyPackages.${system};
-  
-  in 
 
+    # from nixpkgs channel
+    pkgs = import nixpkgs {
+      inherit system;
+      config = {
+        allowUnfree = true;
+      };
+    };
+    # from nixpkgs-stable channel
+    pkgs-stable = import nixpkgs-stable {
+      inherit system;
+      config = {
+        allowUnfree = true;
+      };
+    };
+
+  in
   {
-    nixosConfigurations = {
+
+    nixosConfigurations =
+
+    let
+      systemModules = [
+        # define nix modules
+        ./system/configuration.nix # Your system configuration.
+        chaotic.nixosModules.default # chaotic default module
+        {
+          nixpkgs.overlays = [
+            # example.overlay
+            # inputs.example-overlay.overlay
+          ];
+        }
+      ];
+    in
+    {
       ${systemConfig.hostname} = lib.nixosSystem {
         inherit system;
         specialArgs = {
-        inherit pkgs-stable;
-        inherit systemConfig;
-        inherit userConfig;
-        inherit inputs;
+          inherit pkgs-stable;
+          inherit systemConfig;
+          inherit userConfig;
+          inherit inputs;
         };
-        modules = [
-          ./system/configuration.nix # Your system configuration.
-          chaotic.nixosModules.default # OUR DEFAULT MODULE
+        modules = systemModules ++ [
+          # ./system/hardware/hardware-configuration.nix # other nix modules
         ];
       };
     };
@@ -65,13 +101,14 @@
       ${userConfig.username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         extraSpecialArgs = {
-        inherit pkgs-stable;
-        inherit systemConfig;
-        inherit userConfig;
-        inherit inputs;
+          inherit pkgs-stable;
+          inherit systemConfig;
+          inherit userConfig;
+          inherit inputs;
         };
         modules = [
           ./user/home.nix
+          hyprland.homeManagerModules.default # hyprland hm module
         ];
       };
     };
@@ -85,16 +122,18 @@
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/master";
       # home-manager follows nixpkgs channel
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-24.05";
+      # home-manager follows nixpkgs-stable channel
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
-    home-manager-unstable = {
-      url = "github:nix-community/home-manager/master";
-      # home-manager follows nixpkgs-unstable channel
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
 
   };
 
