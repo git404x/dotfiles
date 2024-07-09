@@ -62,9 +62,18 @@
     mpv                                # media player
     imv                                # image viewer
     firefox-wayland                    # browser
+    vscodium                           # ide text editor
     neovim                             # terminal text editor
     neovide                            # GUI for neovim
-    vscodium                           # ide text editor
+
+    # nvim dependencies ------------------------------------------------ #
+    ripgrep                            # search with regex pattern
+    nodePackages.nodejs                # framework for JS engine
+    python3                            # python3
+    stylua                             # lua formatter for nvim
+    lua-language-server                # lua lsp
+    gcc                                # GNU compiler collection
+    gnumake                            # make system
 
   ]) ++ (with pkgs.vscode-extensions; [
     # vscodium extensions
