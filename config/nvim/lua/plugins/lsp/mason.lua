@@ -14,6 +14,10 @@ return {
     -- import mason_tool_installer
     local mason_tool_installer = require("mason-tool-installer")
 
+    -- mason keymap
+    vim.keymap.set("n", "<leader>ms", ":Mason<CR>", { desc = "open mason" })
+    vim.keymap.set("n", "<leader>ml", ":MasonLog<CR>", { desc = "open mason logs" })
+
     -- enable mason and configure icons
     mason.setup({
       ui = {

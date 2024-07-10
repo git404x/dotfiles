@@ -40,3 +40,6 @@ require("lazy").setup({
     notify = false,
   },
 })
+
+-- lazy keymap
+vim.keymap.set("n", "<leader>lz", ":Lazy<CR>", { desc = "Open Lazy pkg manager" })

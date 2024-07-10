@@ -6,8 +6,17 @@ local keymap = vim.keymap -- for conciseness
 
 -- General Keymaps -------------------
 
--- use jk to exit insert mode
-keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
+-- basic navigation
+keymap.set("i", "<C-b>", "<ESC>^i", { desc = "Beginning of line" })
+keymap.set("i", "<C-e>", "<End>", { desc = "End of line" })
+keymap.set("i", "<C-h>", "<Left>", { desc = "Move left" })
+keymap.set("i", "<C-l>", "<Right>", { desc = "Move right" })
+keymap.set("i", "<C-j>", "<Down>", { desc = "Move down" })
+keymap.set("i", "<C-k>", "<Up>", { desc = "Move up" })
+
+-- exit insert mode or file
+keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode" })
+keymap.set("n", "<leader>qq", ":q!<CR>", { desc = "Exit" })
 
 -- clear search highlights
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
