@@ -7,7 +7,11 @@ return {
       char = "│",
       tab_char = "│",
     },
-    scope = { enabled = true },
+    scope = {
+      enabled = true,
+      char = "│",
+      highlight = "Comment"
+    },
     exclude = {
       filetypes = {
         "help",

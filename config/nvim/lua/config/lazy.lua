@@ -39,6 +39,14 @@ require("lazy").setup({
   change_detection = {
     notify = false,
   },
+  ui = {
+    icons = {
+      ft = " ",
+      lazy = "󰂠 ",
+      loaded = " ",
+      not_loaded = "󰄰 ",
+    },
+  },
 })
 
 -- lazy keymap
