@@ -22,6 +22,7 @@
     unzip
     unrar 
     fzf
+    android-tools
 
     # Shell ------------------------------------------------------------ #
     git                                # version control
@@ -59,12 +60,16 @@
     onlyoffice-bin                     # office
     obs-studio                         # screen rec
     alacritty                          # terminal
+    ranger                             # TUI file manager
     mpv                                # media player
     imv                                # image viewer
     firefox-wayland                    # browser
+    motrix                             # Download manager
+    stremio                            # binge
     vscodium                           # ide text editor
     neovim                             # terminal text editor
     neovide                            # GUI for neovim
+    lazygit                            # TUI git tool
 
     # nvim dependencies ------------------------------------------------ #
     ripgrep                            # search with regex pattern
