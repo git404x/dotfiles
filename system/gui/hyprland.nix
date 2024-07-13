@@ -53,8 +53,7 @@
     # Window Manager --------------------------------------------------- #
     hyprland                           # wlroots-based wayland compositor
     xwayland                           # interface X11 apps with Wayland protocol
-    cinnamon.nemo                      # file manager
-    kdePackages.ark                    # kde file archiver
+    cinnamon.nemo-with-extensions      # file manager
     dunst                              # notification daemon
     rofi-wayland                       # application launcher
     waybar                             # system bar

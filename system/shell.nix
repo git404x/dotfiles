@@ -6,7 +6,7 @@
 
     pkgs.mkShellNoCC { 
       packages = with pkgs; [
-        cowsay
+        figlet
         lolcat
         libgcc
         gcc
@@ -21,10 +21,10 @@
         gnumake
       ];
 
-    GREETING = "Welcome to shell env !";
+    GREETING = "shell env !";
 
     shellHook = ''
-      echo $GREETING | cowsay | lolcat
+      echo $GREETING | figlet | lolcat
     '';
 
     }
