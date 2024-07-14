@@ -2,30 +2,10 @@
 
 {
 
-  # Enable display manager
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command =
-          let
-            session = config.services.displayManager.sessionData.desktops;
-          in
-            "${pkgs.greetd.tuigreet}/bin/tuigreet -t -s ${session}/share/xsessions:${session}/share/wayland-sessions";
-      };
-    };
-  };
-
   # Enable hyprland and related stuff
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-  };
-
-  # Dbus
-  services.dbus = {
-    enable = true;
-    packages = [ pkgs.dconf ];
   };
 
   # security
@@ -74,10 +54,6 @@
     hyprlock                           # lock utility
     hypridle                           # idle utility
     hyprcursor                         # cursor
-
-    # Display Manager -------------------------------------------------- #
-    greetd.greetd                      # login manager daemon
-    greetd.tuigreet                    # Graphical console greeter for greetd
 
     # Dependencies ----------------------------------------------------- #
     polkit_gnome                       # authentication agent

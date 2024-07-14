@@ -64,6 +64,7 @@
     mpv                                # media player
     imv                                # image viewer
     firefox-wayland                    # browser
+    librewolf                          # browser2
     motrix                             # Download manager
     stremio                            # binge
     vscodium                           # ide text editor
