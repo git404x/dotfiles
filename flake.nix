@@ -28,9 +28,14 @@
 
     # ----- USER Configuration ----- #
     userConfig = {
+
+      # users
       username = "itz_levi_404"; # username
-      name = "Levi"; # name/identifier
-      email = "exmaple@gmail.com"; # email (used for certain configurations)
+      name = "Levi Ackerman"; # name/identifier
+
+      username2 = "error"; 
+      name2 = "iTZ_ERROR_404";
+
       dotfilesDir = "~/dotfiles"; # absolute path of the local repo
       dotfilesDirName = "dotfiles"; # name for dotfiles dir
       
