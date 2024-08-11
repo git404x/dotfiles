@@ -34,40 +34,38 @@ let
 in
 
 {
-  programs.zsh = {
-    enable = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    enableCompletion = true;
-    shellAliases = shAliases;
-
-    history.size = 10000;
-
-    oh-my-zsh = {
+  programs= {
+    fish = {
       enable = true;
-      plugins = [ "git" "sudo" ];
-      theme = "agnoster";
-      # agnoster , af-magic , arrow , bira , refined are some good themes 
+      shellAliases = shAliases;
+    };
+
+    bash = {
+      enable = true;
+      enableCompletion = true;
+      shellAliases = shAliases;
+    };
+
+    starship = {
+      enable = true;
+      settings = {
+        add_newline = true;
+        line_break.disabled = true;
+      };
+    };
+
+    direnv = {
+      enable = true;
+      enableFishIntegration = true;
+      nix-direnv.enable = true;
     };
   };
 
-  programs.bash = {
-    enable = true;
-    enableCompletion = true;
-    shellAliases = shAliases;
-  };
-
   home.packages = with pkgs; [
-    disfetch lolcat cowsay onefetch
+    nitch disfetch onefetch
     gnugrep gnused
     bat eza bottom fd bc
     direnv nix-direnv
   ];
-
-  programs.direnv = { 
-    enable = true;
-    enableZshIntegration = true;
-    nix-direnv.enable = true;
-  };
 
 }

@@ -1,0 +1,16 @@
+[Added Associations]
+application/pdf=firefox.desktop;
+image/webp=imv.desktop;
+text/plain=userapp-nvim-LME4P2.desktop;neovide.desktop;
+video/x-matroska=mpv-4.desktop;mpv-3.desktop;mpv-2.desktop;
+x-scheme-handler/tg=org.telegram.desktop.desktop;
+
+[Default Applications]
+application/pdf=firefox.desktop
+image/webp=imv.desktop
+text/plain=neovide.desktop
+video/x-matroska=mpv-4.desktop;
+x-scheme-handler/tg=org.telegram.desktop.desktop
+
+[Removed Associations]
+text/plain=userapp-nano-YN0YO2.desktop;userapp-vim-OF7EP2.desktop;
