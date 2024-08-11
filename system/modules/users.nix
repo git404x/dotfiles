@@ -23,9 +23,9 @@
     ];
   };
 
-  # zsh
-  users.defaultUserShell = pkgs.zsh;
-  programs.zsh.enable = true;
+  # fish
+  users.defaultUserShell = pkgs.fish;
+  programs.fish.enable = true;
 
   # Change runtime directory size
   services.logind.extraConfig = "RuntimeDirectorySize=8G";
