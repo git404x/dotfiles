@@ -15,12 +15,15 @@ vt = 1
 [greeter]
 command = "tuigreet"
 
+#[session]
+#command = "tuigreet"
+
 # Initial session
 [initial_session]
-command = "dbus-run-session startplasma"
+command = "tuigreet"
 user = "greeter"
 
 # The default session, also known as the greeter.
 [default_session]
-command = "dbus-run-session startplasma"
+command = "tuigreet"
 user = "greeter"
