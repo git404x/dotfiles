@@ -3,27 +3,20 @@
 # designating the VT.
 vt = 1
 
-# `agreety` is the bundled agetty/login-lookalike. You can replace `/bin/sh`
-# with whatever you want started, such as `sway`.
-# command = "agreety --cmd /bin/sh"
-
 # The user to run the command as. The privileges this user must have depends
 # on the greeter. A graphical greeter may for example require the user to be
 # in the `video` group.
 # user = "greeter"
 
 [greeter]
-command = "tuigreet"
-
-#[session]
-#command = "tuigreet"
+command = "tuigreet -t -s /usr/share/xsessions:/usr/share/wayland-sessions"
 
 # Initial session
 [initial_session]
-command = "tuigreet"
 user = "greeter"
+command = "tuigreet -t -s /usr/share/xsessions:/usr/share/wayland-sessions"
 
 # The default session, also known as the greeter.
 [default_session]
-command = "tuigreet"
 user = "greeter"
+command = "tuigreet -t -s /usr/share/xsessions:/usr/share/wayland-sessions"
