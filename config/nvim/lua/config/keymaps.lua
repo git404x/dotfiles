@@ -14,6 +14,15 @@ keymap.set("i", "<C-l>", "<Right>", { desc = "Move right" })
 keymap.set("i", "<C-j>", "<Down>", { desc = "Move down" })
 keymap.set("i", "<C-k>", "<Up>", { desc = "Move up" })
 
+-- Better Pane Switching
+keymap.set("n", "<leader>j", "<C-w>j")
+keymap.set("n", "<leader>k", "<C-w>k")
+keymap.set("n", "<leader>h", "<C-w>h")
+keymap.set("n", "<leader>l", "<C-w>l")
+
+-- Close Current Pane Easily
+keymap.set("n", "<A-x>", ":bdelete<CR>")
+
 -- exit insert mode or file
 keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode" })
 keymap.set("n", "<leader>qq", ":q!<CR>", { desc = "Exit" })
@@ -34,6 +43,7 @@ keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" }) 
 keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" }) -- close current split window
 
+-- tab management
 keymap.set("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
 keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" }) -- close current tab
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab

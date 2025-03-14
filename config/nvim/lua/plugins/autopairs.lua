@@ -3,10 +3,12 @@ return {
   event = { "InsertEnter" },
   dependencies = {
     "hrsh7th/nvim-cmp",
+    "windwp/nvim-ts-autotag",
   },
   config = function()
     -- import nvim-autopairs
     local autopairs = require("nvim-autopairs")
+    local ts_autotag = require("nvim-ts-autotag")
 
     -- configure autopairs
     autopairs.setup({
@@ -18,6 +20,22 @@ return {
       },
     })
 
+    ts_autotag.setup({
+      opts = {
+        -- Defaults
+        enable_close = true, -- Auto close tags
+        enable_rename = true, -- Auto rename pairs of tags
+        enable_close_on_slash = false -- Auto close on trailing </
+      },
+      -- Also override individual filetype configs, these take priority.
+      -- Empty by default, useful if one of the "opts" global settings
+      -- doesn't work well in a specific filetype
+      per_filetype = {
+        ["html"] = {
+          enable_close = false
+        }
+      }
+    })
     -- import nvim-autopairs completion functionality
     local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 

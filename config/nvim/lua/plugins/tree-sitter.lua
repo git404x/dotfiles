@@ -1,9 +1,10 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPre", "BufNewFile" },
-  build= ":TSUpdate",
+  build = ":TSUpdate",
   dependencies = {
     "windwp/nvim-ts-autotag",
+    "hiphish/rainbow-delimiters.nvim",
   },
   config = function()
     -- import nvim-treesitter plugin
@@ -11,32 +12,35 @@ return {
 
     -- configure treesitter
     treesitter.setup({
-      highlight = { enable = true }, -- enable syntax highlighting
+      highlight = {
+        enable = true, -- enable syntax highlighting
+        additional_vim_regex_highlighting = false,
+      },
       indent = { enable = true }, -- enable indentation
       autotag = { enable = true }, -- enable autotagging (w/ nvim-ts-autotag plugin)
 
       -- ensure these language parsers are installed
       ensure_installed = {
-        "lua",
-        "vim",
-        "json",
-        "javascript",
-        "typescript",
-        "tsx",
-        "yaml",
-        "html",
-        "css",
-        "prisma",
-        "markdown",
-        "markdown_inline",
-        "svelte",
-        "graphql",
         "bash",
+        "c",
+        "css",
         "dockerfile",
         "gitignore",
+        "graphql",
+        "html",
+        "javascript",
+        "json",
+        "lua",
+        "markdown",
+        "markdown_inline",
+        "prisma",
         "query",
+        "svelte",
+        "tsx",
+        "typescript",
+        "vim",
         "vimdoc",
-        "c",
+        "yaml",
       },
 
       incremental_selection = {
@@ -48,7 +52,6 @@ return {
           node_decremental = "<bs>",
         },
       },
-
     })
   end,
 }

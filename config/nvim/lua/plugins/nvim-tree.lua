@@ -1,9 +1,10 @@
 return {
   "nvim-tree/nvim-tree.lua",
-  cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeFindFileToggle" },
+  -- cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeFindFileToggle" },
   dependencies = {
     "nvim-tree/nvim-web-devicons"
   },
+  lazy = false,
   config = function()
     local nvimtree = require("nvim-tree")
 
@@ -16,6 +17,14 @@ return {
         width = 35,
         relativenumber = true,
       },
+
+      hijack_cursor = true,
+      disable_netrw = true,
+      select_prompts = true,
+      notify = {
+        threshold = vim.log.levels.ERROR,
+      },
+
       -- change folder arrow icons
       renderer = {
         indent_markers = {
@@ -35,13 +44,21 @@ return {
       actions = {
         open_file = {
           window_picker = { enable = false },
+          quit_on_open = true,
         },
-      },
-      filters = {
-        custom = { ".DS_Store" },
       },
       git = {
         ignore = false,
+      },
+      diagnostics = {
+        enable = true,
+        show_on_dirs = true,
+        icons = {
+          hint = '󰠠 ',
+          info = ' '  ,
+          warning = ' ',
+          error = ' ',
+        }
       },
     })
 

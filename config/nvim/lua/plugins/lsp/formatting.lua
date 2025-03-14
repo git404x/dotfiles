@@ -28,6 +28,15 @@ return {
       },
     })
 
+    -- auto format on buffer write
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      pattern = "*",
+      callback = function(args)
+        conform.format({ bufnr = args.buf })
+      end,
+    })
+
+    -- keymap to format file
     vim.keymap.set({ "n", "v" }, "<leader>mp", function()
       conform.format({
         lsp_fallback = true,
