@@ -21,7 +21,15 @@ return {
   {
     "NvChad/nvim-colorizer.lua",
     event = { "BufReadPre", "BufNewFile" },
-    config = true,
+    config = function()
+      local colorizer = require("colorizer")
+      colorizer.setup({
+        -- execute colorizer ASAP
+        vim.defer_fn(function()
+          colorizer.attach_to_buffer(0)
+        end, 0)
+      })
+    end,
   },
 
   -- nvim-surround

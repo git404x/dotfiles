@@ -32,7 +32,15 @@ return {
     vim.api.nvim_create_autocmd("BufWritePre", {
       pattern = "*",
       callback = function(args)
-        conform.format({ bufnr = args.buf })
+        -- Use vim.schedule to ensure conform is called correctly
+        vim.schedule(function()
+          local success, err = pcall(function()
+            conform.format({ bufnr = args.buf })
+          end)
+          if not success then
+            print("Error formatting buffer: " .. err)
+          end
+        end)
       end,
     })
 

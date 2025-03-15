@@ -1,10 +1,12 @@
 return {
   "williamboman/mason.nvim",
   dependencies = {
-    "williamboman/mason-lspconfig.nvim",
+    "williamboman/mason-lspconfig.nvim", -- Ensure this is loaded after mason
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    "neovim/nvim-lspconfig",
+    "neovim/nvim-lspconfig", -- This will be loaded later
   },
+  event = { "BufReadPre", "BufNewFile" },
+  lazy = false,
   config = function()
     -- import mason
     local mason = require("mason")
@@ -15,9 +17,10 @@ return {
     -- import mason_tool_installer
     local mason_tool_installer = require("mason-tool-installer")
 
+    local keymap = vim.keymap
     -- mason keymap
-    vim.keymap.set("n", "<leader>ms", ":Mason<CR>", { desc = "open mason" })
-    vim.keymap.set("n", "<leader>ml", ":MasonLog<CR>", { desc = "open mason logs" })
+    keymap.set("n", "<leader>ms", ":Mason<CR>", { desc = "open mason" })
+    keymap.set("n", "<leader>ml", ":MasonLog<CR>", { desc = "open mason logs" })
 
     -- enable mason and configure icons
     mason.setup({
