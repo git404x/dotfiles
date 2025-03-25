@@ -26,6 +26,8 @@
 
     # Shell ------------------------------------------------------------ #
     git                                # version control
+    gh                                 # github cli
+    glab                               # gitlab cli
     zsh                                # the z shell
     eza                                # file lister for zsh
     oh-my-zsh                          # plugin manager for zsh
@@ -49,6 +51,7 @@
     libinput-gestures                  # Gesture mapper for libinput
 
     brightnessctl                      # screen brightness control
+    udisks                             # disk utility
     udiskie                            # manage removable media
     gparted                            # partition manager
 
@@ -67,6 +70,7 @@
     librewolf                          # browser2
     motrix                             # Download manager
     stremio                            # binge
+    ani-cli                            # anime cli
     vscodium                           # ide text editor
     neovim                             # terminal text editor
     neovide                            # GUI for neovim
