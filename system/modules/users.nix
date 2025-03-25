@@ -10,7 +10,6 @@
     extraGroups = [ "wheel" "networkmanager" "input"  "video" "audio" "adbusers" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       tdesktop
-      ani-cli
     ];
   };
 

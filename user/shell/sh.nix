@@ -20,8 +20,14 @@ let
     ".5" = "cd ../../../../..";
 
     # others
+    info = "fastfetch";
+    fetch = "fastfetch";
+    neofetch = "fastfetch";
+
+    # nix related
     flake-update = "nix flake update";
     nix-switch = "sudo nixos-rebuild switch --flake ${userConfig.dotfilesDir}";
+    nix-switch-impure = "sudo nixos-rebuild switch --flake ${userConfig.dotfilesDir} --show-trace --impure --option --eval-cache false";
     home-switch = "home-manager switch --flake ${userConfig.dotfilesDir}";
   };
 
@@ -36,12 +42,12 @@ in
     shellAliases = shAliases;
 
     history.size = 10000;
-    # history.path = "${config.xdg.dataHome}/zsh/history";
 
     oh-my-zsh = {
       enable = true;
       plugins = [ "git" "sudo" ];
       theme = "agnoster";
+      # agnoster , af-magic , arrow , bira , refined are some good themes 
     };
   };
 
