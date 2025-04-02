@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 
 {
-
   # Enable display manager
   services.greetd = {
     enable = true;
@@ -16,26 +15,10 @@
     };
   };
 
-  # Dbus
-  services.dbus = {
-    enable = true;
-    packages = [ pkgs.dconf ];
-  };
-
-  # gvfs
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs;
-  };
-
   # systemPackages
   environment.systemPackages = with pkgs; [
-    # list of services
-
     # Display Manager -------------------------------------------------- #
     greetd.greetd                      # login manager daemon
     greetd.tuigreet                    # Graphical console greeter for greetd
-
   ];
-
 }

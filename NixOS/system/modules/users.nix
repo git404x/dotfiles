@@ -1,5 +1,8 @@
 { pkgs, userConfig, ... }:
 
+let
+  shellName = userConfig.shell;
+in
 {
   
   # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -23,9 +26,9 @@
     ];
   };
 
-  # fish
-  users.defaultUserShell = pkgs.fish;
-  programs.fish.enable = true;
+  # shell
+  programs.${shellName}.enable = true;
+  users.defaultUserShell = pkgs.${shellName};
 
   # Change runtime directory size
   services.logind.extraConfig = "RuntimeDirectorySize=8G";

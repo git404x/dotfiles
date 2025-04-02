@@ -1,6 +1,23 @@
-{ config, lib, pkgs, pkgs-stable, ... }:
-
 {
+  inputs,
+  config,
+  lib,
+  pkgs,
+  pkgs-stable,
+  systemConfig,
+  ...
+}:
+
+let
+  system = systemConfig.system;
+  zen-browser = inputs.zen-browser.packages."${system}".default;
+in
+{
+
+  # user pkgs
+  programs = {
+    adb.enable = true;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -8,7 +25,7 @@
   environment.systemPackages = (with pkgs; [
 
     # CLI Tools / Dependencies ----------------------------------------- #
-    vim 
+    vim
     tree
     wget
     axel
@@ -20,7 +37,7 @@
     nix-prefetch-git
     zip
     unzip
-    unrar 
+    unrar
     fzf
     android-tools
 
@@ -44,19 +61,10 @@
     tmux                               # terminal multiplexer
 
     # System stuff ----------------------------------------------------- #
-    networkmanager                     # network manager
-    networkmanagerapplet               # nm-applet
-
-    libinput                           # input devices in Wayland compositors
-    libinput-gestures                  # Gesture mapper for libinput
-
     brightnessctl                      # screen brightness control
     udisks                             # disk utility
     udiskie                            # manage removable media
-    gvfs                               # virtual filesystem
-    gnome.gvfs                         # virtual filesystem (full gnome)
     gparted                            # partition manager
-
     usbutils                           # tools for usb
     pciutils                           # tools for pci
 
@@ -75,7 +83,8 @@
     ranger                             # TUI file manager
     mpv                                # media player
     imv                                # image viewer
-    firefox-wayland                    # browser
+    firefox                            # browser
+    zen-browser                        # firefox fork
     librewolf                          # browser2
     motrix                             # Download manager
     stremio                            # binge
@@ -84,10 +93,12 @@
     neovim                             # terminal text editor
     neovide                            # GUI for neovim
     lazygit                            # TUI git tool
+    telegram-desktop                   # telegram
 
     # nvim dependencies ------------------------------------------------ #
     ripgrep                            # search with regex pattern
     nodePackages.nodejs                # framework for JS engine
+    nodePackages.npm                   # npm
     python3                            # python3
     stylua                             # lua formatter for nvim
     lua-language-server                # lua lsp

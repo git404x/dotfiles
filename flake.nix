@@ -7,7 +7,6 @@
               nixpkgs-stable,
               chaotic,
               home-manager,
-              home-manager-stable,
               hyprland,
               ...
             }@inputs:
@@ -27,6 +26,9 @@
 
     # ----- USER Configuration ----- #
     userConfig = {
+
+      # Shell
+      shell = "fish";
 
       # users
       username = "levi"; # username
@@ -75,11 +77,12 @@
     nixosConfigurations =
 
     let
+
       systemModules = [
         # define nix modules
-        ./system/configuration.nix # Your system configuration.
-        chaotic.nixosModules.default # chaotic default module
-        inputs.flake-programs-sqlite.nixosModules.programs-sqlite
+        ./NixOS/system/configuration.nix
+        chaotic.nixosModules.default
+        inputs.programs-db.nixosModules.programs-sqlite
         {
           nixpkgs.overlays = [
             # example.overlay
@@ -87,39 +90,45 @@
           ];
         }
       ];
+
+      specialArgs = {
+        inherit pkgs-stable;
+        inherit systemConfig;
+        inherit userConfig;
+        inherit inputs;
+      };
+
     in
     {
       ${systemConfig.hostname} = lib.nixosSystem {
         inherit system;
-        specialArgs = {
-          inherit pkgs-stable;
-          inherit systemConfig;
-          inherit userConfig;
-          inherit inputs;
-        };
+        specialArgs = specialArgs;
         modules = systemModules ++ [
-          ./system/modules/zen-browser.nix
-          # ./system/hardware/hardware-configuration.nix # other nix modules
+          ./NixOS/system/hardware-configuration.nix
         ];
       };
     };
 
-    homeConfigurations = {
+    homeConfigurations =
+    let
+      userModules = [
+        # user nix modules
+        ./NixOS/user/home.nix
+      ];
+      extraSpecialArgs = {
+        inherit pkgs-stable;
+        inherit systemConfig;
+        inherit userConfig;
+        inherit inputs;
+      };
+    in
+    {
       ${userConfig.username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        extraSpecialArgs = {
-          inherit pkgs-stable;
-          inherit systemConfig;
-          inherit userConfig;
-          inherit inputs;
-        };
-        modules = [
-          ./user/home.nix
-          hyprland.homeManagerModules.default # hyprland hm module
-        ];
+        extraSpecialArgs = extraSpecialArgs;
+        modules = userModules;
       };
     };
-
   };
 
   inputs = {
@@ -135,17 +144,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    home-manager-stable = {
-      url = "github:nix-community/home-manager/release-24.11";
-      # home-manager follows nixpkgs-stable channel
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
-
     hyprland.url = "github:hyprwm/Hyprland";
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
-    flake-programs-sqlite = {
+    programs-db = {
       url = "github:wamserma/flake-programs-sqlite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
