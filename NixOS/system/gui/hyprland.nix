@@ -15,10 +15,13 @@
     polkit.enable = true;
   };
 
-  # Hint Electon apps to use wayland
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  # mouse/touchpad cursor
-  environment.sessionVariables.WLR_NO_HARDWARE_CURSORS = "1";
+  # environment vars
+  environment.sessionVariables = {
+    # Hint Electon apps to use wayland
+    NIXOS_OZONE_WL = "1";
+    # mouse/touchpad cursor
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
 
   # cross desktop grouping (sandbox apps)
   xdg.portal = {
@@ -51,7 +54,7 @@
     slurp                              # region select for screenshot/screenshare
     swappy                             # screenshot editor
     cliphist                           # clipboard manager
-    wl-clipboard                       # clipboard 
+    wl-clipboard                       # clipboard
     wl-clip-persist                    # clipboard-persist
     hyprpaper                          # wallpaper daemon
     hyprlock                           # lock utility
