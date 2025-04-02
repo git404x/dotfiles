@@ -8,7 +8,6 @@
               chaotic,
               home-manager,
               home-manager-stable,
-              private-stuff,
               hyprland,
               ...
             }@inputs:
@@ -30,7 +29,7 @@
     userConfig = {
 
       # users
-      username = "itz_levi_404"; # username
+      username = "levi"; # username
       name = "Levi Ackerman"; # name/identifier
 
       username2 = "error"; 
@@ -80,6 +79,7 @@
         # define nix modules
         ./system/configuration.nix # Your system configuration.
         chaotic.nixosModules.default # chaotic default module
+        inputs.flake-programs-sqlite.nixosModules.programs-sqlite
         {
           nixpkgs.overlays = [
             # example.overlay
@@ -98,6 +98,7 @@
           inherit inputs;
         };
         modules = systemModules ++ [
+          ./system/modules/zen-browser.nix
           # ./system/hardware/hardware-configuration.nix # other nix modules
         ];
       };
@@ -114,7 +115,6 @@
         };
         modules = [
           ./user/home.nix
-          "${private-stuff}/userdata.nix" # pvt stuff
           hyprland.homeManagerModules.default # hyprland hm module
         ];
       };
@@ -123,8 +123,9 @@
   };
 
   inputs = {
+
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
 
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
 
@@ -135,16 +136,18 @@
     };
 
     home-manager-stable = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       # home-manager follows nixpkgs-stable channel
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    hyprland.url = "github:hyprwm/Hyprland";
 
-    private-stuff = {
-        url = "path:/home/itz_levi_404/dotfiles/.private";
-        flake = false;
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+
+    flake-programs-sqlite = {
+      url = "github:wamserma/flake-programs-sqlite";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
   };

@@ -53,16 +53,25 @@
     brightnessctl                      # screen brightness control
     udisks                             # disk utility
     udiskie                            # manage removable media
+    gvfs                               # virtual filesystem
+    gnome.gvfs                         # virtual filesystem (full gnome)
     gparted                            # partition manager
 
-    # GPU stuff -------------------------------------------------------- #
+    usbutils                           # tools for usb
+    pciutils                           # tools for pci
+
+    # GPU & power stuff ------------------------------------------------ #
     amdvlk                             # AMD OSS Driver For Vulkan
+    thermald                           # thermal daemon
+    tlp                                # advanced power management
 
     # Applications ----------------------------------------------------- #
     home-manager                       # /home dir config manager
     onlyoffice-bin                     # office
     obs-studio                         # screen rec
     alacritty                          # terminal
+    wezterm                            # term2
+    foot                               # term3
     ranger                             # TUI file manager
     mpv                                # media player
     imv                                # image viewer

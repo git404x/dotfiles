@@ -22,6 +22,12 @@
     packages = [ pkgs.dconf ];
   };
 
+  # gvfs
+  services.gvfs = {
+    enable = true;
+    package = pkgs.gvfs;
+  };
+
   # systemPackages
   environment.systemPackages = with pkgs; [
     # list of services
