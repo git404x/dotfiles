@@ -10,7 +10,10 @@
 
   # security
   services.gnome.gnome-keyring.enable = true;
-  security.pam.services.login.enableGnomeKeyring = true;
+  security = {
+    pam.services.login.enableGnomeKeyring = true;
+    polkit.enable = true;
+  };
 
   # Hint Electon apps to use wayland
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -33,7 +36,7 @@
     # Window Manager --------------------------------------------------- #
     hyprland                           # wlroots-based wayland compositor
     xwayland                           # interface X11 apps with Wayland protocol
-    cinnamon.nemo-with-extensions      # file manager
+    nemo-with-extensions               # file manager
     dunst                              # notification daemon
     rofi-wayland                       # application launcher
     waybar                             # system bar
@@ -56,6 +59,8 @@
     hyprcursor                         # cursor
 
     # Dependencies ----------------------------------------------------- #
+    wlr-randr                          # randr for wlroots compositors
+    hyprpolkitagent                    # polkit agent in qt/qml
     polkit_gnome                       # authentication agent
     gnome-keyring                      # store pass, keys, etc
     xdg-desktop-portal-hyprland        # xdg desktop portal for hyprland
