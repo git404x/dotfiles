@@ -8,6 +8,7 @@
               chaotic,
               home-manager,
               hyprland,
+              programs-db,
               ...
             }@inputs:
   
@@ -82,7 +83,6 @@
         # define nix modules
         ./NixOS/system/configuration.nix
         chaotic.nixosModules.default
-        inputs.programs-db.nixosModules.programs-sqlite
         {
           nixpkgs.overlays = [
             # example.overlay

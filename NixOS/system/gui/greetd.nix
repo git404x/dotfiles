@@ -15,6 +15,17 @@
     };
   };
 
+  # https://www.reddit.com/r/NixOS/comments/u0cdpi/tuigreet_with_xmonad_how/
+  systemd.services.greetd.serviceConfig = {
+    Type = "idle";
+    StandardInput = "tty";
+    StandardOutput = "tty";
+    StandardError = "journal"; # prevent errors spam
+    TTYReset = true; # prevent bootlogs spam
+    TTYVHangup = true;
+    TTYVTDisallocate = true;
+  };
+
   # systemPackages
   environment.systemPackages = with pkgs; [
     # Display Manager -------------------------------------------------- #
