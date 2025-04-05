@@ -9,6 +9,7 @@
               home-manager,
               hyprland,
               programs-db,
+              cachix,
               ...
             }@inputs:
   
@@ -152,6 +153,8 @@
       url = "github:wamserma/flake-programs-sqlite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    cachix.url = "github:cachix/cachix";
 
   };
 

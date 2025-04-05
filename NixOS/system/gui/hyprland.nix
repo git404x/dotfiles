@@ -1,4 +1,10 @@
-{ config, pkgs, pkgs-stable, ... }:
+{ inputs, lib, config, pkgs, pkgs-stable, ... }:
+
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  hyprlandPkg = inputs.hyprland.packages.${system}.hyprland;
+  portalPkg = inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
+in
 
 {
 
@@ -6,6 +12,8 @@
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+    package = hyprlandPkg;
+    portalPackage = portalPkg;
   };
 
   # security
@@ -21,16 +29,6 @@
     NIXOS_OZONE_WL = "1";
     # mouse/touchpad cursor
     WLR_NO_HARDWARE_CURSORS = "1";
-  };
-
-  # cross desktop grouping (sandbox apps)
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-hyprland
-      xdg-desktop-portal-gtk
-    ];
   };
 
   # Some system packages

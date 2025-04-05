@@ -35,6 +35,7 @@ in
     neofetch
     nix-index
     nix-prefetch-git
+    cachix
     zip
     unzip
     unrar
