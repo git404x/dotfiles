@@ -96,11 +96,15 @@ in
     lazygit                            # TUI git tool
     telegram-desktop                   # telegram
 
-    # nvim dependencies ------------------------------------------------ #
+    # dependencies ----------------------------------------------------- #
     ripgrep                            # search with regex pattern
     nodePackages.nodejs                # framework for JS engine
     nodePackages.npm                   # npm
     python3                            # python3
+    python3Packages.pip                # py pkgs
+    python3Packages.pandas             # pandas
+    python3Packages.pillow             # PIL fork
+    python3Packages.openpyxl           # py excel library
     stylua                             # lua formatter for nvim
     lua-language-server                # lua lsp
     gcc                                # GNU compiler collection
