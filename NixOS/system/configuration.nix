@@ -15,6 +15,7 @@
     ./modules/packages.nix
     ./modules/services.nix
     ./modules/nix-settings.nix
+    ./modules/virtual.nix
 
     # GUI nix modules
     ./gui/fonts.nix
