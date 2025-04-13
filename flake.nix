@@ -33,11 +33,11 @@
       shell = "fish";
 
       # users
-      username = "levi"; # username
-      name = "Levi Ackerman"; # name/identifier
+      username = "error";
+      name = "ERROR";
 
-      username2 = "error"; 
-      name2 = "iTZ_ERROR_404";
+      username2 = "levi";
+      name2 = "Levi";
 
       dotfilesDir = "~/dotfiles"; # absolute path of the local repo
       dotfilesDirName = "dotfiles"; # name for dotfiles dir
