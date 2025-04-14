@@ -13,6 +13,7 @@
     "editor.scrollbar.verticalScrollbarSize": 0,
     "extensions.autoUpdate": false,
     "terminal.external.linuxExec": "alacritty",
+    "terminal.integrated.fontFamily": "JetBrains Mono"
     "terminal.explorerKind": "both",
     "terminal.sourceControlRepositoriesKind": "both",
     "telemetry.telemetryLevel": "off",
