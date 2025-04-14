@@ -64,8 +64,10 @@
   #  /etc/profiles/per-user/userConfig.usernameetc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
-    # EDITOR = "emacs";
+    EDITOR = "nvim";
   };
+
+  # home-manager.backupFileExtension = "backup";
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
