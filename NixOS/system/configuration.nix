@@ -16,6 +16,7 @@
     ./modules/services.nix
     ./modules/nix-settings.nix
     ./modules/virtual.nix
+    ./modules/swap.nix
 
     # GUI nix modules
     ./gui/fonts.nix
@@ -40,6 +41,10 @@
     "psmouse.synaptics_intertouch=0"
     "video4linux"
   ];
+  # sysrq magic key
+  boot.kernel.sysctl = {
+    "kernel.sysrq" = 1; #  R E I S U B
+  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -78,13 +83,6 @@
   #   default = "http://user:password@proxy:port/";
   #   noProxy = "127.0.0.1,localhost,internal.domain";
   # };
-
-  # zram
-  zramSwap = {
-    enable = true;
-    algorithm = "zstd";
-    memoryPercent = 100;
-  };
 
   # time zone.
   time = {
