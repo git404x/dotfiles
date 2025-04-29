@@ -1,0 +1,35 @@
+@define-color rosewater rgba(245, 224, 220, 1.0);
+@define-color flamingo  rgba(242, 205, 205, 1.0);
+@define-color pink      rgba(245, 194, 231, 1.0);
+@define-color mauve     rgba(203, 166, 247, 1.0);
+@define-color red       rgba(243, 139, 168, 1.0);
+@define-color maroon    rgba(235, 160, 172, 1.0);
+@define-color peach     rgba(250, 179, 135, 1.0);
+@define-color yellow    rgba(249, 226, 175, 1.0);
+@define-color green     rgba(166, 227, 161, 1.0);
+@define-color teal      rgba(148, 226, 213, 1.0);
+@define-color sky       rgba(137, 220, 235, 1.0);
+@define-color sapphire  rgba(116, 199, 236, 1.0);
+@define-color blue      rgba(137, 180, 250, 1.0);
+@define-color lavender  rgba(180, 190, 254, 1.0);
+
+@define-color text       rgba(205, 214, 244, 1.0);
+@define-color subtext1   rgba(186, 194, 222, 1.0);
+@define-color subtext0   rgba(166, 173, 200, 1.0);
+@define-color overlay2   rgba(147, 153, 178, 1.0);
+@define-color overlay1   rgba(127, 132, 156, 1.0);
+@define-color overlay0   rgba(108, 112, 134, 1.0);
+
+@define-color surface2   rgba(88, 91, 112, 1.0);
+@define-color surface1   rgba(69, 71, 90, 1.0);
+@define-color surface0   rgba(49, 50, 68, 1.0);
+@define-color base       rgba(30, 30, 46, 1.0);
+@define-color mantle     rgba(24, 24, 37, 1.0);
+@define-color crust      rgba(17, 17, 27, 1.0);
+
+@define-color hover   rgba(147, 153, 178, 0.30);
+@define-color mantle-85     rgba(24, 24, 37, 0.85);
+@define-color bar-glass rgba(17, 17, 27, 0.80);
+@define-color bar-glass2 rgba(18, 19, 25, 0.45);
+@define-color tooltip-glass rgba(17, 17, 27, 0.9);
+@define-color surface-glass rgba(49, 50, 68, 0.85);

@@ -1,206 +1,145 @@
 /* Import color theme */
-@import "themes/mocha.css";
+@import "./themes/mocha-v2.css";
 
+/* global css */
 * {
-    /*all: initial; Ignore gtk theme*/ 
-    border: none;
-    border-radius: 2px;
-    /* `otf-font-awesome` is required to be installed for icons */
-    font-family: "Liberation Sans","Roboto", "Helvetica", "Arial", "sans-serif";
-    font-size: 14px;
-    min-height: 0;
-    /* reference the color by using @color-name */
-    /* color: @text; */
+  border: none;
+  border-radius: 8px;
+  font-family: "JetBrainsMono NF", "Roboto", "sans-serif";
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 0px;
 }
 
-/* Tooltip --------------------------------------------- */
-tooltip {
-    background-color: @mantle;
-    color: @crust;
-    border-radius: 9px;
-    border-width: 0px;
-    opacity: 0.95;
-    box-shadow: 1px 1px 1px 1px @surface0;
-}
-
-/* ----------------------------------------------------- */
-
-/* window module --------------------------------------- */
+/* waybar */
 window#waybar {
-    background-color: @base;
-    border-radius: 9px;
-    color: @base;
-    transition-property: background-color;
-    transition-duration: .4s;
-    opacity: 1;
+  background-color: @crust;
+  color: @text;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+}
+window#waybar.empty {
+  background-color: @bar-glass2;
 }
 
-window#waybar.empty #window {
-	background: transparent;
+/* tooltip (calendar, etc.) */
+tooltip {
+  background-color: @tooltip-glass;
+  padding: 8px 12px;
+  transition: all 0.3s ease-in-out;
 }
-/* ----------------------------------------------------- */
-
-/* workspaces module ------------------------------------ */
-#workspaces button  {
-    color: @text;
-    padding: 2px 2px 2px 2px;
-    margin: 2px;
-    min-width: 10px;
-    border-radius: 4px;
+tooltip label {
+  padding: 4px;
+  letter-spacing: 0.5px;
 }
 
-#workspaces button:hover {
-    background-color: @surface2;
-    color: @sky;
-}
-
-#workspaces button.active{
-    color: @sapphire;
-    background-color: @base;
-    border-bottom: 2px groove @sapphire;
-    padding: 2px;
-    border-radius: 2px;
-}
-
-#workspaces button.urgent{
-    background-color: @surface0;
-    color: @red;
-    border-bottom: 2px solid @red;
-    border-radius: 2px;
-}
-
-#workspaces button.hidden{
-    background-color: @base; 
-    color: @flamingo;
-}
-/* ----------------------------------------------------- */
-
-/* App Taskbar ----------------------------------------- */
-#taskbar button {
-    box-shadow: none; 
-	text-shadow: none;
-    border-radius: 9px;
-    margin: 2px; 
-    padding: 2px 3px 2px 3px;
-    animation: tb_normal 20s ease-in-out .5;
-}
-
-#taskbar button.active {
-    background: @surface0;
-    margin: 2px;
-    padding: 2px 8px 2px 8px;
-    border-bottom: 2px ridge @sapphire;
-    border-radius: 3px;
-    animation: tb_active 20s ease-in-out .5;
-    transition: all 0.4s cubic-bezier(.55,-0.68,.48,1.682);
-}
-
-#taskbar button:hover {
-    background: @overlay2;
-    animation: tb_hover 20s ease-in-out .5;
-    transition: all 0.3s cubic-bezier(.55,-0.68,.48,1.682);
-}
-
-taskbar#waybar.empty {
-	background: transparent;
-}
-/* ----------------------------------------------------- */
-
-/* tray ------------------------------------------------ */
-#tray menu * {
-    min-height: 16px
-}
-
-#tray menu separator {
-    min-height: 10px
-}
-/* ----------------------------------------------------- */
-
-/* tags button ----------------------------------------- */
-#tags button{
-    background-color: @base;
-    padding: 3px;
-    border-radius: 10px;
-    min-width: 20px;
-    color: @flamingo;
-}
-
-#tags button.occupied{
-    background-color: @mantle;
-    color: @crust;
-    padding: 3px;
-    border-radius: 10px;
-    min-width: 20px;
-}
-
-#tags button.focused{
-    background-color: @flamingo;
-    border-bottom: 2px solid @mauve;
-    color: @colfg;
-}
-
-#tags button.urgent{
-    background-color: @colred;
-    color: @colfg;
-}
-/* ----------------------------------------------------- */
-
-/* Common CSS ------------------------------------------ */
+/* module styling (pill effect) */
+#clock,
 #window,
 #workspaces,
 #taskbar,
-#custom-nix,
-#battery,
-#clock,
+#network,
+#pulseaudio,
+#tray,
+#sysinfo {
+  background: @base;
+  padding: 0px 8px;
+  margin: 4px 2px;
+  background-clip: padding-box;
+}
+
+/* Hover effect */
+#window:hover,
+#taskbar button:hover,
+#clock:hover,
+#sysinfo:hover,
+#network:hover,
+#pulseaudio:hover,
+#tray:hover {
+  background-color: @hover;
+  transition: all 0.3s ease-in-out;
+}
+
+/* workspaces module */
+#workspaces button {
+  color: @text;
+  border-radius: 2px;
+  padding: 1px 4px;
+  margin: 0.5px;
+  min-width: 2px;
+}
+#workspaces button.active {
+  color: @teal;
+  background-color: @surface2;
+  border-bottom: 2px groove @teal;
+}
+#workspaces button.urgent {
+  background-color: @hover;
+  color: @red;
+  border-bottom: 2px solid @red;
+}
+#workspaces button.hidden {
+  background-color: @base;
+  color: @mauve;
+}
+#workspaces button:hover {
+  background-color: @surface2;
+  color: @teal;
+}
+
+/* App Taskbar */
+#taskbar button {
+  padding: 2px 3px;
+  border-radius: 2px;
+}
+#taskbar button.active {
+  color: @teal;
+  background: @surface1;
+  border-bottom: 2px groove @sapphire;
+}
+taskbar#waybar.empty {
+  background: transparent;
+}
+
+/* tweak modules */
+#clock {
+  color: @flamingo;
+}
+
+#sysinfo {
+  font-weight: bold;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
+}
+
 #cpu,
 #temperature.cpu,
 #memory,
-#network,
-#pulseaudio,
-#tray
-{
-  background: @crust; 
-  padding: 0 10px;
-  margin: 4px 2px 4px 2px;
-  border-radius: 90px;
-  background-clip: padding-box;
-}
-/* ----------------------------------------------------- */
-
-/* Modules Coloring ------------------------------------ */
-#custom-nix {
-   color: @teal;
+#battery {
+  padding: 0px 4px;
 }
 
 #battery {
-    color: @green; 
+  color: @green;
 }
-
-#clock {
-    color: @teal;
-}
-
 #cpu {
-    color: @sapphire;
+  color: @sapphire;
 }
-
 #temperature.cpu {
-    color: @red;
+  color: @red;
 }
-
 #memory {
-    color: @mauve; 
+  color: @peach;
 }
 
 #network {
-    color: @rosewater; 
-}
-
-#pulseaudio {
-    color: @yellow;
+  color: @yellow;
 }
 
 #window {
-    color: @rosewater;
+  color: @rosewater;
 }
-/* ----------------------------------------------------- */
+#pulseaudio {
+  color: @mauve;
+}

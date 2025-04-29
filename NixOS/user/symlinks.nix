@@ -8,6 +8,9 @@
     # Alacritty config
     ".config/alacritty".source = ../../config/alacritty;
 
+    # bat config
+    ".config/bat".source = ../../config/bat;
+
     # foot config
     ".config/foot".source = ../../config/foot;
 
