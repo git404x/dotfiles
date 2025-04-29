@@ -7,10 +7,19 @@ let
 
     # Helpful aliases
     c = "clear"; # clear terminal
-    l = "eza -lh  --icons=auto"; # long list
-    ls = "eza -1   --icons=auto"; # short list
-    ll = "eza -lha --icons=auto --sort=name --group-directories-first"; # long list all
-    ld = "eza -lhD --icons=auto"; # long list dirs
+    please = "sudo";
+    doas = "sudo";
+    dir = "dir --color=auto";
+    jctl = "journalctl -p 3 -xb"; # get error msgs from journalctl
+    cat = "bat --style full";
+
+    # Replace ls with eza
+    ls = "eza -al --color=always --group-directories-first --icons"; # preferred listing
+    lsz= "eza -al --color=always --total-size --group-directories-first --icons"; # include file size
+    la = "eza -a --color=always --group-directories-first --icons";  # all files and dirs
+    ll = "eza -l --color=always --group-directories-first --icons";  # long format
+    lt = "eza -aT --color=always --group-directories-first --icons"; # tree listing
+    "l." = "eza -ald --color=always --group-directories-first --icons .*"; # show only dotfiles
 
     # Handy change dir shortcuts
     ".." = "cd ..";
