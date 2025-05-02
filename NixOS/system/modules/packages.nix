@@ -10,6 +10,7 @@
 
 let
   system = systemConfig.system;
+  py = pkgs.python3Packages;
   zen-browser = inputs.zen-browser.packages."${system}".default;
 in
 {
@@ -101,10 +102,10 @@ in
     nodePackages.nodejs                # framework for JS engine
     nodePackages.npm                   # npm
     python3                            # python3
-    python3Packages.pip                # py pkgs
-    python3Packages.pandas             # pandas
-    python3Packages.pillow             # PIL fork
-    python3Packages.openpyxl           # py excel library
+    (py.pip)                           # py pkgs
+    (py.pandas)                        # pandas
+    (py.pillow)                        # PIL fork
+    (py.openpyxl)                      # py excel library
     stylua                             # lua formatter for nvim
     lua-language-server                # lua lsp
     gcc                                # GNU compiler collection

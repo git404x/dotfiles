@@ -4,12 +4,11 @@
 
   imports = [
     # import nix modules
-    ./symlinks.nix
-    ./shell/sh.nix
-    ./style/gtk.nix
-    ./style/qt.nix
-    # ./fonts/fonts.nix
-    ./night-light.nix
+    ./modules/symlinks.nix
+    ./modules/shell.nix
+    ./modules/theme.nix
+    ./modules/night-light.nix
+    ./modules/nix-gc.nix
   ];
 
   # Home Manager needs a bit of info about paths it should manage.
