@@ -1,5 +1,5 @@
 {
-  description = "Levi's nixos configuration";
+  description = "ERROR's nixos configuration";
 
   outputs = {
               self,
@@ -41,17 +41,6 @@
 
       dotfilesDir = "~/dotfiles"; # absolute path of the local repo
       dotfilesDirName = "dotfiles"; # name for dotfiles dir
-      
-      themeConfig = {
-        cursorPkg = pkgs.bibata-cursors;
-        cursor = "Bibata-Modern-Ice";
-
-        themePkg = pkgs.adw-gtk3;
-        theme = "adw-gtk3-dark";
-
-        iconPkg = pkgs.tela-circle-icon-theme;
-        icon = "Tela-circle";
-      };
 
     };
 
