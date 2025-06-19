@@ -6,7 +6,7 @@
   gtk = {
     enable = true;
     theme = {
-      name = "adw3-gtk-dark";
+      name = "adw-gtk3-dark";
       package = pkgs.adw-gtk3;
     };
     iconTheme = {
@@ -50,7 +50,7 @@
   home.sessionVariables = {
     QT_QPA_PLATFORMTHEME = "qt5ct";
     QT_STYLE_OVERRIDE = "kvantum";
-    GTK_THEME = "adw3-gtk-dark";
+    GTK_THEME = "adw-gtk3-dark";
     ICON_THEME = "Papirus-Dark";
     XCURSOR_THEME = "Bibata-Modern-Classic";
     XCURSOR_SIZE = 24;

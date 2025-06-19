@@ -24,11 +24,13 @@ let
     # Handy change dir shortcuts
     ".." = "cd ..";
     "..." = "cd ../..";
+    ".2" = "cd ../..";
     ".3" = "cd ../../..";
     ".4" = "cd ../../../..";
     ".5" = "cd ../../../../..";
 
     # others
+    ff = "fastfetch";
     info = "fastfetch";
     fetch = "fastfetch";
     neofetch = "fastfetch";
