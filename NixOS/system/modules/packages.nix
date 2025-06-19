@@ -47,15 +47,11 @@ in
     git                                # version control
     gh                                 # github cli
     glab                               # gitlab cli
-    zsh                                # the z shell
     eza                                # file lister for zsh
-    oh-my-zsh                          # plugin manager for zsh
-    zsh-powerlevel10k                  # theme for zsh
     lsd                                # file lister for fish
     starship                           # customizable shell prompt
     fastfetch                          # system information fetch tool
     imagemagick                        # for custom fetch logo
-    krabby                             # display pokemon sprites
     cava                               # cli audio visualizer
     yt-dlp                             # cli utility for yt
     openssh                            # SSH protocol
@@ -64,8 +60,6 @@ in
 
     # System stuff ----------------------------------------------------- #
     brightnessctl                      # screen brightness control
-    udisks                             # disk utility
-    udiskie                            # manage removable media
     gparted                            # partition manager
     usbutils                           # tools for usb
     pciutils                           # tools for pci
@@ -88,7 +82,7 @@ in
     firefox                            # browser
     zen-browser                        # firefox fork
     librewolf                          # browser2
-    motrix                             # Download manager
+    motrix qbittorrent                 # download manager
     stremio                            # binge
     ani-cli                            # anime cli
     vscodium                           # ide text editor
@@ -96,6 +90,7 @@ in
     neovide                            # GUI for neovim
     lazygit                            # TUI git tool
     telegram-desktop                   # telegram
+    notesnook obsidian                 # notes
 
     # dependencies ----------------------------------------------------- #
     ripgrep                            # search with regex pattern
@@ -120,6 +115,7 @@ in
   ]) ++ (with pkgs-stable; [
 
     # pkgs from stable branch
+    qutebrowser                        # vim-browser
 
   ]);
 
