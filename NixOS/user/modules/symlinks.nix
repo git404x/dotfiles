@@ -22,6 +22,8 @@ let
     configDirs
   );
 in {
-  home.file = configSymlinks;
+  home.file = configSymlinks // {
+    ".tmux.conf".source = "${cfgDir}/tmux/tmux.conf";
+  };
 }
 
