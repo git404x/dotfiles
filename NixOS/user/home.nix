@@ -7,6 +7,7 @@
     ./modules/symlinks.nix
     ./modules/shell.nix
     ./modules/theme.nix
+    ./modules/fonts.nix
     ./modules/night-light.nix
     ./modules/nix-gc.nix
   ];

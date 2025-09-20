@@ -10,7 +10,7 @@
           let
             session = config.services.displayManager.sessionData.desktops;
           in
-            "${pkgs.greetd.tuigreet}/bin/tuigreet -t -s ${session}/share/xsessions:${session}/share/wayland-sessions";
+            "${pkgs.tuigreet}/bin/tuigreet -t -s ${session}/share/xsessions:${session}/share/wayland-sessions";
       };
     };
   };
@@ -29,7 +29,7 @@
   # systemPackages
   environment.systemPackages = with pkgs; [
     # Display Manager -------------------------------------------------- #
-    greetd.greetd                      # login manager daemon
-    greetd.tuigreet                    # Graphical console greeter for greetd
+    greetd                             # login manager daemon
+    tuigreet                           # Graphical console greeter for greetd
   ];
 }

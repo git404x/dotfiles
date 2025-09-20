@@ -17,6 +17,26 @@
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
     };
+    gtk3.extraConfig = {
+      Settings = ''
+        gtk-application-prefer-dark-theme=1
+        '';
+    };
+    gtk4.extraConfig = {
+      Settings = ''
+        gtk-application-prefer-dark-theme=1
+        '';
+    };
+  };
+
+
+
+  # dconf settings for GNOME/GTK apps
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+      gtk-theme = "adw-gtk3-dark";
+    };
   };
 
   # QT
@@ -54,6 +74,8 @@
     ICON_THEME = "Papirus-Dark";
     XCURSOR_THEME = "Bibata-Modern-Classic";
     XCURSOR_SIZE = 24;
+    # Force Firefox to use system theme
+    MOZ_ENABLE_WAYLAND = "1";
   };
 
 }

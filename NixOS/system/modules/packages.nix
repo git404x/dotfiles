@@ -64,11 +64,6 @@ in
     usbutils                           # tools for usb
     pciutils                           # tools for pci
 
-    # GPU & power stuff ------------------------------------------------ #
-    amdvlk                             # AMD OSS Driver For Vulkan
-    thermald                           # thermal daemon
-    tlp                                # advanced power management
-
     # Applications ----------------------------------------------------- #
     home-manager                       # /home dir config manager
     onlyoffice-bin                     # office
@@ -82,8 +77,8 @@ in
     firefox                            # browser
     zen-browser                        # firefox fork
     librewolf                          # browser2
+    brave                              # chromium browser
     motrix qbittorrent                 # download manager
-    stremio                            # binge
     ani-cli                            # anime cli
     vscodium                           # ide text editor
     neovim                             # terminal text editor
@@ -94,8 +89,7 @@ in
 
     # dependencies ----------------------------------------------------- #
     ripgrep                            # search with regex pattern
-    nodePackages.nodejs                # framework for JS engine
-    nodePackages.npm                   # npm
+    nodePackages_latest.nodejs         # framework for JS engine
     python3                            # python3
     (py.pip)                           # py pkgs
     (py.pandas)                        # pandas
@@ -115,7 +109,6 @@ in
   ]) ++ (with pkgs-stable; [
 
     # pkgs from stable branch
-    qutebrowser                        # vim-browser
 
   ]);
 

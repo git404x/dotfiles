@@ -30,9 +30,6 @@ in
   programs.${shellName}.enable = true;
   users.defaultUserShell = pkgs.${shellName};
 
-  # Change runtime directory size
-  services.logind.extraConfig = "RuntimeDirectorySize=8G";
-
   # user pkgs
   programs = {
     adb.enable = true;

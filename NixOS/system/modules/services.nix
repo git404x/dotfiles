@@ -21,7 +21,7 @@
   };
 
   # default behaviour
-  services.logind = {
+  services.logind.settings.Login = {
     powerKey = "suspend-then-hibernate";
     lidSwitch = "suspend-then-hibernate";
   };
