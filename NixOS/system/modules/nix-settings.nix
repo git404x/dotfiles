@@ -20,6 +20,10 @@ in
 
       # cache
       substituters = [
+        "https://cache.nixos.org"
+        "https://hyprland.cachix.org"
+      ];
+      trusted-substituters = [
         "https://hyprland.cachix.org"
       ];
       trusted-public-keys = [
@@ -38,6 +42,9 @@ in
 
     extraOptions = ''
       experimental-features = nix-command flakes auto-allocate-uids
+      max-jobs = auto
+      # download-buffer-size = 100MB
+      cores = 4
       max-substitution-jobs = 64
       http-connections = 64
       auto-allocate-uids = true
