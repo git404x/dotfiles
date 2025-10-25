@@ -1,0 +1,56 @@
+{
+  "git": {
+    "user": {
+      "name": "Your Name",
+      "email": "your.email@example.com",
+      "signingKey": ""
+    },
+    "github": {
+      "token": "",
+      "username": ""
+    }
+  },
+  "email": {
+    "accounts": {
+      "primary": {
+        "address": "your.email@example.com",
+        "imap": {
+          "host": "imap.example.com",
+          "port": 993,
+          "tls": true
+        },
+        "smtp": {
+          "host": "smtp.example.com",
+          "port": 587,
+          "tls": true
+        }
+      }
+    }
+  },
+  "ssh": {
+    "keys": {
+      "personal": {
+        "path": "~/.ssh/id_ed25519",
+        "hosts": ["github.com", "gitlab.com"]
+      },
+      "work": {
+        "path": "~/.ssh/id_work",
+        "hosts": ["company.com"]
+      }
+    }
+  },
+  "api_keys": {
+    "openai": "",
+    "anthropic": "",
+    "services": {}
+  },
+  "passwords": {
+    "vault_path": "~/.password-store"
+  },
+  "cache": {
+    "cachix": {
+      "authToken": "",
+      "publicKey": "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+    }
+  }
+}
