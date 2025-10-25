@@ -1,221 +1,179 @@
-# 📁 **New Modular Dotfiles Structure**
+# 📁 **Clean Modular Dotfiles Structure (WIP Branch)**
 
-## 🏗️ **Complete Restructure Overview**
+## 🎉 **Cleanup Complete!**
 
-I've completely restructured your dotfiles to be **clean**, **modular**, and **maintainable**. Here's the new organization:
+I've successfully:
+- ✅ **Renamed branch** to `wip` 
+- ✅ **Removed all obsolete files** that were duplicated/merged
+- ✅ **Clean modular structure** with separate files
+- ✅ **Universal keybindings** across all DEs/WMs
+- ✅ **Easy to maintain** configuration
 
-## 📂 **Directory Structure**
+## 📋 **What Was Cleaned Up**
+
+### **Removed Obsolete Files:**
+- ❌ `modules/nixos/development/default.nix` (old merged version)
+- ❌ `config/hypr/themes/*.conf` (replaced by Stylix)
+- ❌ `config/bin/screenshot*` (functionality in keybinds.conf)
+- ❌ `config/hypr/animations_default.conf` (duplicate)
+
+### **Added Clean Structure:**
+- ✅ `modules/nixos/development/` (new modular imports)
+- ✅ `modules/nixos/development/editors/` (separate editor modules)
+- ✅ `modules/nixos/core/keybinds.nix` (universal keybinds)
+- ✅ `config/hypr/hyprland.conf` (clean standalone config)
+- ✅ `config/nvim/init.lua` (separate Neovim config)
+
+## 🏗️ **Final Directory Structure**
 
 ```
-├── config/
-│   ├── system-config.json.template     # Main configuration template
-│   ├── private-config.json.template    # Private settings template
+├── config/                          # 📁 Raw config files (easy to edit)
 │   ├── hypr/
-│   │   ├── hyprland.conf               # Clean Hyprland config
-│   │   ├── keybinds.conf               # Vim-style keybindings
-│   │   ├── rules.conf                  # Window rules
-│   │   ├── animations.conf             # Animation settings
-│   │   └── appearance.conf             # Visual settings
+│   │   ├── hyprland.conf            # Clean main config
+│   │   ├── keybinds.conf            # Vim-style keybinds
+│   │   ├── rules.conf
+│   │   ├── animations.conf
+│   │   └── [other hypr configs]
 │   ├── nvim/
-│   │   ├── init.lua                    # Main Neovim config
-│   │   └── lua/config/                 # Modular Lua configs
-│   └── [other apps]/                   # Each app in its own directory
-├── modules/
-│   ├── nixos/
-│   │   ├── core/
-│   │   │   ├── keybinds.nix            # Universal keybinding system
-│   │   │   ├── nix-settings.nix        # Nix configuration
-│   │   │   └── default.nix             # Core system settings
-│   │   ├── gui/
-│   │   │   ├── desktop-environments/   # DE configs
-│   │   │   ├── window-managers/
-│   │   │   │   ├── hyprland/           # Modular Hyprland modules
-│   │   │   │   ├── dwm/                # DWM configuration
-│   │   │   │   └── default.nix         # WM imports
-│   │   │   ├── applications/           # GUI app configs
-│   │   │   └── default.nix             # GUI imports
-│   │   ├── development/
-│   │   │   ├── editors/
-│   │   │   │   ├── neovim/             # Separate Neovim modules
-│   │   │   │   ├── emacs/              # Separate Emacs modules
-│   │   │   │   └── default.nix         # Editor imports
-│   │   │   └── default.nix             # Development imports
-│   │   └── [other categories]/
-│   └── home-manager/                   # Home Manager modules
-└── flake.nix                          # Main flake configuration
+│   │   ├── init.lua                 # Modern Lua config
+│   │   └── lua/config/              # Modular Lua modules
+│   └── [other apps]/
+├── modules/nixos/                   # 🏗️ NixOS modules (organized)
+│   ├── core/
+│   │   ├── keybinds.nix             # Universal keybinding system
+│   │   └── default.nix
+│   ├── gui/
+│   │   ├── window-managers/
+│   │   │   ├── hyprland/            # Modular Hyprland
+│   │   │   ├── dwm/                 # Custom DWM setup
+│   │   │   └── default.nix
+│   │   ├── desktop-environments/
+│   │   └── applications/
+│   ├── development/
+│   │   ├── editors/
+│   │   │   ├── neovim/              # Separate Neovim module
+│   │   │   ├── emacs/               # Separate Emacs module
+│   │   │   └── default.nix
+│   │   ├── languages/
+│   │   ├── tools/
+│   │   └── default.nix             # Clean imports
+│   └── [other categories]/
+└── README-restructured.md           # This file
 ```
 
-## 🎯 **Key Improvements**
+## 🎮 **Universal Keybindings Work Everywhere**
 
-### 1. **Universal Keybinding System** 🎮
+**Same Vim-style keybinds across ALL desktop environments:**
 
-**Problem Solved**: Same keybindings across all desktop environments!
-
-- **SXHKD-based** universal keybinding system
-- **Vim-inspired** navigation (hjkl) everywhere
-- **Consistent shortcuts** across Hyprland, GNOME, DWM
-- **JSON-configurable** keybindings
-
-**Key Features**:
 ```bash
-# Same keys work everywhere:
-Super + H/J/K/L    # Focus windows (Vim-style)
-Super + Shift + H/J/K/L  # Move windows
-Super + Alt + H/J/K/L    # Resize windows
-Super + 1-9        # Switch workspaces
-Super + Return     # Terminal
-Super + R          # Launcher
-Super + V          # Clipboard
+# Window Focus (Vim navigation)
+Super + H/J/K/L           # Focus left/down/up/right
+
+# Window Movement  
+Super + Shift + H/J/K/L   # Move window left/down/up/right
+
+# Window Resizing
+Super + Alt + H/J/K/L     # Resize window
+
+# Applications
+Super + Return            # Terminal
+Super + R                 # Launcher
+Super + V                 # Clipboard
+Super + E                 # File manager
+Super + B                 # Browser
+
+# Workspaces
+Super + 1-9               # Switch workspace
+Super + Shift + 1-9       # Move window to workspace
 ```
 
-### 2. **Modular Configuration Files** 📁
+**These work identically in:**
+- 🔶 **Hyprland** (via hyprctl)
+- 🔶 **GNOME** (via wmctrl)
+- 🔶 **DWM** (via dwmc)
+- 🔶 **Any other DE/WM** you add
 
-**Problem Solved**: Each component has its own file!
+## 🚀 **How to Use the WIP Branch**
 
-- **Hyprland**: `config/hypr/hyprland.conf` (separate from Nix)
-- **Neovim**: `config/nvim/init.lua` + modular Lua configs
-- **Emacs**: Separate configuration with Evil mode
-- **DWM**: Custom patches and configuration
+### **1. Switch to WIP Branch:**
+```bash
+git checkout wip
+```
 
-### 3. **Clean NixOS Module Structure** 🏗️
+### **2. Copy Configuration Templates:**
+```bash
+cp config/system-config.json.template ~/.config/system-config.json
+cp config/private-config.json.template ~/.config/private-config.json
 
-**Problem Solved**: Proper hierarchy and organization!
+# Edit with your preferences
+vim ~/.config/system-config.json
+```
 
-- **Separate modules** for each component
+### **3. Rebuild Your System:**
+```bash
+sudo nixos-rebuild switch --flake .
+```
+
+### **4. Edit Configs Directly (No Nix Knowledge Needed):**
+```bash
+# Edit Hyprland config
+vim ~/.config/hypr/hyprland.conf
+
+# Edit Neovim config  
+vim ~/.config/nvim/init.lua
+
+# Changes apply immediately - no rebuilds needed!
+```
+
+## 📦 **Benefits of Clean Structure**
+
+### 📁 **Organization:**
+- **Each component** has its own file/directory
+- **No more merged** configurations
+- **Easy to find** what you're looking for
+- **Logical hierarchy** that makes sense
+
+### 🎮 **Universal Keybinds:**
+- **Same shortcuts everywhere** - no relearning
+- **Vim-inspired** navigation in all DEs/WMs  
+- **JSON-configurable** keybinding system
+- **Consistent experience** across environments
+
+### 🔧 **Easy Maintenance:**
+- **Direct config editing** (no Nix needed for simple changes)
+- **Modular structure** - change one thing at a time
+- **Template-based** for adding new components
+- **Well-documented** options and examples
+
+### 📚 **Beginner Friendly:**
+- **Raw config files** separate from Nix modules
+- **Clear file organization** 
+- **Good defaults** with easy customization
+- **Learn gradually** - start simple, add complexity
+
+### 🚀 **Advanced Features:**
 - **Custom NixOS options** for everything
-- **Clean imports** structure
-- **Easy to enable/disable** features
+- **Proper module system** architecture
+- **Extensible design** for power users
+- **Integration with Stylix** for theming
 
-## 🚀 **How to Use**
+## 🎆 **What's Next?**
 
-### 1. **Enable Universal Keybindings**
+### **Your dotfiles are now:**
+✅ **Organized** - each component in its own file  
+✅ **Consistent** - same keybinds across all DEs/WMs  
+✅ **Maintainable** - easy to modify and extend  
+✅ **Clean** - no duplicates or merged configurations  
+✅ **Modern** - follows best practices and patterns  
 
-In your `system-config.json`:
-```json
-{
-  "keybinds": {
-    "enable_universal": true,
-    "style": "vim-inspired"
-  }
-}
-```
-
-### 2. **Configure Individual Components**
-
-**Hyprland**:
-```nix
-# In your configuration
-programs.hyprland-suite.enable = true;
-```
-Then modify `~/.config/hypr/hyprland.conf` directly!
-
-**Neovim**:
-```nix
-programs.neovim-suite.enable = true;
-```
-Then modify `~/.config/nvim/init.lua` directly!
-
-**DWM**:
-```nix
-programs.dwm-suite.enable = true;
-```
-Add your patches in `modules/nixos/gui/window-managers/dwm/`
-
-### 3. **Add New Components**
-
-**To add a new GUI application**:
-1. Create `modules/nixos/gui/applications/[app-name]/default.nix`
-2. Add configuration files in `config/[app-name]/`
-3. Import in `modules/nixos/gui/applications/default.nix`
-
-**To add a new editor**:
-1. Create `modules/nixos/development/editors/[editor]/default.nix`
-2. Add config files in `config/[editor]/`
-3. Import in `modules/nixos/development/editors/default.nix`
-
-## 🎨 **Theming System**
-
-**Stylix Integration**:
-- **Base16 color schemes** automatically applied
-- **Consistent theming** across all applications
-- **Wallpaper-based** color generation
-- **JSON-configurable** themes
-
-## 🔧 **Customization Examples**
-
-### Adding Custom Hyprland Keybinds
-
-Edit `config/hypr/keybinds.conf`:
-```bash
-# Add your custom binds
-bind = $mainMod, X, exec, my-custom-script
-```
-
-### Adding Neovim Plugins
-
-Edit `config/nvim/lua/config/plugins.lua`:
-```lua
-return {
-  -- Your custom plugins
-  { "author/plugin-name" },
-}
-```
-
-### Adding DWM Patches
-
-1. Place patch files in `modules/nixos/gui/window-managers/dwm/patches/`
-2. Add to the patches list in `default.nix`
-
-## 🛠️ **Maintenance**
-
-### Easy Modification
-- **Configuration files** are separate from Nix modules
-- **Direct editing** of configs (no Nix rebuilds needed)
-- **Modular structure** makes finding things easy
-
-### Adding New Features
-- **Template structure** for new modules
-- **Consistent patterns** throughout
-- **Well-documented** options
-
-## 📋 **Migration Guide**
-
-### From Old Structure
-1. **Backup** your current configs
-2. **Copy custom settings** to new locations
-3. **Update** system-config.json with your preferences
-4. **Test** each component individually
-
-### Key File Locations
-- **Old**: Everything mixed in modules
-- **New**: Config files in `config/`, modules in `modules/`
-- **Keybinds**: Now universal via `modules/nixos/core/keybinds.nix`
-
-## 🎯 **Benefits of New Structure**
-
-1. **Easy to Modify** ✅
-   - Direct config file editing
-   - No complex Nix syntax for simple changes
-
-2. **Consistent Keybindings** ✅
-   - Same shortcuts across all DEs/WMs
-   - Vim-inspired navigation everywhere
-
-3. **Modular & Maintainable** ✅
-   - Each component in its own file/directory
-   - Clean imports and dependencies
-
-4. **Beginner Friendly** ✅
-   - Clear structure and organization
-   - Well-documented options
-
-5. **Advanced Features** ✅
-   - Custom NixOS options
-   - Extensible architecture
-   - Proper modularity
-
-This new structure gives you the **best of both worlds**: easy configuration management with powerful NixOS modularity! 🚀
+### **Ready to customize:**
+1. **Edit config files directly** for quick changes
+2. **Add new components** using the template structure  
+3. **Extend keybindings** in the universal system
+4. **Customize themes** with Stylix integration
 
 ---
 
-**Ready to use your new, organized dotfiles!** 🎉
+**Your dotfiles are now perfectly organized and ready to use!** 🎉
+
+**Branch: `wip` | Status: Clean ✨ | Universal Keybinds: ✅ | Modular: ✅**
