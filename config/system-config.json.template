@@ -1,0 +1,107 @@
+{
+  "system": {
+    "hostname": "nix-workstation",
+    "architecture": "x86_64-linux",
+    "timezone": "Asia/Kolkata",
+    "locale": "en_US.UTF-8",
+    "boot": {
+      "mode": "uefi",
+      "mountPath": "/boot",
+      "timeout": 4
+    },
+    "hardware": {
+      "cpu": "amd",
+      "gpu": "amd",
+      "bluetooth": true,
+      "wifi": true
+    }
+  },
+  "users": {
+    "primary": {
+      "username": "error",
+      "name": "ERROR",
+      "shell": "fish",
+      "groups": ["wheel", "networkmanager", "audio", "video"]
+    },
+    "secondary": {
+      "username": "levi",
+      "name": "Levi",
+      "shell": "zsh",
+      "groups": ["users"]
+    }
+  },
+  "desktop": {
+    "environments": ["hyprland", "gnome", "dwm"],
+    "defaultDE": "hyprland",
+    "displayManager": "greetd",
+    "themes": {
+      "colorScheme": "gruvbox-dark-hard",
+      "wallpaper": "./assets/wallpapers/default.jpg",
+      "font": {
+        "system": "Inter",
+        "monospace": "JetBrains Mono Nerd Font",
+        "size": 11
+      }
+    }
+  },
+  "security": {
+    "clipboard": {
+      "manager": "clipse",
+      "autoDelete": {
+        "passwords": 30,
+        "otps": 10,
+        "general": 3600
+      },
+      "imagePreview": true,
+      "pinning": true
+    },
+    "authentication": {
+      "passkey": true,
+      "keyAuth": true
+    }
+  },
+  "development": {
+    "editors": ["neovim", "emacs"],
+    "terminals": ["foot", "alacritty"],
+    "aliases": {
+      "lg": "lazygit",
+      "ld": "lazydocker",
+      "ll": "eza -la",
+      "tree": "eza --tree"
+    }
+  },
+  "virtualization": {
+    "enable": true,
+    "vms": {
+      "win7": {
+        "enable": true,
+        "memory": "4096",
+        "disk": "50G"
+      },
+      "kali-cli": {
+        "enable": true,
+        "memory": "2048",
+        "gui": false
+      }
+    }
+  },
+  "network": {
+    "wifi": {
+      "backend": "iwd",
+      "macRandomization": true
+    },
+    "firewall": {
+      "enable": true,
+      "allowedTCPPorts": [],
+      "allowedUDPPorts": []
+    }
+  },
+  "packages": {
+    "categories": {
+      "base": ["pciutils", "usbutils", "lshw", "hwinfo", "lsof", "htop"],
+      "development": ["git", "gcc", "cmake", "nodejs", "python3", "rust"],
+      "multimedia": ["ffmpeg", "imagemagick", "gimp", "vlc"],
+      "utilities": ["ripgrep", "fd", "bat", "eza", "fzf", "jq"]
+    }
+  }
+}
