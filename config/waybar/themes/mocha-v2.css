@@ -30,6 +30,5 @@
 @define-color hover   rgba(147, 153, 178, 0.30);
 @define-color mantle-85     rgba(24, 24, 37, 0.85);
 @define-color bar-glass rgba(17, 17, 27, 0.80);
-@define-color bar-glass2 rgba(18, 19, 25, 0.45);
 @define-color tooltip-glass rgba(17, 17, 27, 0.9);
 @define-color surface-glass rgba(49, 50, 68, 0.85);

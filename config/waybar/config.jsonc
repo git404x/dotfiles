@@ -1,7 +1,7 @@
 {
   "layer": "bottom",
   "position": "bottom",
-  "height": 32,
+  "height": 34,
   "mod": "dock",
   "exclusive": "true",
   "passthrough": false,
@@ -9,13 +9,13 @@
   "reload_style_on_change": true,
 
   "margin-top": 4,
-  "margin-left": 6,
-  "margin-right": 6,
+  "margin-left": 4,
+  "margin-right": 4,
   "margin-bottom": 4,
 
   "modules-left": [
     "hyprland/workspaces",
-    "hyprland/window",
+    // "hyprland/window",
     "wlr/taskbar"
   ],
 
@@ -49,19 +49,18 @@
     "format": "{}",
     "separate-outputs": true,
     "tooltip": false,
-    "max-length": 30
+    "max-length": 24
   },
 
   "wlr/taskbar": {
     "format": "{icon}",
     "tooltip": false,
-    "icon-size": 18,
-    "spacing": 10,
+    "icon-size": 16,
+    "spacing": 6,
     "current-only": true,
-    "tooltip-format": "{title}",
-    "on-click": "activate",
-    "on-click-middle": "close",
-    "ignore-list": [ "Alacritty", "foot", "LibreWolf" ],
+    "on-click": null,
+    "on-click-middle": null,
+    "ignore-list": [ "foot", "LibreWolf" ],
     "app_ids-mapping": {
       "firefoxdeveloperedition": "firefox-developer-edition",
       "vesktop": "discord",
@@ -72,7 +71,7 @@
   "clock": {
     "format": "󰥔 {:%I:%M %p}",
     "interval": 5,
-    // "format-alt": "󰃭 {:%a,%d %b}",
+    "format-alt": "󰃭 {:%a,%d %b}",
     "tooltip-format": "<tt>{calendar}</tt>",
     "calendar": {
       "mode": "month",
@@ -86,27 +85,20 @@
     }
   },
 
-  "tray": {
-    "icon-size": 16,
-    "spacing": 6,
-    "on-click": "activate"
-  },
-
   "group/sysinfo": {
     "orientation": "horizontal",
     "modules": [
       "cpu",
-      "memory",
       "temperature#cpu",
+      "memory",
       "battery"
     ]
   },
 
   "cpu": {
-    "interval": 5,
     "format": " {}%",
-    "max-length": 10,
-    "tooltip": false
+    "tooltip": false,
+    "interval": 5
   },
 
   "temperature#cpu": {
@@ -117,7 +109,7 @@
 
   "memory": {
     "interval": 5,
-    "format": " {used:0.1f}G",
+    "format": " {used:0.1f}G",
     "tooltip": false,
     "max-length": 10
   },
@@ -125,11 +117,11 @@
   "battery": {
     "format": "{icon} {capacity}%",
     "format-icons": {
-      "charging": ["󰢜 ", "󰂆 ", "󰂇 ", "󰂈 ", "󰢝 ", "󰂉 ", "󰢞 ", "󰂊 ", "󰂋 ", " 󰂅 "],
+      "charging": ["󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", " 󰂅"],
       "default": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
     "format-plugged": " {capacity}%",
-    "format-full": "Charged ",
+    "format-full": " Charged",
     "interval": 5,
     "states": {
       "warning": 20,
@@ -139,34 +131,40 @@
   },
 
   "pulseaudio": {
-    "format": "{icon}{volume}%",
+    "format": "{icon} {volume}%",
     "format-muted": "󰝟 mute",
     "format-bluetooth": "󰂰 {volume}%",
-    "tooltip-format": "{icon} {desc} // {volume}%",
-    "on-click": "pavucontrol -t 3",
-    "scroll-step": 5,
-    "max-volume": 150,
+    "tooltip": false,
+    "on-click": null,
+    "scroll-step": 7,
+    "max-volume": 120,
     "format-icons": {
-      "muted": "󰝟 ",
-      "bluetooth": "󰂰 ",
-      "headphone": " ",
-      "hands-free": " ",
-      "headset": " ",
-      "phone": " ",
-      "portable": " ",
-      "car": " ",
-      "default": [" ", " ", "󰕾 ", "󰕾 ", "󰕾 ", "  ", "  ", "  "]
+      "muted": "󰝟",
+      "bluetooth": "󰂰",
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "default": ["", "", "󰕾", "󰕾", "󰕾", " ", " ", " "]
     }
   },
 
   "network": {
     "format": "{ifname}",
-    "format-wifi": "{icon}{essid}",
-    "format-icons": ["󰤯 ", "󰤟 ", "󰤢 ", "󰤥 ", "󰤨 "],
-    "format-ethernet": "󰈀 {ifname} ",
+    "format-wifi": "{icon} {essid}",
+    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "format-ethernet": "󰈀 {ifname}",
     "format-disconnected": "󰤮 Offline", //An empty format will hide the module.
     "tooltip": false,
     "max-length": 20,
     "interval": 4
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 6,
+    "on-click": null
   }
+
+
 }

@@ -5,10 +5,10 @@
 * {
   border: none;
   border-radius: 8px;
-  font-family: "JetBrainsMono NF", "Roboto", "sans-serif";
+  font-family: "JetBrainsMono NF", "GeistMono NFM";
   font-size: 14px;
-  font-weight: 700;
-  min-height: 0px;
+  font-weight: 600;
+  min-height: 12px;
 }
 
 /* waybar */
@@ -19,7 +19,7 @@ window#waybar {
   transition-duration: 0.5s;
 }
 window#waybar.empty {
-  background-color: @bar-glass2;
+  background-color: @base;
 }
 
 /* tooltip (calendar, etc.) */
@@ -43,8 +43,8 @@ tooltip label {
 #tray,
 #sysinfo {
   background: @base;
-  padding: 0px 8px;
-  margin: 4px 2px;
+  padding: 0px 10px;
+  margin: 4px;
   background-clip: padding-box;
 }
 
@@ -56,8 +56,8 @@ tooltip label {
 #network:hover,
 #pulseaudio:hover,
 #tray:hover {
-  background-color: @hover;
-  transition: all 0.3s ease-in-out;
+  background-color: @surface0;
+  transition: all 0.2s ease-in-out;
 }
 
 /* workspaces module */
@@ -123,12 +123,15 @@ taskbar#waybar.empty {
 #battery {
   color: @green;
 }
+
 #cpu {
   color: @sapphire;
 }
+
 #temperature.cpu {
   color: @red;
 }
+
 #memory {
   color: @peach;
 }

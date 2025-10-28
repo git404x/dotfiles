@@ -1,29 +1,41 @@
-{ config, pkgs, userConfig, ... }:
+{ config, lib, pkgs, userConfig, ... }:
 
 let
+  # base paths
+  dotfilesPath = "${config.home.homeDirectory}/dotfiles";
+  configPath = "${dotfilesPath}/config";
+
+  # function to create out-of-store symlinks
+  mkConfigLink = path: {
+    source = config.lib.file.mkOutOfStoreSymlink "${configPath}/${path}";
+  };
+
+  # config directories to symlink
   configDirs = [
-    "alacritty" "foot" "wezterm"
-    "avizo" "dunst"
-    "bat"
-    "fastfetch"
-    "hypr"
-    "rofi"
-    "waybar"
-    "wlogout"
+    "hypr" "waybar" "dunst"
+    "wofi" "wlogout"
+    "nvim" "VSCodium"
+    "foot" "alacritty" "wezterm"
+    "electron-flags.conf" "bat"
   ];
 
-  cfgDir = ./../../../config;
-
-  configSymlinks = builtins.listToAttrs (map
-    (name: {
-      name = ".config/${name}";
-      value.source = "${cfgDir}/${name}";
-    })
-    configDirs
+  # generate xdg.configFile attribute set from the list
+  configFileAttrs = lib.listToAttrs (
+    map (dir: {
+      name = dir;
+      value = mkConfigLink dir;
+    }) configDirs
   );
-in {
-  home.file = configSymlinks // {
-    ".tmux.conf".source = "${cfgDir}/tmux/tmux.conf";
-  };
-}
+in
+{
+  # enable XDG directories
+  xdg.enable = true;
 
+  # set XDG_CONFIG_HOME explicitly
+  home.sessionVariables = {
+    XDG_CONFIG_HOME = "${config.home.homeDirectory}/.config";
+  };
+
+  # symlink all config directories
+  xdg.configFile = configFileAttrs;
+}

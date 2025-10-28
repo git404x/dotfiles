@@ -1,0 +1,13 @@
+prompt=search
+term=foot
+width=40%
+height=30%
+lines=10
+mode=drun
+dmenu=false
+show-icons=true
+no-scrollbar=false
+allow-markup=false
+case-sensitive=false
+allow-images=true
+no-actions=true
