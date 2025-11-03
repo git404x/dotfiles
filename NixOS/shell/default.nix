@@ -15,13 +15,12 @@
         rustup
         cargo
         cmake
-        nodePackages.nodejs
-        nodePackages.npm
+        nodejs_latest
         python3
         gnumake
       ];
 
-    GREETING = "shell env !";
+    GREETING = "nix shell env !!";
 
     shellHook = ''
       echo $GREETING | figlet | lolcat

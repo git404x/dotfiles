@@ -15,33 +15,19 @@
   
   let
 
-    # ---- SYSTEM Configuration ---- #
+    # system
     systemConfig = {
-      system = "x86_64-linux"; # system arch
-      hostname = "nix"; # hostname
-      timezone = "Asia/Kolkata"; # select timezone
-      locale = "en_US.UTF-8"; # select locale
-      bootMode = "uefi"; # uefi or bios
-      bootMountPath = "/boot"; # mount path for efi boot partition; only used for uefi boot mode
-      grubDevice = ""; # device identifier for grub; only used for legacy (bios) boot mode
+      system = "x86_64-linux";
+      hostname = "nix";
+      timezone = "Asia/Kolkata";
+      locale = "en_US.UTF-8";
     };
 
-    # ----- USER Configuration ----- #
+    # user
     userConfig = {
-
-      # Shell
       shell = "fish";
-
-      # users
-      username = "error";
-      name = "ERROR";
-
-      username2 = "levi";
-      name2 = "Levi";
-
-      dotfilesDir = "~/dotfiles"; # absolute path of the local repo
-      dotfilesDirName = "dotfiles"; # name for dotfiles dir
-
+      username = "px";
+      name = "Paradoxx";
     };
 
     system = systemConfig.system;
@@ -54,6 +40,7 @@
         allowUnfree = true;
       };
     };
+
     # from nixpkgs-stable channel
     pkgs-stable = import nixpkgs-stable {
       inherit system;
@@ -66,19 +53,10 @@
   {
 
     nixosConfigurations =
-
     let
-
       systemModules = [
-        # define nix modules
         ./NixOS/system/configuration.nix
         chaotic.nixosModules.default
-        {
-          nixpkgs.overlays = [
-            # example.overlay
-            # inputs.example-overlay.overlay
-          ];
-        }
       ];
 
       specialArgs = {
@@ -93,16 +71,13 @@
       ${systemConfig.hostname} = lib.nixosSystem {
         inherit system;
         specialArgs = specialArgs;
-        modules = systemModules ++ [
-          ./NixOS/system/hardware-configuration.nix
-        ];
+        modules = systemModules ++ [ ./NixOS/system/hardware-configuration.nix ];
       };
     };
 
     homeConfigurations =
     let
       userModules = [
-        # user nix modules
         ./NixOS/user/home.nix
       ];
       extraSpecialArgs = {
@@ -124,24 +99,23 @@
   inputs = {
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager/master";
-      # home-manager follows nixpkgs channel
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    programs-db = {
+      url = "github:wamserma/flake-programs-sqlite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hyprland.url = "github:hyprwm/Hyprland";
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-
-    programs-db = {
-      url = "github:wamserma/flake-programs-sqlite";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     cachix.url = "github:cachix/cachix";
 

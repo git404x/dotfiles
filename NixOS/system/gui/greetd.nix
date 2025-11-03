@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  # Enable display manager
+  # display manager
   services.greetd = {
     enable = true;
     settings = {
@@ -10,7 +10,7 @@
           let
             session = config.services.displayManager.sessionData.desktops;
           in
-            "${pkgs.tuigreet}/bin/tuigreet -t -s ${session}/share/xsessions:${session}/share/wayland-sessions";
+            "${pkgs.tuigreet}/bin/tuigreet -t -s ${session}/share/wayland-sessions:${session}/share/xsessions";
       };
     };
   };
@@ -27,9 +27,5 @@
   };
 
   # systemPackages
-  environment.systemPackages = with pkgs; [
-    # Display Manager -------------------------------------------------- #
-    greetd                             # login manager daemon
-    tuigreet                           # Graphical console greeter for greetd
-  ];
+  environment.systemPackages = [ pkgs.tuigreet ];
 }

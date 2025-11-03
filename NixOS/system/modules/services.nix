@@ -1,61 +1,44 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
-  # Enable touchpad support
-  services.libinput = {
-    enable = true;
-    touchpad.accelSpeed = "0.4";
-    mouse.middleEmulation = false;
-  };
 
-  # dbus services
   services = {
-    dbus.enable = true;
-    fwupd.enable = true;
-  };
+    # CUPS to print documents
+    printing.enable = true;
 
-  # virtual fs
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs;
-  };
+    # touchpad support
+    libinput.enable = true;
 
-  # default behaviour
-  services.logind.settings.Login = {
-    powerKey = "suspend-then-hibernate";
-    lidSwitch = "suspend-then-hibernate";
-  };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-
-  # TPM
-  boot.initrd.systemd.tpm2.enable = false;
-  systemd = {
-    tpm2.enable = false;
-    services = {
-      "tpm2.tagret" = {
-        enable = false;
-      };
-      "dev-tpm0.device" = {
-        enable = false;
-      };
-      "dev-tpmrm0.device" = {
-        enable = false;
-      };
+    # default behaviour
+    logind.settings.Login = {
+      powerKey = "suspend-then-hibernate";
+      lidSwitch = "suspend-then-hibernate";
     };
   };
 
-  # Packages
+  # disable TPM
+  boot.initrd.systemd.tpm2.enable = false;
+  systemd.tpm2.enable = false;
+  systemd.services = {
+    "tpm2.tagret" = { enable = false; };
+    "dev-tpm0.device" = { enable = false; };
+    "dev-tpmrm0.device" = { enable = false; };
+  };
+
+  # Enable sound with pipewire.
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+    jack.enable = false;
+  };
+
   environment.systemPackages = with pkgs; [
-    # list of pkgs
-    libinput
-    libinput-gestures
-    gvfs
+    pavucontrol
+    pamixer
   ];
 }
