@@ -1,5 +1,5 @@
 -- session restore opts
-vim.o.sessionoptions = "blank,curdir,folds,help,localoptions,tabpages,winsize"
+vim.o.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 -- rocks_config
 -- local lazy = require("lazy")

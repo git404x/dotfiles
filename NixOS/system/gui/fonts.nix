@@ -5,6 +5,8 @@ let
 in
 {
   fonts = {
+    fontconfig.enable = true;
+    fontDir.enable = true;
     enableDefaultPackages = true;
     packages = with pkgs; [
       font-awesome # for waybar icons

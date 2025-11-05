@@ -1,33 +1,36 @@
-/* Import color theme */
-@import "./themes/mocha-v2.css";
+/* import theme */
+@import "./themes/gruvbox.css";
 
 /* global css */
 * {
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: "JetBrainsMono NF", "GeistMono NFM";
   font-size: 14px;
   font-weight: 600;
   min-height: 12px;
 }
 
-/* waybar */
+/* waybar window */
 window#waybar {
-  background-color: @crust;
-  color: @text;
+  background-color: @bg-darkest;
+  color: @fg-primary;
   transition-property: background-color;
   transition-duration: 0.5s;
 }
+
 window#waybar.empty {
-  background-color: @base;
+  background-color: @bg-dark;
 }
 
-/* tooltip (calendar, etc.) */
+/* tooltip */
 tooltip {
-  background-color: @tooltip-glass;
+  background-color: @tooltip-bg;
+  color: @fg-primary;
   padding: 8px 12px;
   transition: all 0.3s ease-in-out;
 }
+
 tooltip label {
   padding: 4px;
   letter-spacing: 0.5px;
@@ -42,13 +45,14 @@ tooltip label {
 #pulseaudio,
 #tray,
 #sysinfo {
-  background: @base;
-  padding: 0px 10px;
+  background: @bg-dark;
+  padding: 0px 8px;
   margin: 4px;
   background-clip: padding-box;
+  border-radius: 8px;
 }
 
-/* Hover effect */
+/* Module Hover Effects */
 #window:hover,
 #taskbar button:hover,
 #clock:hover,
@@ -56,35 +60,41 @@ tooltip label {
 #network:hover,
 #pulseaudio:hover,
 #tray:hover {
-  background-color: @surface0;
+  background-color: @bg-medium;
   transition: all 0.2s ease-in-out;
 }
 
-/* workspaces module */
+/* workspaces */
 #workspaces button {
-  color: @text;
+  color: @fg-primary;
   border-radius: 2px;
   padding: 1px 4px;
   margin: 0.5px;
   min-width: 2px;
+  border-bottom: 2px solid @bg-medium;
 }
+
 #workspaces button.active {
-  color: @teal;
-  background-color: @surface2;
-  border-bottom: 2px groove @teal;
+  color: @accent-primary;
+  background-color: @bg-light;
+  border-bottom: 2px solid @accent-primary;
 }
+
 #workspaces button.urgent {
-  background-color: @hover;
-  color: @red;
-  border-bottom: 2px solid @red;
+  background-color: @hover-overlay;
+  color: @accent-error;
+  border-bottom: 2px solid @accent-error;
 }
+
 #workspaces button.hidden {
-  background-color: @base;
-  color: @mauve;
+  background-color: @bg-dark;
+  color: @accent-special;
+  opacity: 0.6;
 }
+
 #workspaces button:hover {
-  background-color: @surface2;
-  color: @teal;
+  background-color: @bg-light;
+  color: @accent-primary;
 }
 
 /* App Taskbar */
@@ -92,27 +102,20 @@ tooltip label {
   padding: 2px 3px;
   border-radius: 2px;
 }
+
 #taskbar button.active {
-  color: @teal;
-  background: @surface1;
-  border-bottom: 2px groove @sapphire;
+  color: @accent-primary;
+  background: @bg-medium;
+  border-bottom: 2px solid @accent-secondary;
 }
+
 taskbar#waybar.empty {
   background: transparent;
 }
 
-/* tweak modules */
-#clock {
-  color: @flamingo;
-}
+/* Module Specific Colors */
 
-#sysinfo {
-  font-weight: bold;
-  transition:
-    background-color 0.3s,
-    box-shadow 0.3s;
-}
-
+/* sysinfo group module */
 #cpu,
 #temperature.cpu,
 #memory,
@@ -120,29 +123,38 @@ taskbar#waybar.empty {
   padding: 0px 4px;
 }
 
+#sysinfo {
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#clock {
+  color: @accent-warning;
+}
+
 #battery {
-  color: @green;
+  color: @accent-success;
 }
 
 #cpu {
-  color: @sapphire;
+  color: @accent-secondary;
 }
 
 #temperature.cpu {
-  color: @red;
+  color: @accent-error;
 }
 
 #memory {
-  color: @peach;
+  color: @accent-warning;
 }
 
 #network {
-  color: @yellow;
+  color: @accent-special;
 }
 
 #window {
-  color: @rosewater;
+  color: @fg-secondary;
 }
+
 #pulseaudio {
-  color: @mauve;
+  color: @accent-info;
 }

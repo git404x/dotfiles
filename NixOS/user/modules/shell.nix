@@ -36,9 +36,9 @@ let
 
     # nix related
     nix-flake-update = "nix flake update";
-    nix-switch = "sudo nixos-rebuild switch --flake ~/dotfiles";
-    nix-switch-impure = "sudo nixos-rebuild switch --flake ~/dotfiles --show-trace --impure --option --eval-cache false";
-    home-switch = "home-manager switch --flake ~/dotfiles";
+    nix-switch = "nh os switch ~/dotfiles";
+    nix-switch-impure = "nh os switch ~/dotfiles --show-trace --impure --option --eval-cache false";
+    home-switch = "nh home switch ~/dotfiles";
   };
 
 in
@@ -63,9 +63,19 @@ in
         line_break.disabled = true;
       };
     };
+
+    # nix helper
+    nh = {
+      enable = true;
+      clean = {
+        enable = true;
+        dates = "weekly";
+      };
+    };
   };
 
   home.packages = with pkgs; [
+    nh nvd nix-output-monitor
     fastfetch nitch onefetch
     bat eza
   ];

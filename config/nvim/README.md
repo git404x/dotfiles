@@ -1,23 +1,23 @@
-# My Neovim Configuration
+# my neovim configuration
 
-This repository contains my personal setup for Neovim.
+This repository contains my personal setup for neovim.
 
 ## Installation
 
-To get started with my Neovim configuration, follow these steps:
+To get started with my neovim configuration, follow these steps:
 
 - **Install Dependencies**:
   (setup a nerd-font in terminal)
 
   ```bash
-  ttf-jetbrains-nerd make gcc ripgrep fzf python3 nodejs npm
+  yay -S ttf-jetbrains-nerd make gcc ripgrep fzf python3 nodejs npm
   ```
 
 - **Clone the Repository**:
 
   ```bash
-  git clone https://github.com/bindal-uday/neovim-dotfiles ~/.config/nvim
+  cp -r dotfiles/config/nvim ~/.config/nvim
   ```
 
 - **Preview**
-  ![Screenshot](./screenshot.jpg)
+  ![Screenshot](./nvim.png)

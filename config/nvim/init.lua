@@ -1,6 +1,6 @@
 -- setup options
 require("config.options")
--- require("config.settings")
+require("config.settings")
 
 -- setup keymaps
 require("config.keymaps")

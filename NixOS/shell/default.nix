@@ -8,16 +8,19 @@
       packages = with pkgs; [
         figlet
         lolcat
-        libgcc
-        gcc
-        yarn
-        ripgrep
-        rustup
         cargo
-        cmake
-        nodejs_latest
-        python3
+        fd
+        gcc
         gnumake
+        go
+        libgcc
+        nodePackages_latest.nodejs
+        openjdk
+        python3
+        ripgrep
+        ruby
+        rustup
+        yarn
       ];
 
     GREETING = "nix shell env !!";

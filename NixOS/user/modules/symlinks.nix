@@ -12,11 +12,17 @@ let
 
   # config directories to symlink
   configDirs = [
-    "hypr" "waybar" "dunst"
-    "wofi" "wlogout"
-    "nvim" "VSCodium"
-    "foot" "alacritty" "wezterm"
-    "electron-flags.conf" "bat"
+    "bat"
+    "btop"
+    "dunst"
+    "electron-flags.conf"
+    "fuzzel"
+    "foot"
+    "hypr"
+    "nvim"
+    "VSCodium"
+    "waybar"
+    "wlogout"
   ];
 
   # generate xdg.configFile attribute set from the list
@@ -38,4 +44,9 @@ in
 
   # symlink all config directories
   xdg.configFile = configFileAttrs;
+
+  # other configs
+  home.file = {
+    ".tmux.conf".source = ../../../config/tmux/tmux.conf;
+  };
 }

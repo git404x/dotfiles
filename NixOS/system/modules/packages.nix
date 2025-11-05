@@ -28,8 +28,6 @@ in
     nano nanorc
     wget
     axel
-    nix-index
-    nix-prefetch-git
     cachix
     zip
     unzip
@@ -46,14 +44,12 @@ in
     gparted
     htop
     btop
-    usbtop
 
     # utilities
     yt-dlp
     imagemagick
     android-tools
     wlr-randr
-    imagemagick
 
     # dev
     git
@@ -64,36 +60,37 @@ in
     vscodium
     neovim
     neovide
+
+    # dependencies
+    fzf
+    stylua
+    ripgrep
+    libgcc
+    gnumake
     python3
+    nodePackages_latest.nodejs
 
     # terminal
     tmux
     tmate
     ranger
-    alacritty
+    yazi
     foot
-    kitty
-    wezterm
 
     # applications
-    zen-browser
+    chromium
     firefox
     librewolf
-    chromium
     qutebrowser
+    zen-browser
     telegram-desktop
-    onlyoffice-bin
-    obs-studio
+    onlyoffice-desktopeditors
     mpv
     imv
     protonvpn-gui
-    protonvpn-cli
-    proton-pass
     motrix
-    qbittorrent
     ani-cli
     notesnook
-    obsidian
 
   ]) ++ (with pkgs-stable; [
     # pkgs-stable

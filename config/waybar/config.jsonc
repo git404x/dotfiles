@@ -8,7 +8,7 @@
   "gtk-layer-shell": true,
   "reload_style_on_change": true,
 
-  "margin-top": 4,
+  "margin-top": 0,
   "margin-left": 4,
   "margin-right": 4,
   "margin-bottom": 4,
@@ -137,7 +137,7 @@
     "tooltip": false,
     "on-click": null,
     "scroll-step": 7,
-    "max-volume": 120,
+    "max-volume": 100,
     "format-icons": {
       "muted": "󰝟",
       "bluetooth": "󰂰",

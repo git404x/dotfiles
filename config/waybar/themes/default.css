@@ -1,0 +1,35 @@
+/* 
+ * Generic Theme Variables Interface
+ * All theme files must define these variables
+ */
+
+/* Background Layers (darkest to lightest) */
+@define-color bg-darkest;       /* Deepest background (waybar, bars) */
+@define-color bg-darker;        /* Standard background (modules) */
+@define-color bg-dark;          /* Standard background (pill effect) */
+@define-color bg-medium;        /* Slightly lighter (hover states) */
+@define-color bg-light;         /* Light backgrounds (active states) */
+
+/* Foreground/Text Layers */
+@define-color fg-primary;       /* Main text color */
+@define-color fg-secondary;     /* Secondary text */
+@define-color fg-tertiary;      /* Dimmed/muted text */
+@define-color fg-disabled;      /* Disabled elements */
+
+/* Accent Colors (semantic meanings) */
+@define-color accent-primary;   /* Primary accent (active elements) */
+@define-color accent-secondary; /* Secondary accent */
+@define-color accent-info;      /* Information */
+@define-color accent-success;   /* Success/positive */
+@define-color accent-warning;   /* Warning */
+@define-color accent-error;     /* Error/urgent */
+@define-color accent-special;   /* Special highlight */
+
+/* Transparency Variants */
+@define-color bg-transparent;   /* Semi-transparent background */
+@define-color tooltip-bg;       /* Tooltip background */
+@define-color hover-overlay;    /* Hover effect overlay */
+
+/* Border colors for visual separation */
+@define-color border-subtle     /* subtle border */
+@define-color border-strong     /* stronger border */

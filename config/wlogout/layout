@@ -24,9 +24,9 @@
 }
 {
     "label" : "suspend",
-    "action" : "systemctl suspend",
+    "action" : "hyprlock --grace 20; systemctl suspend -i",
     "text" : "Suspend",
-    "keybind" : "u"
+    "keybind" : "z"
 }
 {
     "label" : "reboot",

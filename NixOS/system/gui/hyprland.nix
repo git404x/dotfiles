@@ -35,6 +35,9 @@ in
     # core pkgs
     networkmanagerapplet                # nm-applet
     nemo-with-extensions                # file manager
+    nemo-fileroller                     # arhive open
+    nemo-preview                        # quick previewer
+    nautilus-open-any-terminal          # open terminal in files
     polkit_gnome                        # authentication
     gnome-keyring                       # credential
     wl-clipboard                        # clipboard
@@ -43,8 +46,9 @@ in
     # core hyprland tools
     dunst                              # notification daemon
     waybar                             # system bar
-    wofi                               # app launcher
+    fuzzel                             # app launcher
     wlogout                            # power menu
+    hyprpolkitagent                    # polkit auth
     hyprpaper                          # wallpaper daemon
     hyprlock                           # lock utility
     hypridle                           # idle utility

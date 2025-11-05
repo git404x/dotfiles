@@ -1,0 +1,76 @@
+/* import colors */
+@import "./gruvbox.css";
+
+* {
+  background-image: none;
+  box-shadow: none;
+}
+
+window {
+  background-color: @bg0-20;
+}
+
+button {
+  color: @fg1-60;
+  text-decoration-color: @fg1-60;
+  background-color: @bg0-60;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 20%;
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: transparent;
+  margin: 4px;
+  padding: 8px;
+}
+
+button:focus,
+button:active,
+button:hover {
+  background-color: @orange-60;
+  outline-style: none;
+  border-width: 2px;
+  border-color: @fg-70;
+}
+
+#lock {
+  background-image: image(
+    url("./icons/lock.png"),
+    url("/usr/local/share/wlogout/icons/lock.png")
+  );
+}
+
+#logout {
+  background-image: image(
+    url("./icons/logout.png"),
+    url("/usr/local/share/wlogout/icons/logout.png")
+  );
+}
+
+#suspend {
+  background-image: image(
+    url("./icons/suspend.png"),
+    url("/usr/local/share/wlogout/icons/suspend.png")
+  );
+}
+
+#hibernate {
+  background-image: image(
+    url("./icons/hibernate.png"),
+    url("/usr/local/share/wlogout/icons/hibernate.png")
+  );
+}
+
+#shutdown {
+  background-image: image(
+    url("./icons/shutdown.png"),
+    url("/usr/local/share/wlogout/icons/shutdown.png")
+  );
+}
+
+#reboot {
+  background-image: image(
+    url("./icons/reboot.png"),
+    url("/usr/local/share/wlogout/icons/reboot.png")
+  );
+}

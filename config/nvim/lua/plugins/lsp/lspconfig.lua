@@ -39,75 +39,106 @@ return {
     --   }
     -- end
 
-    -- Change the Diagnostic symbols in the sign column (gutter)
-    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-    for type, icon in pairs(signs) do
-      local hl = "DiagnosticSign" .. type
-      vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+    -- Setup diagnostic signs and diagnostics configuration
+    local function setup_diagnostics()
+      -- Define diagnostic signs with icons for the sign column (gutter)
+      local signs = {
+        Error = "",
+        Warn = "",
+        Hint = "󰠠",
+        Info = "",
+      }
+      local sign_definitions = {}
+      for type, icon in pairs(signs) do
+        sign_definitions["DiagnosticSign" .. type] = { text = icon, texthl = "DiagnosticSign" .. type }
+      end
+
+      -- Configure diagnostic display options
+      vim.diagnostic.config({
+        signs = sign_definitions,         -- Show signs with custom icons
+        underline = true,                 -- Underline problematic code
+        severity_sort = true,             -- Sort diagnostics by severity
+        virtual_text = {                  -- Virtual text with prefix icon and spacing
+          prefix = "●",
+          spacing = 2,
+          severity = { min = vim.diagnostic.severity.HINT },
+        },
+        float = {                        -- Floating window options for show_line_diagnostics()
+          border = "rounded",
+          source = "always",             -- Show source of diagnostic
+          header = "",
+          prefix = "",
+        },
+        update_in_insert = false,        -- Update diagnostics while in insert mode (false for minimal distractions)
+      })
     end
 
-    -- Setup handlers for each language server
-    mason_lspconfig.setup_handlers({
-      -- default handler for installed servers
-      function(server_name)
-        lspconfig[server_name].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-        })
-      end,
+    -- Call setup function immediately or from your config setup
+    setup_diagnostics()
 
-      ["lua_ls"] = function()
-        -- configure lua server (with special settings)
-        lspconfig["lua_ls"].setup({
-          capabilities = capabilities,
-          settings = {
-            Lua = {
-              diagnostics = {
-                globals = { "vim" }, -- Recognize 'vim' as a global variable
-              },
-              completion = {
-                callSnippet = "Replace",
+    -- Setup handlers for each language server
+    mason_lspconfig.setup({
+      handlers = {
+        -- default handler for installed servers
+        function(server_name)
+          lspconfig[server_name].setup({
+            capabilities = capabilities,
+            on_attach = on_attach,
+          })
+        end,
+
+        ["lua_ls"] = function()
+          -- configure lua server (with special settings)
+          lspconfig["lua_ls"].setup({
+            capabilities = capabilities,
+            settings = {
+              Lua = {
+                diagnostics = {
+                  globals = { "vim" }, -- Recognize 'vim' as a global variable
+                },
+                completion = {
+                  callSnippet = "Replace",
+                },
               },
             },
-          },
-          on_attach = on_attach,
-        })
-      end,
+            on_attach = on_attach,
+          })
+        end,
 
-      ["svelte"] = function()
-        -- configure svelte server
-        lspconfig["svelte"].setup({
-          capabilities = capabilities,
-          on_attach = function(client, buf)
-            vim.api.nvim_create_autocmd("BufWritePost", {
-              pattern = { "*.js", "*.ts" },
-              callback = function(ctx)
-                -- Here use ctx.match instead of ctx.file
-                client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-              end,
-            })
-          end,
-        })
-      end,
+        ["svelte"] = function()
+          -- configure svelte server
+          lspconfig["svelte"].setup({
+            capabilities = capabilities,
+            on_attach = function(client, buf)
+              vim.api.nvim_create_autocmd("BufWritePost", {
+                pattern = { "*.js", "*.ts" },
+                callback = function(ctx)
+                  -- Here use ctx.match instead of ctx.file
+                  client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+                end,
+              })
+            end,
+          })
+        end,
 
-      ["graphql"] = function()
-        -- configure graphql language server
-        lspconfig["graphql"].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-        })
-      end,
+        ["graphql"] = function()
+          -- configure graphql language server
+          lspconfig["graphql"].setup({
+            capabilities = capabilities,
+            on_attach = on_attach,
+            filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+          })
+        end,
 
-      ["emmet_ls"] = function()
-        -- configure emmet language server
-        lspconfig["emmet_ls"].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
-        })
-      end,
-
+        ["emmet_ls"] = function()
+          -- configure emmet language server
+          lspconfig["emmet_ls"].setup({
+            capabilities = capabilities,
+            on_attach = on_attach,
+            filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
+          })
+        end,
+      },
     })
   end,
 }

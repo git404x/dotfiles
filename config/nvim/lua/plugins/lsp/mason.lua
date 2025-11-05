@@ -34,29 +34,40 @@ return {
     })
 
     mason_lspconfig.setup({
-      -- list of servers for mason to install
+      -- list of language servers for mason to install
       ensure_installed = {
+        "ast_grep",
+        "vimls",
+        "dockerls",
+        "pyright",
+        "bashls",
+        "fish_lsp",
+        "jsonls",
         "cssls",
+        "html",
+        "hyprls",
+        "prismals",
+        "systemd_ls",
+        "tailwindcss",
+        "lua_ls",
+        "awk_ls",
         "emmet_ls",
         "graphql",
-        "html",
-        "lua_ls",
-        "prismals",
-        "pyright",
-        "svelte",
-        "tailwindcss",
-        "ts_ls",
       },
     })
 
     mason_tool_installer.setup({
       ensure_installed = {
-        "black", -- python formatter
-        "eslint_d", -- js linter
-        "isort", -- python formatter
-        "prettier", -- prettier formatter
-        "pylint", -- python linter
-        "stylua", -- lua formatter
+        -- formatters
+        "nixfmt",
+        "black",
+        "isort",
+        "prettier",
+        "stylua",
+
+        -- linters
+        "eslint_d",
+        "pylint",
       },
     })
   end,
