@@ -14,11 +14,6 @@ let
 in
 {
 
-  # pkgs
-  programs = {
-    adb.enable = true;
-  };
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   ## TWO VERSIONS OF SAME PACKAGE (BINARY) DOESN'T WORK!!
@@ -42,6 +37,7 @@ in
     lm_sensors
     brightnessctl
     gparted
+    cryptsetup
     htop
     btop
 
