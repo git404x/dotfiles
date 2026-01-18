@@ -11,6 +11,7 @@
 let
   system = systemConfig.system;
   zen-browser = inputs.zen-browser.packages."${system}".default;
+  legacy-launcher = inputs.legacy-launcher.packages."${system}".default;
 in
 {
 
@@ -65,6 +66,7 @@ in
     gnumake
     python3
     nodePackages_latest.nodejs
+    javaPackages.compiler.openjdk25
 
     # terminal
     tmux
@@ -87,6 +89,7 @@ in
     motrix
     ani-cli
     notesnook
+    legacy-launcher
 
   ]) ++ (with pkgs-stable; [
     # pkgs-stable

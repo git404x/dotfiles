@@ -119,6 +119,8 @@
 
     cachix.url = "github:cachix/cachix";
 
+    legacy-launcher.url = "path:./NixOS/packages/legacy-launcher";
+
   };
 
 }
