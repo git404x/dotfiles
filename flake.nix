@@ -120,6 +120,8 @@
     cachix.url = "github:cachix/cachix";
 
     legacy-launcher.url = "path:./NixOS/packages/legacy-launcher";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
+    playit.url = "github:pedorich-n/playit-nixos-module";
 
   };
 
