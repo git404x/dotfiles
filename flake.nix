@@ -71,7 +71,10 @@
       ${systemConfig.hostname} = lib.nixosSystem {
         inherit system;
         specialArgs = specialArgs;
-        modules = systemModules ++ [ ./NixOS/system/hardware-configuration.nix ];
+        modules = systemModules ++ [
+          ./NixOS/system/hardware-configuration.nix
+          inputs.nix-craft.nixosModules.default
+        ];
       };
     };
 
@@ -120,8 +123,7 @@
     cachix.url = "github:cachix/cachix";
 
     legacy-launcher.url = "path:./NixOS/packages/legacy-launcher";
-    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
-    playit.url = "github:pedorich-n/playit-nixos-module";
+    nix-craft.url = "path:./NixOS/packages/nix-craft";
 
   };
 

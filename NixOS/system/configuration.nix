@@ -14,8 +14,6 @@
     ./gui/greetd.nix
     ./gui/gnome.nix
     ./gui/hyprland.nix
-
-    ./../../NixOS/packages/minecraft-server.nix
   ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,

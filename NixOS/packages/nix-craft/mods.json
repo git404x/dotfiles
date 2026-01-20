@@ -1,0 +1,18 @@
+{
+  "fabric-api": {
+    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/DdVHbeR1/fabric-api-0.141.1%2B1.21.11.jar",
+    "sha256": "sha256-ald/g72LM8lAQSfRZTGsycQZX0feA5WVfJ1M0J17mMY="
+  },
+  "lithium": {
+    "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar",
+    "sha256": "sha256-MQZjnHPuI/RL++Xl56gVTf460P1ISR5KhXZ1mO17Bzk="
+  },
+  "easyauth": {
+    "url": "https://cdn.modrinth.com/data/aZj58GfX/versions/LPQE6Dfu/easyauth-mc1.21.11-3.4.1.jar",
+    "sha256": "sha256-oBKhyVAii4rdfE20w+EhrZddVn68rM/buycc1oHgSZQ="
+  },
+  "better-sleep": {
+    "url": "https://cdn.modrinth.com/data/HzlME0ff/versions/WKBhdN3D/single-sleep-mod-1.0.0.jar",
+    "sha256": "sha256-S6/mU15dPzLxMCNmMG6rmLth4Itw8pNUMrit7b3CGgs="
+  }
+}
