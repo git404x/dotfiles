@@ -11,7 +11,6 @@
 let
   system = systemConfig.system;
   zen-browser = inputs.zen-browser.packages."${system}".default;
-  legacy-launcher = inputs.legacy-launcher.packages."${system}".default;
 in
 {
 
@@ -89,7 +88,6 @@ in
     motrix
     ani-cli
     notesnook
-    legacy-launcher
 
   ]) ++ (with pkgs-stable; [
     # pkgs-stable

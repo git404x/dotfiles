@@ -4,13 +4,19 @@
 , makeWrapper
 , makeDesktopItem
 , copyDesktopItems
+  # runtime dependencies
 , jre
 , xorg
 , libGL
 , libpulseaudio
+, pipewire
+, libjack2
+, alsa-lib
 , udev
 , flite
 , vulkan-loader
+, libusb1
+, addDriverRunpath
 }:
 
 stdenv.mkDerivation rec {
@@ -29,47 +35,56 @@ stdenv.mkDerivation rec {
 
   desktopItems = [
     (makeDesktopItem {
-     name = "legacy-launcher";
-     desktopName = "Legacy Launcher";
-     exec = "legacy-launcher";
-     icon = "${./legacy-launcher.png}";
-     categories = [ "Game" ];
-     comment = "Stable, fast and simple Minecraft Launcher.";
-     })
+      name = "legacy-launcher";
+      desktopName = "Minecraft: Legacy Launcher";
+      exec = "legacy-launcher";
+      icon = "legacy-launcher";
+      categories = [ "Game" ];
+      comment = "Stable, fast and simple Minecraft Launcher.";
+    })
   ];
 
-  # These are the runtime libraries Minecraft needs to "see"
+  # runtime libraries to fix NixOS linking errors
   runtimeLibs = [
     xorg.libX11
     xorg.libXext
     xorg.libXcursor
     xorg.libXrandr
     xorg.libXxf86vm
+
+    # graphics
     libGL
+    vulkan-loader # performance mods
+
+    # audio stack
     libpulseaudio
+    pipewire
+    libjack2
+    alsa-lib
+
+    # input & controller
     udev
+    libusb1
     flite
-    vulkan-loader
   ];
 
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/bin $out/share/legacy-launcher $out/share/pixmaps
-
-    # Install the JAR
+    # install .jar
+    mkdir -p $out/bin $out/share/legacy-launcher
     cp $src $out/share/legacy-launcher/LegacyLauncher_legacy.jar
 
-    # Install the Icon (We assume legacy-launcher.png is next to this file)
-    cp ${./legacy-launcher.png} $out/share/pixmaps/legacy-launcher.png
+    # icon
+    mkdir -p $out/share/pixmaps $out/share/icons/hicolor/scalable/apps
+    cp ${./icon.svg} $out/share/pixmaps/legacy-launcher.svg
+    cp ${./icon.svg} $out/share/icons/hicolor/scalable/apps/legacy-launcher.svg
 
-    # use makeLibraryPath to turn the list of libs into a folder string
-    # Then we inject it into LD_LIBRARY_PATH
+    # wrapper script
     makeWrapper ${jre}/bin/java $out/bin/legacy-launcher \
       --add-flags "-jar $out/share/legacy-launcher/LegacyLauncher_legacy.jar" \
-      --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath runtimeLibs}"
+      --prefix LD_LIBRARY_PATH : "${addDriverRunpath.driverLink}/lib:${lib.makeLibraryPath runtimeLibs}"
 
-    # Install the desktop item generated above
     copyDesktopItems
 
     runHook postInstall

@@ -73,7 +73,8 @@
         specialArgs = specialArgs;
         modules = systemModules ++ [
           ./NixOS/system/hardware-configuration.nix
-          inputs.nix-craft.nixosModules.default
+          inputs.nix-craft.nixosModules.client
+          inputs.nix-craft.nixosModules.server
         ];
       };
     };
@@ -122,7 +123,6 @@
 
     cachix.url = "github:cachix/cachix";
 
-    legacy-launcher.url = "path:./NixOS/packages/legacy-launcher";
     nix-craft.url = "path:./NixOS/packages/nix-craft";
 
   };
