@@ -5,15 +5,16 @@
   imports = [
     ./modules/amdgpu.nix
     ./modules/core.nix
-    ./modules/nix-conf.nix
+    ./modules/hardware-mod.nix
+    ./modules/nix-config.nix
+    ./modules/privacy.nix
     ./modules/packages.nix
     ./modules/services.nix
     ./modules/users.nix
 
     ./gui/fonts.nix
     ./gui/greetd.nix
-    ./gui/gnome.nix
-    ./gui/hyprland.nix
+    ./gui/gui.nix
   ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,

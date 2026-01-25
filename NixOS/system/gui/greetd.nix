@@ -4,13 +4,14 @@
   # display manager
   services.greetd = {
     enable = true;
+    useTextGreeter = true;
     settings = {
       default_session = {
         command =
           let
             session = config.services.displayManager.sessionData.desktops;
           in
-            "${pkgs.tuigreet}/bin/tuigreet -t -s ${session}/share/wayland-sessions:${session}/share/xsessions";
+            "${pkgs.tuigreet}/bin/tuigreet -trs ${session}/share/wayland-sessions:${session}/share/xsessions";
       };
     };
   };

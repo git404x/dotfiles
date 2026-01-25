@@ -9,20 +9,14 @@
     # touchpad support
     libinput.enable = true;
 
-    # default behaviour
+    # logind.conf
     logind.settings.Login = {
-      powerKey = "suspend-then-hibernate";
-      lidSwitch = "suspend-then-hibernate";
+      lidSwitch = "suspend";
+      lidSwitchExternalPower = "suspend";
+      HandlePowerKey = "ignore";
+      HandlePowerKeyLongPress= "poweroff";
+      RemoveIPC = "yes";
     };
-  };
-
-  # disable TPM
-  boot.initrd.systemd.tpm2.enable = false;
-  systemd.tpm2.enable = false;
-  systemd.services = {
-    "tpm2.tagret" = { enable = false; };
-    "dev-tpm0.device" = { enable = false; };
-    "dev-tpmrm0.device" = { enable = false; };
   };
 
   # Enable sound with pipewire.

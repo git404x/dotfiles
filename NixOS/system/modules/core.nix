@@ -2,7 +2,7 @@
 
 {
   # kernel
-  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # magic-key
   boot.kernel.sysctl = {
@@ -37,6 +37,28 @@
       # Open ports in the firewall.
       allowedTCPPorts = [ ];
       allowedUDPPorts = [ ];
+    };
+
+    # manual config
+    extraHosts = ''
+      185.199.111.133 raw.githubusercontent.com
+    '';
+  };
+
+  # DNS & TLS
+  networking.nameservers = [
+    "1.1.1.1" # Cloudfare
+    "9.9.9.9" # Quad9
+  ];
+  services.resolved = {
+    enable = true;
+    settings = {
+      Resolve = {
+        DNSSEC = "true";
+        Domains = [ "~." ];
+        FallbackDNS = [ "1.1.1.1" "1.0.0.1" ];
+        DNSOverTLS = "true";
+      };
     };
   };
 

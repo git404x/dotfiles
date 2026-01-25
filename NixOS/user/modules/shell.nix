@@ -39,6 +39,7 @@ let
     nix-switch = "nh os switch ~/dotfiles";
     nix-switch-impure = "nh os switch ~/dotfiles --show-trace --impure --option --eval-cache false";
     home-switch = "nh home switch ~/dotfiles";
+    nix-clean = "nh clean all";
   };
 
 in

@@ -26,16 +26,12 @@ in
       extra-trusted-public-keys = [ ];
     };
 
-    extraOptions = ''
-      download-buffer-size = 104857600
-    '';
-
     # garbage-collection
     optimise.automatic = true;
     gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 14d";
+      options = "--delete-older-than 7d";
     };
   };
 

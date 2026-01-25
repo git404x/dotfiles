@@ -12,7 +12,6 @@ in
       font-awesome # for waybar icons
       noto-fonts
       inter
-      jetbrains-mono
       nf.jetbrains-mono
     ];
   };

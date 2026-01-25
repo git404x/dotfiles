@@ -1,17 +1,15 @@
-{ config, lib, pkgs, userConfig, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   # base paths
   dotfilesPath = "${config.home.homeDirectory}/dotfiles";
-  configPath = "${dotfilesPath}/config";
+  configSource = "${dotfilesPath}/config";
 
   # function to create out-of-store symlinks
-  mkConfigLink = path: {
-    source = config.lib.file.mkOutOfStoreSymlink "${configPath}/${path}";
-  };
+  mkSymlink = path: config.lib.file.mkOutOfStoreSymlink "${configSource}/${path}";
 
   # config directories to symlink
-  configDirs = [
+  xdgApps = [
     "bat"
     "btop"
     "dunst"
@@ -20,33 +18,32 @@ let
     "foot"
     "hypr"
     "nvim"
+    "tmux"
     "VSCodium"
     "waybar"
     "wlogout"
   ];
 
-  # generate xdg.configFile attribute set from the list
-  configFileAttrs = lib.listToAttrs (
-    map (dir: {
-      name = dir;
-      value = mkConfigLink dir;
-    }) configDirs
-  );
+  # config files to symlink
+  rootFiles = {
+    # ".zshrc"     = "zsh/.zshrc";
+  };
+
 in
 {
   # enable XDG directories
   xdg.enable = true;
-
-  # set XDG_CONFIG_HOME explicitly
   home.sessionVariables = {
     XDG_CONFIG_HOME = "${config.home.homeDirectory}/.config";
   };
 
   # symlink all config directories
-  xdg.configFile = configFileAttrs;
+  xdg.configFile = lib.genAttrs xdgApps (name: {
+    source = mkSymlink name;
+  });
 
   # other configs
-  home.file = {
-    ".tmux.conf".source = ../../../config/tmux/tmux.conf;
-  };
+  home.file = lib.mapAttrs (target: source: {
+    source = mkSymlink source;
+  }) rootFiles;
 }

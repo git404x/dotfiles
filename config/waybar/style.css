@@ -1,77 +1,66 @@
-/* import theme */
 @import "./themes/gruvbox.css";
 
-/* global css */
+/* Global */
 * {
-  border: none;
-  border-radius: 10px;
   font-family: "JetBrainsMono NF", "GeistMono NFM";
   font-size: 14px;
   font-weight: 600;
   min-height: 12px;
+  border: none;
+  border-radius: 10px;
 }
 
-/* waybar window */
+/* Main Bar Window */
 window#waybar {
   background-color: @bg-darkest;
   color: @fg-primary;
-  transition-property: background-color;
-  transition-duration: 0.5s;
+  transition: background-color 0.5s;
 }
 
 window#waybar.empty {
   background-color: @bg-dark;
 }
 
-/* tooltip */
+/* Tooltips */
 tooltip {
   background-color: @tooltip-bg;
   color: @fg-primary;
+  border: 1px solid @border-subtle;
   padding: 8px 12px;
-  transition: all 0.3s ease-in-out;
 }
 
-tooltip label {
-  padding: 4px;
-  letter-spacing: 0.5px;
-}
-
-/* module styling (pill effect) */
+/* MODULE PILLS */
 #clock,
-#window,
 #workspaces,
-#taskbar,
 #network,
 #pulseaudio,
 #tray,
-#sysinfo {
+#sysinfo,
+#taskbar {
   background: @bg-dark;
   padding: 0px 8px;
   margin: 4px;
-  background-clip: padding-box;
   border-radius: 8px;
 }
 
-/* Module Hover Effects */
-#window:hover,
-#taskbar button:hover,
+/* Hover Effects */
 #clock:hover,
 #sysinfo:hover,
 #network:hover,
 #pulseaudio:hover,
-#tray:hover {
+#tray:hover,
+#taskbar button:hover {
   background-color: @bg-medium;
-  transition: all 0.2s ease-in-out;
+  transition: background-color 0.2s;
 }
 
-/* workspaces */
+/* Workspaces */
 #workspaces button {
   color: @fg-primary;
-  border-radius: 2px;
-  padding: 1px 4px;
-  margin: 0.5px;
-  min-width: 2px;
+  padding: 0px 2px;
+  margin: 0px 1px;
   border-bottom: 2px solid @bg-medium;
+  border-radius: 2px;
 }
 
 #workspaces button.active {
@@ -81,15 +70,8 @@ tooltip label {
 }
 
 #workspaces button.urgent {
-  background-color: @hover-overlay;
   color: @accent-error;
   border-bottom: 2px solid @accent-error;
-}
-
-#workspaces button.hidden {
-  background-color: @bg-dark;
-  color: @accent-special;
-  opacity: 0.6;
 }
 
 #workspaces button:hover {
@@ -97,9 +79,9 @@ tooltip label {
   color: @accent-primary;
 }
 
-/* App Taskbar */
+/* Taskbar */
 #taskbar button {
-  padding: 2px 3px;
+  padding: 0px 4px;
   border-radius: 2px;
 }
 
@@ -107,54 +89,40 @@ tooltip label {
   color: @accent-primary;
   background: @bg-medium;
   border-bottom: 2px solid @accent-secondary;
+  margin-bottom: 0px;
 }
 
-taskbar#waybar.empty {
-  background: transparent;
-}
-
-/* Module Specific Colors */
-
-/* sysinfo group module */
-#cpu,
-#temperature.cpu,
-#memory,
-#battery {
-  padding: 0px 4px;
-}
-
+/* System Info */
 #sysinfo {
-  transition: background-color 0.3s, box-shadow 0.3s;
+  padding: 0 4px;
 }
-
-#clock {
-  color: @accent-warning;
-}
-
-#battery {
-  color: @accent-success;
-}
-
-#cpu {
-  color: @accent-secondary;
-}
-
-#temperature.cpu {
-  color: @accent-error;
-}
-
-#memory {
-  color: @accent-warning;
-}
-
-#network {
-  color: @accent-special;
-}
-
-#window {
+#cpu,
+#memory,
+#battery,
+#temperature {
+  padding: 0px 6px;
   color: @fg-secondary;
 }
 
+/* Module Specific Colors */
+#clock {
+  color: @accent-warning;
+}
+#battery {
+  color: @accent-success;
+}
+#cpu {
+  color: @accent-secondary;
+}
+#temperature {
+  color: @accent-error;
+}
+#memory {
+  color: @accent-warning;
+}
+#network {
+  color: @accent-special;
+}
 #pulseaudio {
   color: @accent-info;
 }

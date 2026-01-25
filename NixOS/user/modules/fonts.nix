@@ -14,7 +14,6 @@ in
     jetbrains-mono
     nf.jetbrains-mono
     nf.geist-mono
-    nf.iosevka
   ];
 
 }

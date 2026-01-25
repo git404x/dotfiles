@@ -75,12 +75,14 @@ in
     foot
 
     # applications
+    bitwarden-desktop
     chromium
     firefox
     librewolf
     qutebrowser
     zen-browser
     telegram-desktop
+    discord
     onlyoffice-desktopeditors
     mpv
     imv
