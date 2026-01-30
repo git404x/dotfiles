@@ -13,7 +13,6 @@ let
     "bat"
     "btop"
     "dunst"
-    "electron-flags.conf"
     "fuzzel"
     "foot"
     "hypr"
@@ -22,6 +21,8 @@ let
     "VSCodium"
     "waybar"
     "wlogout"
+    "electron-flags.conf"
+    "gamemode.ini"
   ];
 
   # config files to symlink

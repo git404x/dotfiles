@@ -11,6 +11,7 @@
     ./modules/packages.nix
     ./modules/services.nix
     ./modules/users.nix
+    ./modules/game.nix
 
     ./gui/fonts.nix
     ./gui/greetd.nix

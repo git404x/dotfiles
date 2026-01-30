@@ -71,8 +71,6 @@
         specialArgs = specialArgs;
         modules = systemModules ++ [
           ./NixOS/system/hardware-configuration.nix
-          inputs.nix-craft.nixosModules.client
-          inputs.nix-craft.nixosModules.server
         ];
       };
     };
