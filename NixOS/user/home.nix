@@ -1,12 +1,14 @@
-{ config, pkgs, userConfig, ... }:
+{ config, lib, pkgs, userConfig, ... }:
 
 {
 
   imports = [
+    ./modules/nvim.nix
     ./modules/shell.nix
+    ./modules/term.nix
     ./modules/theme.nix
-    ./modules/fonts.nix
-    ./modules/symlinks.nix
+    ./modules/tmux.nix
+    ./modules/hypr/hyprland.nix
   ];
 
   # Home Manager needs a bit of info about paths it should manage.
@@ -15,16 +17,6 @@
     homeDirectory = "/home/"+userConfig.username;
   };
   
-  # The home.packages option allows you to install Nix packages 
-  # into your environment.
-  home.packages = with pkgs; [
-    # hello
-  ];
-
-  home.sessionVariables = {
-    EDITOR = "nvim";
-  };
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 

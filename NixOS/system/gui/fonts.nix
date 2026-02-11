@@ -1,18 +1,26 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   nf = pkgs.nerd-fonts;
 in
 {
   fonts = {
-    fontconfig.enable = true;
     fontDir.enable = true;
+    fontconfig.enable = true;
     enableDefaultPackages = true;
+
     packages = with pkgs; [
       font-awesome # for waybar icons
+      google-fonts
+      liberation_ttf
+
+      nf.jetbrains-mono
+      nf.geist-mono
+      nf.fira-code
+
       noto-fonts
       inter
-      nf.jetbrains-mono
+      roboto
     ];
   };
 

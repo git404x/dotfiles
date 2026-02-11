@@ -14,82 +14,55 @@ let
 in
 {
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  ## TWO VERSIONS OF SAME PACKAGE (BINARY) DOESN'T WORK!!
+  # system pkgs
   environment.systemPackages = (with pkgs; [
     # core tools
-    vim
-    nano nanorc
-    wget
-    axel
-    cachix
-    zip
-    unzip
-    fzf
-    parallel
-    jq
+    axel curl wget dig
+    vim nano nanorc
+    zip unzip p7zip unrar
+    parallel jq
     openssh
 
     # system
-    usbutils
-    pciutils
-    lm_sensors
-    brightnessctl
-    gparted
-    cryptsetup
-    htop
-    btop
+    usbutils pciutils lshw lm_sensors
+    parted gparted
+    cryptsetup gnome-disk-utility
+    ntfs3g os-prober
+    htop btop
+    killall
 
     # utilities
     yt-dlp
-    imagemagick
     android-tools
-    wlr-randr
 
     # dev
     git
     git-filter-repo
-    gh
-    glab
+    gh glab
     lazygit
     vscodium
     neovim
     neovide
 
     # dependencies
-    fzf
-    stylua
-    ripgrep
-    libgcc
-    gnumake
-    python3
-    nodePackages_latest.nodejs
     javaPackages.compiler.openjdk25
 
     # terminal
     tmux
     tmate
-    ranger
     yazi
     foot
 
     # applications
     bitwarden-desktop
-    chromium
-    firefox
     librewolf
-    qutebrowser
     zen-browser
     telegram-desktop
     discord
     onlyoffice-desktopeditors
     mpv
     imv
-    protonvpn-gui
-    motrix
     ani-cli
-    notesnook
 
   ]) ++ (with pkgs-stable; [
     # pkgs-stable

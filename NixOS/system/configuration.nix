@@ -7,7 +7,6 @@
     ./modules/core.nix
     ./modules/hardware-mod.nix
     ./modules/nix-config.nix
-    ./modules/privacy.nix
     ./modules/packages.nix
     ./modules/services.nix
     ./modules/users.nix
@@ -16,6 +15,7 @@
     ./gui/fonts.nix
     ./gui/greetd.nix
     ./gui/gui.nix
+    ./gui/theme.nix
   ];
 
   # This option defines the first version of NixOS you have installed on this particular machine,

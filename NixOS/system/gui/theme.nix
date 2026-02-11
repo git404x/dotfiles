@@ -6,8 +6,7 @@
   ];
 
   stylix.targets = {
-    hyprlock.enable = false;
-    waybar.enable = false;
-    neovim.enable = false;
+    console.enable = true;
+    gtk.enable = true;
   };
 }

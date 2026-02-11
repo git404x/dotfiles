@@ -5,9 +5,10 @@
   boot.initrd.kernelModules = [ "amdgpu" ];
   boot.loader.systemd-boot.consoleMode = "max";
 
-  # TPM fix (For broken/buggy TPM)
+  # kernel modules
   boot.blacklistedKernelModules = [
-    "tpm" "tpm_crb" "tpm_tis" "tpm_tis_core"
+    "tpm" "tpm_crb" "tpm_tis" "tpm_tis_core" # fix tpm
+    "uvcvideo" # camera module
   ];
 
   # systemd tpm block

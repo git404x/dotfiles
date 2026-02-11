@@ -1,5 +1,5 @@
 {
-  description = "ERROR's nixos configuration";
+  description = "ERROR nixos configuration";
 
   outputs = {
               self,
@@ -8,7 +8,7 @@
               home-manager,
               hyprland,
               programs-db,
-              cachix,
+              stylix,
               ...
             }@inputs:
   
@@ -32,7 +32,6 @@
     system = systemConfig.system;
     lib = nixpkgs.lib;
 
-    # from nixpkgs channel
     pkgs = import nixpkgs {
       inherit system;
       config = {
@@ -40,7 +39,6 @@
       };
     };
 
-    # from nixpkgs-stable channel
     pkgs-stable = import nixpkgs-stable {
       inherit system;
       config = {
@@ -54,6 +52,7 @@
     nixosConfigurations =
     let
       systemModules = [
+        stylix.nixosModules.default
         ./NixOS/system/configuration.nix
       ];
 
@@ -79,6 +78,7 @@
     let
       userModules = [
         ./NixOS/user/home.nix
+        stylix.homeModules.default
       ];
       extraSpecialArgs = {
         inherit pkgs-stable;
@@ -113,9 +113,9 @@
 
     hyprland.url = "github:hyprwm/Hyprland";
 
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    stylix.url = "github:danth/stylix";
 
-    cachix.url = "github:cachix/cachix";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     nix-craft.url = "path:./NixOS/packages/nix-craft";
 

@@ -46,18 +46,22 @@
   };
 
   # DNS & TLS
-  networking.nameservers = [
-    "1.1.1.1" # Cloudfare
-    "9.9.9.9" # Quad9
-  ];
+  networking = {
+    nameservers = [
+      "1.1.1.1" "1.0.0.1" # Cloudflare
+      "9.9.9.9" "149.112.112.112" # Quad9
+    ];
+    networkmanager.dns = "systemd-resolved";
+  };
+
   services.resolved = {
     enable = true;
     settings = {
       Resolve = {
         DNSSEC = "true";
         Domains = [ "~." ];
-        FallbackDNS = [ "1.1.1.1" "1.0.0.1" ];
-        DNSOverTLS = "true";
+        FallbackDNS = [ "1.1.1.1" "9.9.9.9" ];
+        DNSOverTLS = "yes";
       };
     };
   };
