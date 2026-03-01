@@ -5,7 +5,7 @@
 , makeDesktopItem
 , copyDesktopItems
   # runtime dependencies
-, jre
+, jdk21
 , xorg
 , libGL
 , libpulseaudio
@@ -81,8 +81,10 @@ stdenv.mkDerivation rec {
     cp ${./icon.svg} $out/share/icons/hicolor/scalable/apps/legacy-launcher.svg
 
     # wrapper script
-    makeWrapper ${jre}/bin/java $out/bin/legacy-launcher \
+    makeWrapper ${jdk21}/bin/java $out/bin/legacy-launcher \
       --add-flags "-jar $out/share/legacy-launcher/LegacyLauncher_legacy.jar" \
+      --set JAVA_HOME "${jdk21}" \
+      --prefix PATH : "${jdk21}/bin" \
       --prefix LD_LIBRARY_PATH : "${addDriverRunpath.driverLink}/lib:${lib.makeLibraryPath runtimeLibs}"
 
     copyDesktopItems

@@ -3,6 +3,8 @@
 {
 
   imports = [
+    ./modules/browser.nix
+    ./modules/game.nix
     ./modules/nvim.nix
     ./modules/shell.nix
     ./modules/term.nix

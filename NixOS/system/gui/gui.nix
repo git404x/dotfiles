@@ -5,6 +5,12 @@ let
   hyprPkgs = inputs.hyprland.packages.${system};
 in
 {
+
+  # gnome
+  services.desktopManager.gnome.enable = true;
+  services.gnome.core-apps.enable = false;
+  programs.seahorse.enable = true;
+
   # Hyprland
   programs.hyprland = {
     enable = true;
@@ -20,7 +26,6 @@ in
     login.enableGnomeKeyring = true;
     greetd.enableGnomeKeyring = true;
   };
-  programs.seahorse.enable = true;
 
   # other services
   services.gvfs.enable = true;

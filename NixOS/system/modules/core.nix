@@ -35,7 +35,7 @@
     firewall = {
       enable = true;
       # Open ports in the firewall.
-      allowedTCPPorts = [ ];
+      allowedTCPPorts = [ 5173 ];
       allowedUDPPorts = [ ];
     };
 
