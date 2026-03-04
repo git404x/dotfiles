@@ -10,9 +10,5 @@
   "easyauth": {
     "url": "https://cdn.modrinth.com/data/aZj58GfX/versions/LPQE6Dfu/easyauth-mc1.21.11-3.4.1.jar",
     "sha256": "sha256-oBKhyVAii4rdfE20w+EhrZddVn68rM/buycc1oHgSZQ="
-  },
-  "better-sleep": {
-    "url": "https://cdn.modrinth.com/data/HzlME0ff/versions/WKBhdN3D/single-sleep-mod-1.0.0.jar",
-    "sha256": "sha256-S6/mU15dPzLxMCNmMG6rmLth4Itw8pNUMrit7b3CGgs="
   }
 }

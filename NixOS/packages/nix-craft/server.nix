@@ -4,6 +4,7 @@
 let
   # server details
   serverName = "shin-sekai";
+  rconPass = "mc@1211";
   ramAlloc   = "2G";
   loader    = "fabric";
   mcVersion = "1_21_11";
@@ -51,6 +52,11 @@ in {
         server-port = 25565;
         online-mode = false;
 
+        # RCON
+        enable-rcon = true;
+        "rcon.port" = 25575;
+        "rcon.password" = "${rconPass}";
+
         # game-config
         view-distance = 8;
         simulation-distance = 5;
@@ -68,5 +74,10 @@ in {
     mc-stop = "sudo systemctl stop minecraft-server-${serverName}";
     mc-status = "sudo systemctl status minecraft-server-${serverName}";
     mc-log = "journalctl -u minecraft-server-${serverName} -f";
+    mc-console = "mcrcon -H localhost -P 25575 -p '${rconPass}'";
   };
+
+  environment.systemPackages = with pkgs; [
+    mcrcon
+  ];
 }
