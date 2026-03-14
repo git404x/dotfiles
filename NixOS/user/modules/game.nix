@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   programs.mangohud = {
     enable = true;
@@ -6,8 +6,13 @@
       # Layout
       position = "top-left";
       round_corners = 8;
-      offset_x = 10;
-      offset_y = 10;
+      offset_x = 14;
+      offset_y = 14;
+
+      # font
+      font_scale = lib.mkForce 1;
+      font_size = lib.mkForce 18;
+      font_size_text = lib.mkForce 18;
 
       # CPU
       cpu_text = "CPU";

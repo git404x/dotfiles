@@ -368,7 +368,7 @@ in
       windowrule {
         name = FileDialogs
         match:class = ^(($browser)|(xdg-desktop-portal-gtk.*)|(.*Telegram.*))$
-        match:title = ^((Opening)(.*)|(Open Files)|(All Files)|(.*save.*)|(Save.*))$
+        match:title = ^($|(Opening)(.*)|(Open Files)|(All Files)|(.*save.*)|(Save.*))$
         suppress_event = maximize fullscreen
         float = on
         center = on
@@ -412,6 +412,35 @@ in
         center = on
         size = (monitor_w*0.60) (monitor_h*0.60)
         suppress_event = maximize
+      }
+
+      # steam
+      windowrule {
+        name = SteamPopups
+        match:class = ^(steam)$
+        match:title = ^(?!Steam$).*$
+        float = on
+        center = on
+        content = game
+        size = (monitor_w*0.50) (monitor_h*0.50)
+      }
+
+      windowrule {
+        name = SteamMain
+        match:class = ^(steam)$
+        match:title = ^(Steam)$
+        tile = on
+        maximize = on
+        content = game
+      }
+
+      windowrule {
+        name = XWaylandGhostFix
+        match:class = ^$
+        match:title = ^$
+        match:xwayland = true
+        no_initial_focus = on
+        suppress_event = activatefocus
       }
 
       layerrule {

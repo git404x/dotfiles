@@ -60,6 +60,8 @@ in
     telegram-desktop
     discord
     onlyoffice-desktopeditors
+    motrix
+    qbittorrent
     mpv
     imv
     ani-cli

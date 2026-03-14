@@ -1,5 +1,12 @@
 { inputs, pkgs, lib, config, ... }:
-
+let
+  play-game-script = builtins.readFile ./../../../scripts/game.sh;
+  play-game      = pkgs.writeShellScriptBin "play-game" play-game-script;
+  play-goldberg  = pkgs.writeShellScriptBin "play-goldberg"  ''exec play-game goldberg "$@"'';
+  play-fixed     = pkgs.writeShellScriptBin "play-fixed"     ''exec play-game fixed "$@"'';
+  play-base      = pkgs.writeShellScriptBin "play-base"      ''exec play-game base "$@"'';
+  setup-goldberg = pkgs.writeShellScriptBin "setup-goldberg" ''exec play-game setup "$@"'';
+in
 {
   imports = [
     inputs.nix-craft.nixosModules.client
@@ -13,11 +20,18 @@
     "amdgpu.noretry=0"
   ];
 
+  # LAN games
+  networking.firewall.trustedInterfaces = [ "tailscale0" ];
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = false;
     dedicatedServer.openFirewall = false;
     gamescopeSession.enable = true;
+    protontricks.enable = true;
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
   };
 
   programs.gamemode = {
@@ -49,17 +63,12 @@
   environment.systemPackages = with pkgs; [
     ryzenadj
     mangohud
+    goldberg-emu
 
-    # steam launcher wrapper
-    (writeShellScriptBin "game-run" ''
-      # Inject the crack/repack bypass overrides
-      export WINEDLLOVERRIDES="OnlineFix64=n;SteamOverlay64=n;winmm=n,b;dnet=n;steam_api64=n;winhttp=n,b"
-
-      # Enable MangoHud
-      export MANGOHUD=1
-
-      # Execute the game wrapped in Gamemode
-      exec gamemoderun "$@"
-    '')
+    play-game
+    play-goldberg
+    play-fixed
+    play-base
+    setup-goldberg
   ];
 }
