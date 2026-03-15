@@ -5,26 +5,26 @@
     enable = true;
     autoEnable = true;
     base16Scheme = {
-      base00 = "#0f1011";
-      base01 = "#1d2021";
-      base02 = "#32302f";
-      base03 = "#504945";
-      base04 = "#a89984";
-      base05 = "#ebdbb2";
-      base06 = "#fbf1c7";
-      base07 = "#ffffff";
-      base08 = "#fb543f";
-      base09 = "#fe8019";
-      base0A = "#fac03b";
-      base0B = "#b8bb26";
-      base0C = "#8ec07c";
-      base0D = "#83a598";
-      base0E = "#e089a1";
-      base0F = "#f28534";
+      base00 = "#050705";
+      base01 = "#0A0D0A";
+      base02 = "#154630";
+      base03 = "#5A7A5A";
+      base04 = "#7A9A8A";
+      base05 = "#D4D4D4";
+      base06 = "#E5E5E5";
+      base07 = "#FFFFFF";
+      base08 = "#FF6666";
+      base09 = "#D4A574";
+      base0A = "#FFEE58";
+      base0B = "#00DD88";
+      base0C = "#7DD3C0";
+      base0D = "#4FA8D8";
+      base0E = "#A78BFA";
+      base0F = "#83A1CD";
     };
 
     polarity = "dark";
-    image = ./../backgrounds/default.jpg;
+    image = ./../backgrounds/zoro.png;
 
     fonts = {
       monospace = {
