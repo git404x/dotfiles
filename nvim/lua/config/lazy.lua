@@ -8,7 +8,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     "--filter=blob:none",
     "--branch=stable",
     lazyrepo,
-    lazypath
+    lazypath,
   })
 
   if vim.v.shell_error ~= 0 then
@@ -28,7 +28,11 @@ require("lazy").setup({
   spec = {
     -- add your plugins inherits
     { import = "plugins" },
-    { import = "plugins.lsp" }
+    { import = "plugins.lsp" },
+    { import = "plugins.colorscheme" },
+  },
+  rocks = {
+    enabled = false, --disable Luarocks
   },
   -- automatically check for plugin updates
   checker = {

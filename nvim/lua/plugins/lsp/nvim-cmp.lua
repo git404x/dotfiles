@@ -24,7 +24,7 @@ return {
     local luasnip = require("luasnip")
     local lspkind = require("lspkind")
     local vscode_loaders = require("luasnip.loaders.from_vscode")
-    
+
     -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
     vscode_loaders.lazy_load()
 
@@ -58,7 +58,7 @@ return {
         { name = "buffer" }, -- text within current buffer
         { name = "cmdline" }, -- cmdline
         { name = "luasnip" }, -- snippets
-        { name = "nvim_lsp"}, -- LSP code completion
+        { name = "nvim_lsp" }, -- LSP code completion
       }),
 
       -- configure lspkind for vs-code like pictograms in completion menu
@@ -69,14 +69,11 @@ return {
         }),
       },
     })
-      
-    -- show borders on hover
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-      vim.lsp.handlers.hover, {
-        border = "single",
-        title = " Hover "
-      }
-    )
 
+    -- show borders on hover
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+      border = "single",
+      title = " Hover ",
+    })
   end,
 }

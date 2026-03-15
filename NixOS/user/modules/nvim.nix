@@ -12,14 +12,26 @@ in
 
     # dependencies
     extraPackages = with pkgs; [
-      fd
-      gcc
-      gnumake
+      # core tools
+      fd gcc gnumake ripgrep
+      python3 nodePackages_latest.nodejs
+      tree-sitter
+
+      # LSPs
       lua-language-server
-      nodePackages_latest.nodejs
-      python3
-      ripgrep
+      pyright
+      nodePackages.bash-language-server
+      vscode-langservers-extracted # html, cssls, jsonls, eslint
+      tailwindcss-language-server
+
+      # Formatters & Linters
+      shfmt
       stylua
+      black
+      isort
+      nodePackages.prettier
+      eslint_d
+      pylint
     ];
   };
 

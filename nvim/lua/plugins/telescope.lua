@@ -1,6 +1,5 @@
 return {
   "nvim-telescope/telescope.nvim",
-  branch = "0.1.x",
   event = { "BufReadPost" },
   cmd = { "Telescope", "TodoTelescope" },
   dependencies = {
@@ -25,6 +24,19 @@ return {
     telescope.setup({
       defaults = {
         path_display = { "smart" },
+        file_ignore_patterns = {
+          "%.png",
+          "%.jpg",
+          "%.jpeg",
+          "%.webp",
+          "%.gif",
+          "%.pdf",
+          "%.mkv",
+          "%.mp4",
+          "%.zip",
+          "%.tar.gz",
+          "%.DS_Store",
+        },
         mappings = {
           i = {
             ["<C-k>"] = actions.move_selection_previous, -- move to prev result

@@ -1,5 +1,8 @@
+local is_nixos = vim.fn.executable("nixos-version") == 1
+
 return {
   "williamboman/mason.nvim",
+  enabled = not is_nixos, -- prevents Mason from loading on NixOS
   dependencies = {
     "williamboman/mason-lspconfig.nvim", -- Ensure this is loaded after mason
     "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -35,7 +38,7 @@ return {
 
     mason_lspconfig.setup({
       -- list of language servers for mason to install
-      ensure_installed = {
+      ensure_installed = is_nixos and {} or {
         "ast_grep",
         "vimls",
         "dockerls",
@@ -57,7 +60,7 @@ return {
     })
 
     mason_tool_installer.setup({
-      ensure_installed = {
+      ensure_installed = is_nixos and {} or {
         -- formatters
         "nixfmt",
         "black",
