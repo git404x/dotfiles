@@ -14,6 +14,19 @@ return {
     { "folke/neodev.nvim", opts = {} },
   },
   config = function()
+    -- Silence NEOVIM LSPCONFIG DEPRECATION TRACEBACKS
+    if vim.deprecate then
+      local orig_deprecate = vim.deprecate
+      vim.deprecate = function(name, alt, ver, plugin, backtrace)
+        -- Intercept and drop the lspconfig warning instantly
+        if type(name) == "string" and name:match("lspconfig") then
+          return
+        end
+        -- Let all other valid deprecations through normally
+        orig_deprecate(name, alt, ver, plugin, backtrace)
+      end
+    end
+
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
