@@ -17,6 +17,7 @@ return {
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     "rafamadriz/friendly-snippets", -- useful snippets
     "onsails/lspkind.nvim", -- vs-code like pictograms
+    "zbirenbaum/copilot-cmp", -- Copilot
   },
   config = function()
     local cmp = require("cmp")
@@ -54,6 +55,7 @@ return {
 
       -- sources for autocompletion
       sources = cmp.config.sources({
+        { name = "copilot", group_index = 2 }, -- AI into autocomplete
         { name = "path" }, -- file system paths
         { name = "buffer" }, -- text within current buffer
         { name = "cmdline" }, -- cmdline
@@ -66,6 +68,17 @@ return {
         format = lspkind.cmp_format({
           maxwidth = 50,
           ellipsis_char = "...",
+          symbol_map = {
+            Copilot = "",
+          },
+          before = function(entry, vim_item)
+            -- If the suggestion comes from Copilot, force the icon and color
+            if entry.source.name == "copilot" then
+              vim_item.kind = " Copilot"
+              vim_item.kind_hl_group = "CmpItemKindCopilot"
+            end
+            return vim_item
+          end,
         }),
       },
     })
