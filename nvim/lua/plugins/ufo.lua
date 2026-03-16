@@ -1,7 +1,23 @@
 return {
   "kevinhwang91/nvim-ufo",
-  dependencies = { "kevinhwang91/promise-async" },
-  event = "BufReadPost",
+  dependencies = {
+    "kevinhwang91/promise-async",
+    {
+      "luukvbaal/statuscol.nvim",
+      config = function()
+        local builtin = require("statuscol.builtin")
+        require("statuscol").setup({
+          relculright = true,
+          segments = {
+            { text = { "%s" }, click = "v:lua.ScSa" }, -- Git Signs
+            { text = { builtin.lnumfunc, " " }, click = "v:lua.ScLa" }, -- Line Numbers
+            { text = { builtin.foldfunc, " " }, click = "v:lua.ScFa" }, -- Fold Chevrons (No digits!)
+          },
+        })
+      end,
+    },
+  },
+  event = { "BufReadPost", "BufNewFile" },
   -- init() runs on startup
   init = function()
     vim.o.foldcolumn = "1"
@@ -10,6 +26,7 @@ return {
     vim.o.foldenable = true
     vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
   end,
+
   keys = {
     {
       "zR",
@@ -47,6 +64,7 @@ return {
       desc = "Peek fold",
     },
   },
+
   config = function()
     -- Shows a clean indicator on folded code
     local handler = function(virtText, lnum, endLnum, width, truncate)
@@ -78,9 +96,8 @@ return {
 
     require("ufo").setup({
       fold_virt_text_handler = handler,
-      -- Fallback chain: Try LSP first, then fallback to indentation-based folds
       provider_selector = function(bufnr, filetype, buftype)
-        return { "lsp", "indent" }
+        return { "treesitter", "indent" }
       end,
     })
   end,

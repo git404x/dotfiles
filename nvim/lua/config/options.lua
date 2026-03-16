@@ -48,9 +48,9 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 -- turn off swapfile
 opt.swapfile = false
--- opt.backup = false
--- opt.writebackup = false
---
--- -- Disable Highlight In Searching
--- opt.hlsearch = false
--- opt.incsearch = true
+opt.backup = false
+opt.writebackup = false
+
+-- Disable Highlight In Searching
+opt.hlsearch = true
+opt.incsearch = true

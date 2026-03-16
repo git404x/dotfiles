@@ -27,12 +27,6 @@ return {
     local capabilities =
       vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), cmp_nvim_lsp.default_capabilities())
 
-    -- Broadcast advanced folding capabilities for nvim-ufo
-    capabilities.textDocument.foldingRange = {
-      dynamicRegistration = false,
-      lineFoldingOnly = true,
-    }
-
     -- Common on_attach function for all language servers
     local on_attach = function(client, bufnr)
       -- Key mappings and other setup can go here
