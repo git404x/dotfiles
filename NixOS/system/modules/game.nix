@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, ... }:
+{ inputs, pkgs, lib, config, userConfig, ... }:
 let
   play-game-script = builtins.readFile ./../../../scripts/game.sh;
   play-game      = pkgs.writeShellScriptBin "play-game" play-game-script;
@@ -20,15 +20,36 @@ in
     "amdgpu.noretry=0"
   ];
 
-  # LAN games
-  networking.firewall.trustedInterfaces = [ "tailscale0" ];
+  services.nix-craft-server = {
+    enable = true;
+    serverName = "shin-sekai";
+    ramAlloc = "2G";
+    loader = "fabric";
+    mcVersion = "1_21_11";
+    enableTailscale = true;
+    openFirewall = false;
+
+    mods = [
+      {
+        name = "fabric-api";
+        url = "https://cdn.modrinth.com/data/P7dR8mSH/versions/DdVHbeR1/fabric-api-0.141.1%2B1.21.11.jar";
+        sha256 = "sha256-ald/g72LM8lAQSfRZTGsycQZX0feA5WVfJ1M0J17mMY=";
+      }
+      {
+        name = "lithium";
+        url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar";
+        sha256 = "sha256-MQZjnHPuI/RL++Xl56gVTf460P1ISR5KhXZ1mO17Bzk=";
+      }
+      {
+        name = "easyauth";
+        url = "https://cdn.modrinth.com/data/aZj58GfX/versions/LPQE6Dfu/easyauth-mc1.21.11-3.4.1.jar";
+        sha256 = "sha256-oBKhyVAii4rdfE20w+EhrZddVn68rM/buycc1oHgSZQ=";
+      }
+    ];
+  };
 
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = false;
-    dedicatedServer.openFirewall = false;
-    gamescopeSession.enable = true;
-    protontricks.enable = true;
     extraCompatPackages = with pkgs; [
       proton-ge-bin
     ];
@@ -50,10 +71,10 @@ in
     };
   };
 
-  users.users.px.extraGroups = [ "gamemode" ];
+  users.users.${userConfig.username}.extraGroups = [ "gamemode" ];
   security.sudo.extraRules = [
   {
-    users = [ "px" ];
+    users = [ "${userConfig.username}" ];
     commands = [
     { command = "${pkgs.ryzenadj}/bin/ryzenadj"; options = [ "NOPASSWD" ]; }
     ];
