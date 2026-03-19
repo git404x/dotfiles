@@ -9,9 +9,6 @@ in
   # programs-db
   programs.command-not-found.dbPath = programs-db;
 
-  # allow unfree pkgs
-  nixpkgs.config.allowUnfree = true;
-
   # nix config
   nix = {
     settings = {

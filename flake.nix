@@ -56,6 +56,11 @@
     pkgs = import nixpkgs {
       inherit system;
       config.allowUnfree = true;
+      overlays = [
+        (import ./NixOS/packages/overlays.nix {
+          inherit inputs system;
+        })
+      ];
     };
 
     pkgs-stable = import nixpkgs-stable {
@@ -80,6 +85,7 @@
             inherit system;
             specialArgs = globalArgs;
             modules = [
+              { nixpkgs.pkgs = pkgs; }
               stylix.nixosModules.default
               ./NixOS/system/configuration.nix
               ./NixOS/system/hardware-configuration.nix

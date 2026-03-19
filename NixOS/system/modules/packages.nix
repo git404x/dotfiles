@@ -1,17 +1,5 @@
-{
-  inputs,
-  config,
-  lib,
-  pkgs,
-  pkgs-stable,
-  systemConfig,
-  ...
-}:
+{ inputs, config, lib, pkgs, pkgs-stable, ... }:
 
-let
-  system = systemConfig.system;
-  zen-browser = inputs.zen-browser.packages."${system}".default;
-in
 {
 
   # system pkgs
@@ -46,6 +34,7 @@ in
 
     # dependencies
     javaPackages.compiler.openjdk25
+    python3
 
     # terminal
     tmux
@@ -60,7 +49,9 @@ in
     telegram-desktop
     discord
     onlyoffice-desktopeditors
+    protonvpn-gui
     motrix
+    jdownloader
     qbittorrent
     mpv
     imv
