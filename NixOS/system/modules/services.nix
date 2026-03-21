@@ -9,6 +9,9 @@
     # touchpad support
     libinput.enable = true;
 
+    # disk
+    fstrim.enable = true;
+
     # logind.conf
     logind.settings.Login = {
       lidSwitch = "suspend";

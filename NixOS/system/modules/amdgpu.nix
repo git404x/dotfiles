@@ -35,6 +35,4 @@ in
     VDPAU_DRIVER = "radeonsi";
   };
 
-  # Thermal management daemon
-  services.thermald.enable = true;
 }

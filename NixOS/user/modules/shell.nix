@@ -62,6 +62,7 @@ in
       shellAliases = shAliases;
       interactiveShellInit = ''
         set fish_greeting # Disable the "Welcome to Fish" message
+        clear # clean term
       '';
     };
 

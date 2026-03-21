@@ -1,11 +1,7 @@
 { inputs, pkgs, lib, config, userConfig, ... }:
 let
-  play-game-script = builtins.readFile ./../../../scripts/game.sh;
-  play-game      = pkgs.writeShellScriptBin "play-game" play-game-script;
-  play-goldberg  = pkgs.writeShellScriptBin "play-goldberg"  ''exec play-game goldberg "$@"'';
-  play-fixed     = pkgs.writeShellScriptBin "play-fixed"     ''exec play-game fixed "$@"'';
-  play-base      = pkgs.writeShellScriptBin "play-base"      ''exec play-game base "$@"'';
-  setup-goldberg = pkgs.writeShellScriptBin "setup-goldberg" ''exec play-game setup "$@"'';
+  gamerun-script = builtins.readFile ./../../../scripts/game.sh;
+  gamerun      = pkgs.writeShellScriptBin "gamerun" gamerun-script;
 in
 {
   imports = [
@@ -15,8 +11,6 @@ in
 
   # prevent unstable sleep states
   boot.kernelParams = [
-    "idle=nomwait"
-    "processor.max_cstate=1"
     "amdgpu.noretry=0"
   ];
 
@@ -85,11 +79,6 @@ in
     ryzenadj
     mangohud
     goldberg-emu
-
-    play-game
-    play-goldberg
-    play-fixed
-    play-base
-    setup-goldberg
+    gamerun
   ];
 }

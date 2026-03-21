@@ -202,7 +202,7 @@ in
         "$mainMod, Q, killactive"
         "$mainMod, F, fullscreen"
         "$mainMod, G, togglegroup"
-        "$mainMod, T, togglesplit"
+        "$mainMod, T, layoutmsg, togglesplit"
         "$mainMod SHIFT, P, pseudo"
         "$mainMod SHIFT, F, togglefloating"
         "$mainMod SHIFT, Q, exec, hyprctl kill"
@@ -441,6 +441,16 @@ in
         match:xwayland = true
         no_initial_focus = on
         suppress_event = activatefocus
+      }
+
+      windowrule {
+        name = Gamescope
+        match:class = ^(gamescope)$
+        workspace = 10
+        fullscreen = on
+        idle_inhibit = focus
+        opaque = on
+        no_blur = on
       }
 
       layerrule {
