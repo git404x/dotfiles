@@ -63,8 +63,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     opts.desc = "Restart LSP"
     keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
 
-    opts.desc = "Displays signature info about symbol under the cursor in floating window"
-    keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts) -- sign info
+    opts.desc = "Displays signature help about symbol under the cursor in floating window"
+    keymap.set("n", "<leader>sh", vim.lsp.buf.signature_help, opts) -- sign info
 
     -- buffer workspace binds
     opts.desc = "Add workspace folder for the buffer"

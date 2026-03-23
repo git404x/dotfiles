@@ -58,7 +58,6 @@ return {
         { name = "copilot", group_index = 2 }, -- AI into autocomplete
         { name = "path" }, -- file system paths
         { name = "buffer" }, -- text within current buffer
-        { name = "cmdline" }, -- cmdline
         { name = "luasnip" }, -- snippets
         { name = "nvim_lsp" }, -- LSP code completion
       }),
@@ -82,11 +81,17 @@ return {
         }),
       },
     })
+    -- Search completion (/ and ?)
+    cmp.setup.cmdline({ "/", "?" }, {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = { { name = "buffer" } },
+    })
 
-    -- show borders on hover
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-      border = "single",
-      title = " Hover ",
+    -- Command-line completion (:)
+    cmp.setup.cmdline(":", {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
+      matching = { disallow_symbol_nonprefix_matching = false },
     })
   end,
 }

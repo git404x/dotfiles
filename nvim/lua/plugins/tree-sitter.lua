@@ -23,6 +23,7 @@ return {
       -- ensure these language parsers are installed
       ensure_installed = {
         "bash",
+        "nix",
         "c",
         "css",
         "dockerfile",

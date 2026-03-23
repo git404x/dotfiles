@@ -39,8 +39,8 @@ return {
     mason_lspconfig.setup({
       -- list of language servers for mason to install
       ensure_installed = is_nixos and {} or {
-        "ast_grep",
         "vimls",
+        "ts_ls",
         "dockerls",
         "pyright",
         "bashls",

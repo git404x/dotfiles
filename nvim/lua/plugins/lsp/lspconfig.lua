@@ -11,22 +11,9 @@ return {
     },
     "hrsh7th/cmp-nvim-lsp",
     { "antosha417/nvim-lsp-file-operations", config = true },
-    { "folke/neodev.nvim", opts = {} },
+    { "folke/lazydev.nvim", ft = "lua" },
   },
   config = function()
-    -- Silence NEOVIM LSPCONFIG DEPRECATION TRACEBACKS
-    if vim.deprecate then
-      local orig_deprecate = vim.deprecate
-      vim.deprecate = function(name, alt, ver, plugin, backtrace)
-        -- Intercept and drop the lspconfig warning instantly
-        if type(name) == "string" and name:match("lspconfig") then
-          return
-        end
-        -- Let all other valid deprecations through normally
-        orig_deprecate(name, alt, ver, plugin, backtrace)
-      end
-    end
-
     -- import lspconfig plugin
     local lspconfig = require("lspconfig")
 
@@ -57,40 +44,36 @@ return {
 
     -- Setup diagnostic signs and diagnostics configuration
     local function setup_diagnostics()
-      -- Define diagnostic signs with icons for the sign column (gutter)
-      local signs = {
-        Error = "",
-        Warn = "",
-        Hint = "󰠠",
-        Info = "",
-      }
-      local sign_definitions = {}
-      for type, icon in pairs(signs) do
-        sign_definitions["DiagnosticSign" .. type] = { text = icon, texthl = "DiagnosticSign" .. type }
-      end
-
       -- Configure diagnostic display options
       vim.diagnostic.config({
-        signs = sign_definitions, -- Show signs with custom icons
-        underline = true, -- Underline problematic code
-        severity_sort = true, -- Sort diagnostics by severity
-        virtual_text = { -- Virtual text with prefix icon and spacing
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.HINT] = "󰠠",
+            [vim.diagnostic.severity.INFO] = "",
+          },
+        },
+        underline = true,
+        severity_sort = true,
+        virtual_text = {
           prefix = "●",
           spacing = 2,
           severity = { min = vim.diagnostic.severity.HINT },
         },
-        float = { -- Floating window options for show_line_diagnostics()
-          border = "rounded",
-          source = "always", -- Show source of diagnostic
-          header = "",
-          prefix = "",
-        },
-        update_in_insert = false, -- Update diagnostics while in insert mode (false for minimal distractions)
+        float = { border = "rounded", source = true, header = "", prefix = "" },
+        update_in_insert = false,
       })
     end
 
     -- Call setup function immediately or from your config setup
     setup_diagnostics()
+
+    -- show borders on hover
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+      border = "single",
+      title = " Hover ",
+    })
 
     -- server configs
     local servers = {
@@ -121,7 +104,14 @@ return {
           return cap
         end)(),
       },
+      -- TypeScript / JavaScript
+      ts_ls = {
+        init_options = {
+          preferences = { disableSuggestions = false },
+        },
+      },
       -- zero-config servers
+      nixd = {},
       pyright = {},
       bashls = {},
       cssls = {},

@@ -18,14 +18,21 @@ in
       tree-sitter
 
       # LSPs
+      nixd
       lua-language-server
       pyright
       nodePackages.bash-language-server
+      nodePackages.typescript-language-server
+      nodePackages.prisma
+      dockerfile-language-server-nodejs
       vscode-langservers-extracted # html, cssls, jsonls, eslint
       tailwindcss-language-server
 
       # Formatters & Linters
       shfmt
+      nixfmt-rfc-style
+      shellcheck
+      statix
       stylua
       black
       isort

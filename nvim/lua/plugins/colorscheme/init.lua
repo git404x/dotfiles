@@ -65,6 +65,8 @@ return {
       end
 
       for _, mod in ipairs(hl_modules) do
+        -- clear cache so switching themes doesn't bleed old highlight tables
+        package.loaded["plugins.colorscheme.highlights." .. mod] = nil
         local ok, get_hls = pcall(require, "plugins.colorscheme.highlights." .. mod)
 
         if ok and type(get_hls) == "function" then

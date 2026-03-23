@@ -5,6 +5,9 @@ return {
     local lint = require("lint")
 
     lint.linters_by_ft = {
+      sh = { "shellcheck" },
+      bash = { "shellcheck" },
+      nix = { "statix" },
       javascript = { "eslint_d" },
       typescript = { "eslint_d" },
       javascriptreact = { "eslint_d" },
@@ -18,7 +21,10 @@ return {
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
       group = lint_augroup,
       callback = function()
-        lint.try_lint()
+        local ft = vim.bo.filetype
+        if ft ~= "" and lint.linters_by_ft[ft] then
+          lint.try_lint()
+        end
       end,
     })
 

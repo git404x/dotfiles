@@ -14,12 +14,6 @@ keymap.set("i", "<C-l>", "<Right>", { desc = "Move right" })
 keymap.set("i", "<C-j>", "<Down>", { desc = "Move down" })
 keymap.set("i", "<C-k>", "<Up>", { desc = "Move up" })
 
--- Better Pane Switching
-keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
-keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
-keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
-keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
-
 -- Close Current Pane Easily
 keymap.set("n", "<A-x>", ":bdelete<CR>")
 

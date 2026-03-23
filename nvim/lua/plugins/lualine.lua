@@ -1,16 +1,15 @@
 return {
-  'nvim-lualine/lualine.nvim',
+  "nvim-lualine/lualine.nvim",
   dependencies = {
-    'nvim-tree/nvim-web-devicons'
+    "nvim-tree/nvim-web-devicons",
   },
+  event = "VeryLazy",
   config = function()
-    -- setup lualine.nvim
-    require('lualine').setup({
-      options = {
-        theme = 'auto',
-      }
-    })
+    require("lualine").setup({ options = { theme = "auto" } })
+    -- Re-apply the active theme now that lualine is loaded.
+    -- The highlights/lualine.lua pcall will succeed this time.
+    if _G.LoadTheme and vim.g.colors_name then
+      _G.LoadTheme(vim.g.colors_name, false)
+    end
   end,
 }
-
-

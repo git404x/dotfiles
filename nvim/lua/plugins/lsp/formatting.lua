@@ -6,6 +6,10 @@ return {
 
     conform.setup({
       formatters_by_ft = {
+        sh = { "shfmt" },
+        bash = { "shfmt" },
+        zsh = { "shfmt" },
+        nix = { "nixfmt" },
         javascript = { "prettier" },
         typescript = { "prettier" },
         javascriptreact = { "prettier" },
@@ -26,22 +30,6 @@ return {
         async = false,
         timeout_ms = 1000,
       },
-    })
-
-    -- auto format on buffer write
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      pattern = "*",
-      callback = function(args)
-        -- Use vim.schedule to ensure conform is called correctly
-        vim.schedule(function()
-          local success, err = pcall(function()
-            conform.format({ bufnr = args.buf })
-          end)
-          if not success then
-            print("Error formatting buffer: " .. err)
-          end
-        end)
-      end,
     })
 
     -- keymap to format file

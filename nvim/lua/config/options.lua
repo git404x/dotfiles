@@ -51,6 +51,6 @@ opt.swapfile = false
 opt.backup = false
 opt.writebackup = false
 
--- Disable Highlight In Searching
+-- Highlight search
 opt.hlsearch = true
 opt.incsearch = true
