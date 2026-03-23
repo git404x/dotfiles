@@ -14,9 +14,6 @@ return {
     { "folke/lazydev.nvim", ft = "lua" },
   },
   config = function()
-    -- import lspconfig plugin
-    local lspconfig = require("lspconfig")
-
     -- import cmp-nvim-lsp plugin
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
@@ -32,15 +29,6 @@ return {
       -- Key mappings and other setup can go here
       -- Example: vim.api.nvim_buf_set_keymap(bufnr, ...)
     end
-
-    -- setup multiple lsp with same default options
-    -- local servers = { "tsserver", "html", "cssls" }
-    -- for _, lsp in ipairs(servers) do
-    --   lspconfig["lsp"].setup {
-    --     capabilities = capabilities,
-    --     on_attach = on_attach,
-    --   }
-    -- end
 
     -- Setup diagnostic signs and diagnostics configuration
     local function setup_diagnostics()
@@ -127,7 +115,13 @@ return {
       for server_name, config in pairs(servers) do
         config.capabilities = capabilities
         config.on_attach = config.on_attach or on_attach
-        lspconfig[server_name].setup(config)
+
+        if vim.lsp.config then
+          vim.lsp.config(server_name, config)
+          vim.lsp.enable(server_name)
+        else
+          require("lspconfig")[server_name].setup(config)
+        end
       end
     else
       -- Mason's handler
@@ -137,7 +131,12 @@ return {
           local config = servers[server_name] or {}
           config.capabilities = capabilities
           config.on_attach = config.on_attach or on_attach
-          lspconfig[server_name].setup(config)
+          if vim.lsp.config then
+            vim.lsp.config(server_name, config)
+            vim.lsp.enable(server_name)
+          else
+            require("lspconfig")[server_name].setup(config)
+          end
         end,
       })
     end
