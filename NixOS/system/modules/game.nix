@@ -1,7 +1,15 @@
-{ inputs, pkgs, lib, config, userConfig, ... }:
+{
+  inputs,
+  pkgs,
+  pkgs-stable,
+  lib,
+  config,
+  userConfig,
+  ...
+}:
 let
   gamerun-script = builtins.readFile ./../../../scripts/game.sh;
-  gamerun      = pkgs.writeShellScriptBin "gamerun" gamerun-script;
+  gamerun = pkgs.writeShellScriptBin "gamerun" gamerun-script;
 in
 {
   imports = [
@@ -13,6 +21,22 @@ in
   boot.kernelParams = [
     "amdgpu.noretry=0"
   ];
+
+  networking.firewall = {
+    allowedUDPPorts = [ 41641 ];
+    interfaces."tailscale0".allowedTCPPortRanges = [
+      {
+        from = 47984;
+        to = 48010;
+      }
+    ];
+    interfaces."tailscale0".allowedUDPPortRanges = [
+      {
+        from = 47998;
+        to = 48010;
+      }
+    ];
+  };
 
   services.nix-craft-server = {
     enable = true;
@@ -33,11 +57,6 @@ in
         name = "lithium";
         url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar";
         sha256 = "sha256-MQZjnHPuI/RL++Xl56gVTf460P1ISR5KhXZ1mO17Bzk=";
-      }
-      {
-        name = "easyauth";
-        url = "https://cdn.modrinth.com/data/aZj58GfX/versions/LPQE6Dfu/easyauth-mc1.21.11-3.4.1.jar";
-        sha256 = "sha256-oBKhyVAii4rdfE20w+EhrZddVn68rM/buycc1oHgSZQ=";
       }
     ];
   };
@@ -67,18 +86,39 @@ in
 
   users.users.${userConfig.username}.extraGroups = [ "gamemode" ];
   security.sudo.extraRules = [
-  {
-    users = [ "${userConfig.username}" ];
-    commands = [
-    { command = "${pkgs.ryzenadj}/bin/ryzenadj"; options = [ "NOPASSWD" ]; }
-    ];
-  }
+    {
+      users = [ "${userConfig.username}" ];
+      commands = [
+        {
+          command = "${pkgs.ryzenadj}/bin/ryzenadj";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
   ];
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = with pkgs-stable; [
     ryzenadj
     mangohud
-    goldberg-emu
     gamerun
+    goldberg-emu
+
+    (retroarch.withCores (
+      cores: with cores; [
+        mgba
+        ppsspp
+        snes9x
+        mupen64plus
+        citra
+        desmume
+      ]
+    ))
+
+    ppsspp
+    pcsx2
+    sunshine
+    moonlight-qt
+    parsec-bin
+
   ];
 }
