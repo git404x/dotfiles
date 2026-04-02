@@ -58,6 +58,16 @@ in
         url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar";
         sha256 = "sha256-MQZjnHPuI/RL++Xl56gVTf460P1ISR5KhXZ1mO17Bzk=";
       }
+      {
+        name = "geyser";
+        url = "https://cdn.modrinth.com/data/wKkoqHrH/versions/wQ026mlb/geyser-fabric-Geyser-Fabric-2.9.5-b1109.jar";
+        sha256 = "sha256-CRk86J2Z2EE2XDlf4itbXaDa/cQR1VcIE5PtpLl/yYU=";
+      }
+      {
+        name = "floodgate";
+        url = "https://cdn.modrinth.com/data/bWrNNfkb/versions/wzwExuYr/Floodgate-Fabric-2.2.6-b54.jar";
+        sha256 = "sha256-KVfeM69JWnYBpTyKfGMbXH9SayR+/GJ50RWxd7Y258g=";
+      }
     ];
   };
 
