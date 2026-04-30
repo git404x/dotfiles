@@ -1,7 +1,11 @@
-{ inputs, lib, config, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  ...
+}:
 
 let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   hyprPkgs = inputs.hyprland.packages.${system};
 in
 {

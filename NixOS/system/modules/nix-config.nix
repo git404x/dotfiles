@@ -1,26 +1,47 @@
-{ config, lib, inputs, systemConfig, ... }:
+{
+  config,
+  lib,
+  inputs,
+  systemConfig,
+  ...
+}:
 
 let
-  system = systemConfig.system;
+  inherit (systemConfig) system;
   programs-db = inputs.programs-db.packages.${system}.programs-sqlite;
 in
 
 {
   # programs-db
-  programs.command-not-found.dbPath = programs-db;
+  programs.command-not-found.dbPath = lib.mkDefault programs-db;
 
   # nix config
   nix = {
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       auto-optimise-store = true;
 
       # cache
-      substituters = [ "https://hyprland.cachix.org" ];
-      trusted-substituters = [ "https://hyprland.cachix.org" ];
-      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
-      extra-substituters = [ ];
-      extra-trusted-public-keys = [ ];
+      substituters = [
+        "https://cache.nixos.org/"
+        "https://hyprland.cachix.org"
+      ];
+      trusted-substituters = [
+        "https://cache.nixos.org/"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      ];
+      extra-substituters = [
+        "https://nix-community.cachix.org"
+      ];
+      extra-trusted-public-keys = [
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
     };
 
     # garbage-collection

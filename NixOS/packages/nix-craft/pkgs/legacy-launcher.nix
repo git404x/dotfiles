@@ -1,22 +1,27 @@
-{ lib
-, stdenv
-, fetchurl
-, makeWrapper
-, makeDesktopItem
-, copyDesktopItems
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
   # runtime dependencies
-, jdk21
-, xorg
-, libGL
-, libpulseaudio
-, pipewire
-, libjack2
-, alsa-lib
-, udev
-, flite
-, vulkan-loader
-, libusb1
-, addDriverRunpath
+  jdk21,
+  libGL,
+  libpulseaudio,
+  pipewire,
+  libjack2,
+  alsa-lib,
+  udev,
+  flite,
+  vulkan-loader,
+  libusb1,
+  addDriverRunpath,
+  libx11,
+  libxext,
+  libxcursor,
+  libxrandr,
+  libxxf86vm,
 }:
 
 stdenv.mkDerivation rec {
@@ -25,13 +30,16 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://dl.llaun.ch/legacy/bootstrap";
-    sha256 = "sha256-a7bkm0ssu1/95hg0jlUxoBJFb6qVohQNcs1kLlRrc/4=";
+    sha256 = "sha256-n4J+/I8hsU4EA6eqyUUIScJhvLpkUdmr7u5jiLhQhX4=";
     name = "LegacyLauncher_legacy.jar";
   };
 
   dontUnpack = true;
 
-  nativeBuildInputs = [ makeWrapper copyDesktopItems ];
+  nativeBuildInputs = [
+    makeWrapper
+    copyDesktopItems
+  ];
 
   desktopItems = [
     (makeDesktopItem {
@@ -46,15 +54,15 @@ stdenv.mkDerivation rec {
 
   # runtime libraries to fix NixOS linking errors
   runtimeLibs = [
-    xorg.libX11
-    xorg.libXext
-    xorg.libXcursor
-    xorg.libXrandr
-    xorg.libXxf86vm
+    libx11
+    libxext
+    libxcursor
+    libxrandr
+    libxxf86vm
 
     # graphics
     libGL
-    vulkan-loader # performance mods
+    vulkan-loader
 
     # audio stack
     libpulseaudio
@@ -96,7 +104,7 @@ stdenv.mkDerivation rec {
     description = "Stable, fast and simple Minecraft Launcher";
     homepage = "https://llaun.ch";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ git404x ];
     platforms = platforms.all;
   };
 }

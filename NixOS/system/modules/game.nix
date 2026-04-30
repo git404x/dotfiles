@@ -117,18 +117,15 @@ in
       cores: with cores; [
         mgba
         ppsspp
-        snes9x
-        mupen64plus
         citra
         desmume
       ]
     ))
 
+    azahar
     ppsspp
     pcsx2
     sunshine
     moonlight-qt
-    parsec-bin
-
   ];
 }

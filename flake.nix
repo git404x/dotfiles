@@ -23,61 +23,76 @@
     nix-craft.url = "path:./NixOS/packages/nix-craft";
   };
 
-  outputs = {
-              self,
-              nixpkgs,
-              nixpkgs-stable,
-              flake-parts,
-              home-manager,
-              stylix,
-              hyprland,
-              programs-db,
-              ...
-            }@inputs:
-  
-  let
-    system = "x86_64-linux";
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-stable,
+      flake-parts,
+      home-manager,
+      stylix,
+      hyprland,
+      programs-db,
+      ...
+    }@inputs:
 
-    # system
-    systemConfig = {
-      inherit system;
-      hostname = "nix";
-      timezone = "Asia/Kolkata";
-      locale = "en_US.UTF-8";
-    };
+    let
+      system = "x86_64-linux";
 
-    # user
-    userConfig = {
-      shell = "fish";
-      username = "px";
-      name = "px";
-    };
-
-    pkgs = import nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-      overlays = [
-        (import ./NixOS/packages/overlays.nix {
-          inherit inputs system;
-        })
-      ];
-    };
-
-    pkgs-stable = import nixpkgs-stable {
-      inherit system;
-      config.allowUnfree = true;
-    };
-
-    lib = nixpkgs.lib;
-    globalArgs = { inherit inputs pkgs-stable systemConfig userConfig; };
-
-  in
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-
-      perSystem = { pkgs, ... }: {
-        formatter = pkgs.nixpkgs-fmt;
+      # system
+      systemConfig = {
+        inherit system;
+        hostname = "nix";
+        timezone = "Asia/Kolkata";
+        locale = "en_US.UTF-8";
       };
+
+      # user
+      userConfig = {
+        shell = "fish";
+        username = "px";
+        name = "px";
+      };
+
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+        overlays = [
+          (import ./NixOS/packages/overlays.nix {
+            inherit inputs system;
+          })
+        ];
+      };
+
+      pkgs-stable = import nixpkgs-stable {
+        inherit system;
+        config.allowUnfree = true;
+      };
+
+      lib = nixpkgs.lib;
+      globalArgs = {
+        inherit
+          inputs
+          pkgs-stable
+          systemConfig
+          userConfig
+          ;
+      };
+
+    in
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+
+      perSystem =
+        { pkgs, ... }:
+        {
+          formatter = pkgs.nixpkgs-fmt;
+        };
 
       flake = {
         nixosConfigurations = {

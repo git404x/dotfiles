@@ -1,4 +1,10 @@
-{ config, lib, pkgs, systemConfig, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  systemConfig,
+  ...
+}:
 
 {
   # kernel
@@ -48,8 +54,10 @@
   # DNS & TLS
   networking = {
     nameservers = [
-      "1.1.1.1" "1.0.0.1" # Cloudflare
-      "9.9.9.9" "149.112.112.112" # Quad9
+      "1.1.1.1"
+      "1.0.0.1" # Cloudflare
+      "9.9.9.9"
+      "149.112.112.112" # Quad9
     ];
     networkmanager.dns = "systemd-resolved";
   };
@@ -60,7 +68,10 @@
       Resolve = {
         DNSSEC = "true";
         Domains = [ "~." ];
-        FallbackDNS = [ "1.1.1.1" "9.9.9.9" ];
+        FallbackDNS = [
+          "1.1.1.1"
+          "9.9.9.9"
+        ];
         DNSOverTLS = "yes";
       };
     };
@@ -84,9 +95,9 @@
   # zram
   zramSwap = {
     enable = true;
-    memoryPercent = 50;
+    memoryPercent = 60;
     priority = 100;
-    algorithm = "lz4";
+    algorithm = "zstd";
   };
 
   # pkgs

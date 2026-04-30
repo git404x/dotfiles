@@ -3,6 +3,13 @@
 {
 
   services = {
+    # mem mgmt
+    earlyoom = {
+      enable = true;
+      freeMemThreshold = 5;
+      freeSwapThreshold = 5;
+    };
+
     # CUPS to print documents
     printing.enable = true;
 
@@ -17,7 +24,7 @@
       lidSwitch = "suspend";
       lidSwitchExternalPower = "suspend";
       HandlePowerKey = "ignore";
-      HandlePowerKeyLongPress= "poweroff";
+      HandlePowerKeyLongPress = "poweroff";
       RemoveIPC = "yes";
     };
   };
