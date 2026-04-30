@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 let
   terminal = "footclient";
@@ -18,13 +23,19 @@ in
   ];
 
   home.packages = with pkgs; [
-    hyprpaper hyprlock hypridle
-    avizo networkmanagerapplet
+    hyprpaper
+    hyprlock
+    hypridle
+    avizo
+    networkmanagerapplet
     playerctl
 
     # dependencies for wrappers
-    wl-clipboard cliphist
-    grim slurp swappy
+    wl-clipboard
+    cliphist
+    grim
+    slurp
+    swappy
     wl-screenrec
     polkit_gnome
   ];
@@ -70,7 +81,7 @@ in
         border_size = 2;
         layout = "dwindle";
         resize_on_border = true;
-        allow_tearing = false;
+        allow_tearing = true;
 
         snap = {
           enabled = true;
@@ -143,7 +154,6 @@ in
       };
 
       dwindle = {
-        pseudotile = true;
         preserve_split = true;
       };
 
@@ -176,7 +186,7 @@ in
 
         "$active_speed" = "$speed_fast";
         "$active_curve" = "fluid";
-        "$anim_style"   = "popin 70%"; # or slide, popin, gnomed
+        "$anim_style" = "popin 70%"; # or slide, popin, gnomed
 
         animation = [
           # windows
@@ -432,6 +442,7 @@ in
         tile = on
         maximize = on
         content = game
+        immediate = true
       }
 
       windowrule {

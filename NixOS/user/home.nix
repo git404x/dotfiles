@@ -1,9 +1,14 @@
-{ config, lib, pkgs, userConfig, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  userConfig,
+  ...
+}:
 
 {
 
   imports = [
-    ./modules/browser.nix
     ./modules/game.nix
     ./modules/nvim.nix
     ./modules/shell.nix
@@ -11,14 +16,16 @@
     ./modules/theme.nix
     ./modules/tmux.nix
     ./modules/hypr/hyprland.nix
+    ./modules/zen-browser.nix
+    ./modules/chromium.nix
   ];
 
   # Home Manager needs a bit of info about paths it should manage.
   home = {
     username = userConfig.username;
-    homeDirectory = "/home/"+userConfig.username;
+    homeDirectory = "/home/" + userConfig.username;
   };
-  
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 

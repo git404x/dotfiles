@@ -50,7 +50,7 @@ let
 in
 
 {
-  programs= {
+  programs = {
     bash = {
       enable = true;
       enableCompletion = true;
@@ -62,7 +62,6 @@ in
       shellAliases = shAliases;
       interactiveShellInit = ''
         set fish_greeting # Disable the "Welcome to Fish" message
-        clear # clean term
       '';
     };
 
@@ -117,9 +116,14 @@ in
   };
 
   home.packages = with pkgs; [
-    nh nvd nix-output-monitor
-    fastfetch nitch onefetch
-    fzf ripgrep
+    nh
+    nvd
+    nix-output-monitor
+    fastfetch
+    nitch
+    onefetch
+    fzf
+    ripgrep
   ];
 
 }

@@ -10,4 +10,6 @@
     waybar.enable = false;
     neovim.enable = false;
   };
+
+  gtk.gtk4.theme = null;
 }
