@@ -16,6 +16,7 @@
     ./modules/theme.nix
     ./modules/tmux.nix
     ./modules/hypr/hyprland.nix
+    ./modules/mpv.nix
     ./modules/zen-browser.nix
     ./modules/chromium.nix
   ];
