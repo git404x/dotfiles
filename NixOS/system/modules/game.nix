@@ -1,42 +1,18 @@
 {
   inputs,
   pkgs,
-  pkgs-stable,
-  lib,
-  config,
   userConfig,
   ...
 }:
 let
-  gamerun-script = builtins.readFile ./../../../scripts/game.sh;
-  gamerun = pkgs.writeShellScriptBin "gamerun" gamerun-script;
+  game-sh = builtins.readFile ./../../../scripts/game.sh;
+  gamerun = pkgs.writeShellScriptBin "gamerun" game-sh;
 in
 {
   imports = [
     inputs.nix-craft.nixosModules.client
     inputs.nix-craft.nixosModules.server
   ];
-
-  # prevent unstable sleep states
-  boot.kernelParams = [
-    "amdgpu.noretry=0"
-  ];
-
-  networking.firewall = {
-    allowedUDPPorts = [ 41641 ];
-    interfaces."tailscale0".allowedTCPPortRanges = [
-      {
-        from = 47984;
-        to = 48010;
-      }
-    ];
-    interfaces."tailscale0".allowedUDPPortRanges = [
-      {
-        from = 47998;
-        to = 48010;
-      }
-    ];
-  };
 
   services.nix-craft-server = {
     enable = true;
@@ -58,16 +34,6 @@ in
         url = "https://cdn.modrinth.com/data/gvQqBUqZ/versions/gl30uZvp/lithium-fabric-0.21.2%2Bmc1.21.11.jar";
         sha256 = "sha256-MQZjnHPuI/RL++Xl56gVTf460P1ISR5KhXZ1mO17Bzk=";
       }
-      {
-        name = "geyser";
-        url = "https://cdn.modrinth.com/data/wKkoqHrH/versions/wQ026mlb/geyser-fabric-Geyser-Fabric-2.9.5-b1109.jar";
-        sha256 = "sha256-CRk86J2Z2EE2XDlf4itbXaDa/cQR1VcIE5PtpLl/yYU=";
-      }
-      {
-        name = "floodgate";
-        url = "https://cdn.modrinth.com/data/bWrNNfkb/versions/wzwExuYr/Floodgate-Fabric-2.2.6-b54.jar";
-        sha256 = "sha256-KVfeM69JWnYBpTyKfGMbXH9SayR+/GJ50RWxd7Y258g=";
-      }
     ];
   };
 
@@ -88,44 +54,32 @@ in
         desiredgov = "default";
       };
       custom = {
-        start = "/run/wrappers/bin/sudo ${pkgs.ryzenadj}/bin/ryzenadj --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --tctl-temp=80";
-        end = "/run/wrappers/bin/sudo ${pkgs.ryzenadj}/bin/ryzenadj --stapm-limit=15000 --fast-limit=25000 --slow-limit=15000 --tctl-temp=95";
+        start = "${gamerun}/bin/gamerun power max";
+        end = "${gamerun}/bin/gamerun power default";
       };
     };
   };
 
   users.users.${userConfig.username}.extraGroups = [ "gamemode" ];
-  security.sudo.extraRules = [
-    {
-      users = [ "${userConfig.username}" ];
-      commands = [
-        {
-          command = "${pkgs.ryzenadj}/bin/ryzenadj";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
+  security.wrappers.ryzenadj = {
+    source = "${pkgs.ryzenadj}/bin/ryzenadj";
+    owner = "root";
+    group = "root";
+    setuid = true;
+  };
 
-  environment.systemPackages = with pkgs-stable; [
-    ryzenadj
+  environment.systemPackages = with pkgs; [
     mangohud
-    gamerun
     goldberg-emu
+    gamerun
+    ppsspp
 
     (retroarch.withCores (
       cores: with cores; [
         mgba
         ppsspp
-        citra
-        desmume
       ]
     ))
 
-    azahar
-    ppsspp
-    pcsx2
-    sunshine
-    moonlight-qt
   ];
 }

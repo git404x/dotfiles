@@ -1,4 +1,8 @@
-{ config, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  ...
+}:
 
 {
 
@@ -12,6 +16,10 @@
 
     # CUPS to print documents
     printing.enable = true;
+
+    # disable local discovery
+    avahi.enable = lib.mkForce false;
+    resolved.settings.Resolve.LLMNR = "false";
 
     # touchpad support
     libinput.enable = true;

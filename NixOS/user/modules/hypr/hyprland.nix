@@ -417,7 +417,7 @@ in
 
       windowrule {
         name = MediaPlayers
-        match:class = ^(.*mpv.*|.*imv.*|.*vlc.*)$
+        match:class = ^(.*mpv.*|.*imv.*|.*vlc.*|org.gnome.Loupe)$
         float = on
         center = on
         size = (monitor_w*0.60) (monitor_h*0.60)

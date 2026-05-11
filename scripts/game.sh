@@ -24,6 +24,45 @@ if [ "$1" = "install" ]; then
   fi
 fi
 
+# POWER MANAGEMENT
+if [ "$1" = "power" ]; then
+  if [ -z "$2" ]; then
+    echo "Usage: gamerun power [default | cool | balanced | max | hyper]"
+    exit 1
+  fi
+
+  PROFILE=$2
+
+  case "$PROFILE" in
+  default)
+    ryzenadj --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000 --tctl-temp=75
+    echo "[+] Power profile reset to DEFAULT (15W / 75C)"
+    ;;
+  cool)
+    ryzenadj --stapm-limit=10000 --fast-limit=12000 --slow-limit=10000 --tctl-temp=70
+    echo "[+] Power profile set to COOL (10W Limit)"
+    ;;
+  balanced)
+    ryzenadj --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --tctl-temp=80
+    echo "[+] Power profile set to BALANCED (15W Limit)"
+    ;;
+  max)
+    ryzenadj --stapm-limit=20000 --fast-limit=20000 --slow-limit=20000 --tctl-temp=85
+    echo "[+] Power profile set to MAX (20W Limit / 85C)"
+    ;;
+  hyper)
+    ryzenadj --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000 --tctl-temp=95
+    echo "[+] Power profile set to HYPER (25W Limit / 95C)"
+    ;;
+  *)
+    echo "[-] Invalid power mode: $PROFILE"
+    exit 1
+    ;;
+  esac
+  exit 0
+fi
+
+# GAME WRAPPER
 MODE=$1
 shift
 
@@ -41,7 +80,7 @@ fixed)
   ;;
 
 *)
-  echo "[-] Invalid mode: $MODE"
+  echo "[-] Invalid mode: $MODE. Use base, goldberg, fixed, or power."
   exit 1
   ;;
 esac

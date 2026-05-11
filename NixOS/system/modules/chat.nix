@@ -1,6 +1,6 @@
 {
+  lib,
   pkgs,
-  pkgs-stable,
   ...
 }:
 
@@ -17,19 +17,24 @@
   };
 
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [
-      64738
-      21118 # rustdesk
-    ];
+    allowedTCPPorts = [ 64738 ];
     allowedUDPPorts = [ 64738 ];
   };
 
   systemd.services.murmur = {
+    wantedBy = lib.mkForce [ ];
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
   };
 
-  environment.systemPackages = with pkgs-stable; [
+  # alias
+  environment.shellAliases = {
+    vc-start = "sudo systemctl start murmur.service";
+    vc-stop = "sudo systemctl stop murmur.service";
+    vc-status = "systemctl status murmur.service";
+  };
+
+  environment.systemPackages = with pkgs; [
     mumble
   ];
 }

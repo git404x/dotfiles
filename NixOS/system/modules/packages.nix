@@ -72,6 +72,8 @@
       ani-cli
       mpv
       imv
+      loupe
+      tectonic
 
       # applications
       bitwarden-desktop
@@ -79,10 +81,10 @@
       zen-browser
       telegram-desktop
       onlyoffice-desktopeditors
+      stirling-pdf-desktop
       gimp
       proton-vpn
       motrix
-      jdownloader
       qbittorrent
 
     ])

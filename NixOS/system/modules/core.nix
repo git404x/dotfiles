@@ -35,14 +35,17 @@
       enable = true;
       wifi.macAddress = "random";
       wifi.backend = "iwd";
+      dns = "systemd-resolved";
     };
 
     # network firewall
     firewall = {
       enable = true;
-      # Open ports in the firewall.
-      allowedTCPPorts = [ 5173 ];
-      allowedUDPPorts = [ ];
+      allowedUDPPorts = [ 41641 ]; # tailscale P2P
+      allowedTCPPorts = [ ];
+      allowedTCPPortRanges = [ ];
+      allowedUDPPortRanges = [ ];
+      trustedInterfaces = [ ];
     };
 
     # manual config
@@ -59,7 +62,6 @@
       "9.9.9.9"
       "149.112.112.112" # Quad9
     ];
-    networkmanager.dns = "systemd-resolved";
   };
 
   services.resolved = {
@@ -95,7 +97,7 @@
   # zram
   zramSwap = {
     enable = true;
-    memoryPercent = 60;
+    memoryPercent = 50;
     priority = 100;
     algorithm = "zstd";
   };
