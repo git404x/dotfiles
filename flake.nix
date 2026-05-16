@@ -20,7 +20,7 @@
     };
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-    nix-craft.url = "path:./NixOS/packages/nix-craft";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };
 
   outputs =

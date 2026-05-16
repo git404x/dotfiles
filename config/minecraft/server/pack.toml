@@ -1,0 +1,13 @@
+name = "Shin-Sekai Optimized"
+author = "git404x"
+version = "1.0.0"
+pack-format = "packwiz:1.1.0"
+
+[index]
+file = "index.toml"
+hash-format = "sha256"
+hash = "1a422e95e205962adedaebec05b258edef7c985452aaea9f9fd04c7725671637"
+
+[versions]
+fabric = "0.18.4"
+minecraft = "1.21.11"

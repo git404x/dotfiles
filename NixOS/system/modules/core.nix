@@ -41,7 +41,7 @@
     # network firewall
     firewall = {
       enable = true;
-      allowedUDPPorts = [ 41641 ]; # tailscale P2P
+      allowedUDPPorts = [ ];
       allowedTCPPorts = [ ];
       allowedTCPPortRanges = [ ];
       allowedUDPPortRanges = [ ];
