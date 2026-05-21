@@ -6,7 +6,7 @@
 }:
 
 let
-  nvimPath = "${config.home.homeDirectory}/dotfiles/nvim";
+  nvimPath = "${config.home.homeDirectory}/dotfiles/config/nvim";
 in
 {
 

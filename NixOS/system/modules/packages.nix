@@ -68,6 +68,7 @@
 
       # utilities
       android-tools
+      ffmpeg
       yt-dlp
       ani-cli
       mpv
