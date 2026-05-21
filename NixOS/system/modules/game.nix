@@ -6,8 +6,6 @@
   ...
 }:
 let
-  game-sh = builtins.readFile ./../../../config/bin/game.sh;
-  gamerun = pkgs.writeShellScriptBin "gamerun" game-sh;
   mc-config = ./../../../config/minecraft;
 in
 {
@@ -105,8 +103,8 @@ in
         desiredgov = "default";
       };
       custom = {
-        start = "${gamerun}/bin/gamerun power max";
-        end = "${gamerun}/bin/gamerun power default";
+        start = "${pkgs.configBin.gamerun}/bin/gamerun power max";
+        end = "${pkgs.configBin.gamerun}/bin/gamerun power default";
       };
     };
   };
@@ -122,7 +120,8 @@ in
   environment.systemPackages = with pkgs; [
     mangohud
     goldberg-emu
-    gamerun
+    configBin.gamerun
+    configBin.mc-bak
     mcrcon
     legacy-launcher
     ppsspp

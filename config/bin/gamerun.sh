@@ -5,8 +5,14 @@ if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "cygwin"* ]]; then
   IS_WINDOWS=true
 fi
 
+# catch empty execution before evaluating arguments
+if [ $# -eq 0 ]; then
+  echo "[-] Usage: gamerun [install | power | base | goldberg | fixed] <executable>"
+  exit 1
+fi
+
 # INSTALLER
-if [ "$1" = "install" ]; then
+if [ "${1:-}" = "install" ]; then
   echo "gamerun installer"
 
   if [ "$IS_WINDOWS" = true ]; then
@@ -25,8 +31,8 @@ if [ "$1" = "install" ]; then
 fi
 
 # POWER MANAGEMENT
-if [ "$1" = "power" ]; then
-  if [ -z "$2" ]; then
+if [ "${1:-}" = "power" ]; then
+  if [ -z "${2:-}" ]; then
     echo "Usage: gamerun power [default | cool | balanced | max | hyper]"
     exit 1
   fi
@@ -63,7 +69,7 @@ if [ "$1" = "power" ]; then
 fi
 
 # GAME WRAPPER
-MODE=$1
+MODE=${1:-}
 shift
 
 case "$MODE" in
