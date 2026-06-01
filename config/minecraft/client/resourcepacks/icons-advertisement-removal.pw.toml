@@ -1,0 +1,13 @@
+name = "Icons Removed ADS"
+filename = "Icon Branding Remover - For 1.8-1.21.8.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/7Rq0ipFz/versions/OXZb3ihp/Icon%20Branding%20Remover%20-%20For%201.8-1.21.8.zip"
+hash-format = "sha512"
+hash = "7ac728ef2d86110b8c75e87bf2a6ac7d9c1dd043349402cc4d0ac22701d4d873ff5d17b402c4a7dfb4057f03b6a5ebedfe9bbac7a8c25206d8deaad3b511285a"
+
+[update]
+[update.modrinth]
+mod-id = "7Rq0ipFz"
+version = "OXZb3ihp"

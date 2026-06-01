@@ -1,0 +1,13 @@
+name = "Colourful containers GUI"
+filename = "§lColourful Containers§8.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/L85p0yMA/versions/ByX1BZf5/%C2%A7lColourful%20Containers%C2%A78.zip"
+hash-format = "sha512"
+hash = "9e54a83cae56b7dc86a3fa49151f22a781980ef3129f4bd61690e0ac2aa9d79658e5516c87e8ab9a66bffb801171ebf4a470a58c72944b2a35521b846fa7c8d8"
+
+[update]
+[update.modrinth]
+mod-id = "L85p0yMA"
+version = "ByX1BZf5"

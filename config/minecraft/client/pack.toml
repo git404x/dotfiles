@@ -1,4 +1,4 @@
-name = "Fluxd"
+name = "Flux"
 author = "git404x"
 version = "1.0.0"
 pack-format = "packwiz:1.1.0"
@@ -6,7 +6,7 @@ pack-format = "packwiz:1.1.0"
 [index]
 file = "index.toml"
 hash-format = "sha256"
-hash = "d88b23df442704b06fe3b437f4b2129920ebf7a63c5e82ed99bb9cd76fc34ef6"
+hash = "55b7992486dd7d7a46177df0d27681ce3d6d96381c75e5a6065a116ad062e1de"
 
 [versions]
 fabric = "0.19.2"

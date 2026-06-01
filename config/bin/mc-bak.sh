@@ -15,67 +15,105 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 if [ -n "$SUDO_USER" ]; then
+  S_USER="$SUDO_USER"
   U_HOME=$(eval echo ~"$SUDO_USER")
-  B_DEST="${2:-${XDG_DATA_HOME:-$U_HOME/.local/share}/minecraft_backups}"
-  U_GRP=$(id -gn "$SUDO_USER")
 else
-  B_DEST="${2:-${XDG_DATA_HOME:-$HOME/.local/share}/minecraft_backups}"
-  U_GRP=$(id -gn)
+  S_USER="$USER"
+  U_HOME=$HOME
 fi
+U_GRP=$(id -gn "$S_USER")
 
-B_DIR="${1:-/var/lib/minecraft}"
+B_BASE="${XDG_DATA_HOME:-$U_HOME/.local/share}/minecraft"
+B_DEST="$B_BASE/backups"
 DATE=$(date +'%Y-%m-%d_%H-%M-%S')
 
 mkdir -p "$B_DEST"
+chown -R "$S_USER":"$U_GRP" "$B_BASE" 2>/dev/null || true
 
-if [ ! -d "$B_DIR" ]; then
-  echo -e "${RED}${BOLD}[✖ Error]${NC} Directory [${B_DIR}] is missing!"
+TARGET_NAMES=()
+TARGET_PATHS=()
+
+P_CLIENT="$U_HOME/.minecraft"
+if [ -d "$P_CLIENT" ]; then
+  TARGET_NAMES+=(".minecraft (Saves Only)")
+  TARGET_PATHS+=("$P_CLIENT|SAVES")
+
+  TARGET_NAMES+=(".minecraft (Configs & Launchers)")
+  TARGET_PATHS+=("$P_CLIENT|CONFIGS")
+fi
+
+P_SERVER_BASE="/var/lib/minecraft"
+if [ -d "$P_SERVER_BASE" ]; then
+  while IFS= read -r dir; do
+    if [ -n "$dir" ]; then
+      server_name=$(basename "$dir")
+      if [[ "$server_name" == .* ]]; then continue; fi
+      TARGET_NAMES+=("$server_name (Server)")
+      TARGET_PATHS+=("$dir|SERVER")
+    fi
+  done < <(find "$P_SERVER_BASE" -mindepth 1 -maxdepth 1 -type d)
+fi
+
+if [ ${#TARGET_NAMES[@]} -eq 0 ]; then
+  echo -e "${RED}${BOLD}[✖ Error]${NC} No Minecraft directories found!"
   exit 1
 fi
 
-mapfile -t W < <(find "$B_DIR" -mindepth 1 -maxdepth 1 -type d -not -name ".*" -printf "%f\n")
-
-if [ ${#W[@]} -eq 0 ]; then
-  echo -e "${YELLOW}${BOLD}[✦ Info]${NC} No worlds found in [${B_DIR}]"
-  exit 0
-fi
-
-clear
-echo -e "${CYAN}${BOLD}==========================================${NC}"
-echo -e "${GREEN}${BOLD} [✦] Detected Worlds in [${B_DIR}] ${NC}"
-echo -e "${CYAN}${BOLD}==========================================${NC}"
-
-for i in "${!W[@]}"; do
-  echo -e "  ${YELLOW}${BOLD}[$((i + 1))]${NC} ${W[$i]}"
+echo -e "${CYAN}${BOLD}[ Backup Targets ]${NC}"
+for i in "${!TARGET_NAMES[@]}"; do
+  echo -e "  ${YELLOW}$((i + 1))${NC}) ${TARGET_NAMES[$i]}"
 done
+echo -e "  ${YELLOW}$((${#TARGET_NAMES[@]} + 1))${NC}) All of the above"
 
-echo -e "  ${YELLOW}${BOLD}[A]${NC} Backup ALL Worlds"
-echo -e "  ${RED}${BOLD}[Q]${NC} Quit"
-echo -e "${CYAN}${BOLD}==========================================${NC}"
-echo -en "${BLUE}${BOLD}[➜] Select option:${NC} "
+echo -n -e "\n${BLUE}${BOLD}[➜] Select option:${NC} "
 read -r C
 
-T=()
-if [[ "$C" =~ ^[Aa]$ ]]; then
-  T=("${W[@]}")
-elif [[ "$C" =~ ^[Qq]$ ]]; then
-  exit 0
-elif [[ "$C" =~ ^[0-9]+$ ]] && [ "$C" -ge 1 ] && [ "$C" -le "${#W[@]}" ]; then
-  T=("${W[$((C - 1))]}")
+SELECTED_NAMES=()
+SELECTED_PATHS=()
+
+if [[ "$C" =~ ^[0-9]+$ ]]; then
+  if [ "$C" -eq $((${#TARGET_NAMES[@]} + 1)) ]; then
+    SELECTED_NAMES=("${TARGET_NAMES[@]}")
+    SELECTED_PATHS=("${TARGET_PATHS[@]}")
+  elif [ "$C" -ge 1 ] && [ "$C" -le "${#TARGET_NAMES[@]}" ]; then
+    idx=$((C - 1))
+    SELECTED_NAMES=("${TARGET_NAMES[$idx]}")
+    SELECTED_PATHS=("${TARGET_PATHS[$idx]}")
+  else
+    echo -e "${RED}[✖ Error]${NC} Invalid selection!"
+    exit 1
+  fi
 else
-  echo -e "${RED}${BOLD}[✖ Error]${NC} Invalid selection!"
+  echo -e "${RED}[✖ Error]${NC} Invalid selection!"
   exit 1
 fi
 
-pacman_anim() {
+pacman_anim_with_pct() {
   local p=$1
   local m=$2
-  local f=("ᗧ · · · ·" " ᗧ · · ·" "  ᗧ · ·" "   ᗧ ·" "    ᗧ" "· · · · ᗤ" "· · · ᗤ  " "· · ᗤ    " "· ᗤ      ")
+  local prog_file=$3
+  local f=("ᗧ · · · ·" " ᗧ · · · " "  ᗧ · ·  " "   ᗧ ·   " "    ᗧ    " "· · · · ᗤ" "· · · ᗤ  " "· · ᗤ    " "· ᗤ      ")
 
   tput civis
   while kill -0 "$p" 2>/dev/null; do
     for i in "${f[@]}"; do
-      printf "\r${YELLOW}${BOLD}[ %s ]${NC} ${CYAN}%s${NC}" "$i" "$m"
+      local cols
+      cols=$(tput cols 2>/dev/null || echo 80)
+      local pct=""
+
+      if [ -f "$prog_file" ]; then
+        local val
+        val=$(tail -n 1 "$prog_file" 2>/dev/null | tr -dc '0-9')
+        if [ -n "$val" ]; then pct="[${val}%] "; fi
+      fi
+
+      local max_len=$((cols - 18 - ${#pct}))
+      local trunc_m="${m}"
+      if [ ${#m} -gt $max_len ] && [ $max_len -gt 3 ]; then
+        trunc_m="${m:0:$((max_len - 3))}..."
+      fi
+
+      printf "\r\033[2K${YELLOW}${BOLD}[ %s ]${NC} ${GREEN}%s${NC}${CYAN}%s${NC}" "$i" "$pct" "$trunc_m"
       sleep 0.15
       kill -0 "$p" 2>/dev/null || break
     done
@@ -85,34 +123,57 @@ pacman_anim() {
 }
 
 echo ""
-for w in "${T[@]}"; do
-  A_N="${w}_backup_${DATE}.tar.zst"
-  A_P="${B_DEST}/${A_N}"
 
-  tar --exclude='logs/*' \
-    --exclude='cache/*' \
-    --exclude='crash-reports/*' \
-    --exclude='bluemap/web/data/*' \
-    --exclude='*.jar' \
-    --exclude='libraries/*' \
-    --exclude='versions/*' \
-    --exclude='.fabric/*' \
-    -I 'zstd -11 -T0' \
-    -cf "$A_P" -C "$B_DIR" "$w" >/dev/null 2>&1 &
+for idx in "${!SELECTED_NAMES[@]}"; do
+  NAME="${SELECTED_NAMES[$idx]}"
+  RAW_PATH="${SELECTED_PATHS[$idx]}"
 
-  pid=$!
-  pacman_anim "$pid" "Compressing [${w}] ➜ [${A_N}]..."
-  wait "$pid"
+  SRC_DIR="${RAW_PATH%|*}"
+  MODE="${RAW_PATH##*|}"
 
-  if [ -n "$SUDO_USER" ]; then
-    chown "$SUDO_USER:$U_GRP" "$A_P"
+  SAFE_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\+/-/g' | sed 's/^-//;s/-$//')
+  A_N="${SAFE_NAME}_${DATE}.tar.zst"
+
+  EXCLUDES=()
+  INCLUDES=()
+
+  cd "$SRC_DIR" || continue
+
+  if [ "$MODE" == "SAVES" ]; then
+    INCLUDES=("saves")
+
+  elif [ "$MODE" == "CONFIGS" ]; then
+    EXCLUDES=("--exclude=sessions" "--exclude=crash_assistant" "--exclude=*.xwmc" "--exclude=*.outdated")
+
+    shopt -s nullglob
+    for item in config options*.txt servers.dat *profiles*.json usercache.json; do
+      INCLUDES+=("$item")
+    done
+    shopt -u nullglob
+
+  elif [ "$MODE" == "SERVER" ]; then
+    INCLUDES=(".")
+    EXCLUDES=("--exclude=cache" "--exclude=logs" "--exclude=*.jar" "--exclude=plugins/spark/tmp")
   fi
 
-  echo -e "${GREEN}${BOLD}[✔ Success]${NC} [${w}] ➜ [${A_P}]"
+  if [ ${#INCLUDES[@]} -eq 0 ]; then
+    echo -e "${YELLOW}[⚠ Warning]${NC} Target data missing in [$SRC_DIR]. Skipping..."
+    continue
+  fi
+
+  TOTAL_BYTES=$(du -sb -c "${INCLUDES[@]}" 2>/dev/null | tail -n 1 | awk '{print $1}')
+  PROG_FILE="/tmp/mc-bak-prog-$$.txt"
+  touch "$PROG_FILE"
+
+  tar -cf - "${EXCLUDES[@]}" "${INCLUDES[@]}" 2>/dev/null | pv -n -s "$TOTAL_BYTES" 2>"$PROG_FILE" | zstd -T0 -10 >"$B_DEST/$A_N" &
+  PID=$!
+
+  pacman_anim_with_pct $PID "compressing $NAME..." "$PROG_FILE"
+  wait $PID
+
+  chown "$S_USER":"$U_GRP" "$B_DEST/$A_N" 2>/dev/null || true
+  rm -f "$PROG_FILE"
+  echo -e "${GREEN}${BOLD}[✔ Success]${NC}: $B_DEST/$A_N"
 done
 
-if [ -n "$SUDO_USER" ]; then
-  chown "$SUDO_USER:$U_GRP" "$B_DEST"
-fi
-
-echo -e "\n${BLUE}${BOLD}[✦ Done]${NC} Vault located at: [${B_DEST}]"
+echo -e "\n${CYAN}${BOLD}[ Backup finalized. ]${NC}"
