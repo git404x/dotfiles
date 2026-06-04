@@ -1,6 +1,15 @@
 { pkgs, ... }:
 
 {
+  ytdl = pkgs.writeShellApplication {
+    name = "ytdl";
+    runtimeInputs = with pkgs; [
+      yt-dlp
+      fzf
+    ];
+    text = builtins.readFile ./ytdl.sh;
+  };
+
   gamerun = pkgs.writeShellApplication {
     name = "gamerun";
     runtimeInputs = with pkgs; [
@@ -38,5 +47,21 @@
     ];
     text = builtins.readFile ./mc-pack.sh;
   };
+
+  ai-cli = pkgs.writers.writePython3Bin "ai-cli" {
+    libraries = [ ];
+    makeWrapperArgs = [
+      "--prefix"
+      "PATH"
+      ":"
+      "${pkgs.lib.makeBinPath (
+        with pkgs;
+        [
+          fzf
+          litellm
+        ]
+      )}"
+    ];
+  } (builtins.readFile ./ai-cli.py);
 
 }

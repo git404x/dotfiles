@@ -59,9 +59,9 @@
       foot
 
       # utilities
+      configBin.ytdl
       android-tools
       ffmpeg
-      yt-dlp
       ani-cli
       mpv
       imv

@@ -89,6 +89,20 @@ in
       enableFishIntegration = true;
     };
 
+    direnv = {
+      enable = true;
+      enableBashIntegration = true;
+      nix-direnv.enable = true;
+      config = {
+        whitelist = {
+          prefix = [
+            "~/dotfiles"
+            "~/dev"
+          ];
+        };
+      };
+    };
+
     bat = {
       enable = true;
       config = {

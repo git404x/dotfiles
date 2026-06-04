@@ -3,6 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     # agent
+    configBin.ai-cli
     antigravity
     antigravity-cli
     code-cursor
