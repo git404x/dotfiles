@@ -8,11 +8,22 @@
 
 {
   # kernel
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
-  # magic-key
+  # boot params
   boot.kernel.sysctl = {
+    # sysrq
     "kernel.sysrq" = 176;
+    # memMgmt
+    "vm.swappiness" = 100;
+    "vm.page-cluster" = 0;
+  };
+
+  # zram
+  zramSwap = {
+    enable = true;
+    memoryPercent = 100;
+    algorithm = "zstd";
   };
 
   # bootloader
@@ -92,14 +103,6 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
-  };
-
-  # zram
-  zramSwap = {
-    enable = true;
-    memoryPercent = 50;
-    priority = 100;
-    algorithm = "zstd";
   };
 
   # pkgs

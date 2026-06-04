@@ -8,8 +8,10 @@
     ./modules/hardware-mod.nix
     ./modules/nix-config.nix
     ./modules/packages.nix
+    ./modules/flatpak.nix
     ./modules/services.nix
     ./modules/users.nix
+    ./modules/dev.nix
     ./modules/chat.nix
     ./modules/game.nix
 

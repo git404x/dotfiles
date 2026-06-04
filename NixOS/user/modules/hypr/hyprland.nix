@@ -45,6 +45,7 @@ in
     systemd.enable = true;
     package = null;
     portalPackage = null;
+    # configType = "lua";
 
     settings = {
 
@@ -93,12 +94,12 @@ in
       };
 
       decoration = {
-        rounding = 10;
+        rounding = 8;
         rounding_power = 4.0;
 
-        active_opacity = 0.85;
-        inactive_opacity = 0.80;
-        fullscreen_opacity = 0.95;
+        active_opacity = 0.95;
+        inactive_opacity = 0.85;
+        fullscreen_opacity = 1.0;
 
         dim_modal = true;
         dim_inactive = false;
@@ -108,15 +109,16 @@ in
 
         blur = {
           enabled = true;
-          size = 10;
-          passes = 2;
+          size = 8;
+          passes = 3;
           new_optimizations = true;
           xray = true;
           ignore_opacity = true;
-          contrast = 0.85;
+          contrast = 0.90;
           brightness = 0.85;
-          vibrancy = 0.2;
-          vibrancy_darkness = 0.2;
+          vibrancy = 0.30;
+          vibrancy_darkness = 0.20;
+          noise = 0.0117;
         };
       };
 

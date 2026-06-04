@@ -17,7 +17,6 @@ return {
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     "rafamadriz/friendly-snippets", -- useful snippets
     "onsails/lspkind.nvim", -- vs-code like pictograms
-    "zbirenbaum/copilot-cmp", -- Copilot
   },
   config = function()
     local cmp = require("cmp")
@@ -55,7 +54,6 @@ return {
 
       -- sources for autocompletion
       sources = cmp.config.sources({
-        { name = "copilot", group_index = 2 }, -- AI into autocomplete
         { name = "path" }, -- file system paths
         { name = "buffer" }, -- text within current buffer
         { name = "luasnip" }, -- snippets

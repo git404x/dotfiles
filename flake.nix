@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     home-manager = {
@@ -19,6 +19,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };
@@ -33,6 +35,7 @@
       stylix,
       hyprland,
       programs-db,
+      nix-flatpak,
       ...
     }@inputs:
 
@@ -102,6 +105,7 @@
             modules = [
               { nixpkgs.pkgs = pkgs; }
               stylix.nixosModules.default
+              nix-flatpak.nixosModules.nix-flatpak
               ./NixOS/system/configuration.nix
               ./NixOS/system/hardware-configuration.nix
             ];

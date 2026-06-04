@@ -52,14 +52,6 @@
       neovim
       neovide
 
-      # dependencies
-      javaPackages.compiler.openjdk25
-      python3
-      nodejs
-      cursor-cli
-      code-cursor
-      antigravity
-
       # terminal
       tmux
       tmate
@@ -77,7 +69,6 @@
       tectonic
 
       # applications
-      bitwarden-desktop
       librewolf
       zen-browser
       telegram-desktop
