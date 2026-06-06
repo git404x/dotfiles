@@ -4,17 +4,18 @@ return {
   dependencies = {
     "JoosepAlviste/nvim-ts-context-commentstring",
   },
-
   config = function()
-    -- import comment plugin safely
-    local comment = require("Comment")
+    local ctx_module = "ts_context_commentstring"
 
-    local ts_context_commentstring = require("ts_context_commentstring.integrations.comment_nvim")
+    -- prevent nil language_tree crashes
+    require(ctx_module).setup({
+      enable_autocmd = false,
+    })
 
-    -- enable comment
-    comment.setup({
-      -- for commenting tsx, jsx, svelte, html files
-      pre_hook = ts_context_commentstring.create_pre_hook(),
+    -- setup & inject the AST hook
+    require("Comment").setup({
+      -- for commenting mixed-language files(tsx, jsx, svelte, html)
+      pre_hook = require(ctx_module .. ".integrations.comment_nvim").create_pre_hook(),
     })
   end,
 }

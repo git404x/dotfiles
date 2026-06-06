@@ -57,12 +57,6 @@ return {
     -- Call setup function immediately or from your config setup
     setup_diagnostics()
 
-    -- show borders on hover
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-      border = "single",
-      title = " Hover ",
-    })
-
     -- server configs
     local servers = {
       lua_ls = {
@@ -98,8 +92,13 @@ return {
           preferences = { disableSuggestions = false },
         },
       },
+      nixd = {
+        settings = {
+          -- serialize an empty object '{}' instead of 'null' or '[]'
+          nixd = vim.empty_dict(),
+        },
+      },
       -- zero-config servers
-      nixd = {},
       pyright = {},
       bashls = {},
       cssls = {},

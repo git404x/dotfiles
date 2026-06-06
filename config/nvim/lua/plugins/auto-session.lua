@@ -8,7 +8,7 @@ return {
       suppressed_dirs = { "~/", "~/Downloads", "~/Documents", "~/Desktop/" },
       session_lens = {
         load_on_setup = true,
-        theme_conf = { border = true },
+        picker_opts = { border = true },
         previewer = false,
       },
     })

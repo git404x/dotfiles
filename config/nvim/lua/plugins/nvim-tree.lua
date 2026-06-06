@@ -1,9 +1,6 @@
 return {
   "nvim-tree/nvim-tree.lua",
   -- cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeFindFileToggle" },
-  dependencies = {
-    "nvim-tree/nvim-web-devicons"
-  },
   lazy = false,
   config = function()
     local nvimtree = require("nvim-tree")
@@ -54,11 +51,11 @@ return {
         enable = true,
         show_on_dirs = true,
         icons = {
-          hint = '󰠠 ',
-          info = ' '  ,
-          warning = ' ',
-          error = ' ',
-        }
+          hint = "󰠠 ",
+          info = " ",
+          warning = " ",
+          error = " ",
+        },
       },
     })
 
@@ -69,5 +66,5 @@ return {
     keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Toggle file explorer on current file" }) -- toggle file explorer on current file
     keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse file explorer" }) -- collapse file explorer
     keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh file explorer" }) -- refresh file explorer
-  end
+  end,
 }

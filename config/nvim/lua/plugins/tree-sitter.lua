@@ -18,7 +18,6 @@ return {
         additional_vim_regex_highlighting = false,
       },
       indent = { enable = true }, -- enable indentation
-      autotag = { enable = true }, -- enable autotagging (w/ nvim-ts-autotag plugin)
 
       -- ensure these language parsers are installed
       ensure_installed = {

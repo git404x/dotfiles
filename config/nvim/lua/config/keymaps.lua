@@ -43,3 +43,59 @@ keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" 
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
+
+-- wrapping
+
+-- -- soft wrap
+keymap.set("n", "<leader>uw", function()
+  vim.opt_local.wrap = not vim.opt_local.wrap:get()
+  local state = vim.opt_local.wrap:get() and "ON" or "OFF"
+  vim.notify("Soft Wrap " .. state, vim.log.levels.INFO, { title = "Text Engine" })
+end, { desc = "Toggle soft (visual) line wrapping" })
+
+-- hard wrap
+keymap.set("n", "<leader>uh", function()
+  if vim.bo.textwidth == 0 then
+    -- calc window width minus gutters (numbers, folds, git signs)
+    local win_width = vim.api.nvim_win_get_width(0)
+    local gutter_margin = vim.opt.numberwidth:get() + 4
+    local dynamic_tw = win_width - gutter_margin
+
+    vim.bo.textwidth = dynamic_tw
+    vim.opt_local.formatoptions:append("t")
+    vim.notify("Hard Wrap ON (tw=" .. dynamic_tw .. ")", vim.log.levels.INFO, { title = "Text Engine" })
+  else
+    vim.bo.textwidth = 0
+    vim.opt_local.formatoptions:remove("t")
+    vim.notify("Hard Wrap OFF", vim.log.levels.WARN, { title = "Text Engine" })
+  end
+end, { desc = "Toggle dynamic hard line wrapping" })
+
+-- -- falls back to standard absolute movement if count is provided.
+keymap.set({ "n", "x" }, "j", function()
+  return (vim.g.visual_wrap_nav and vim.v.count == 0) and "gj" or "j"
+end, { expr = true, silent = true, desc = "Smart move down" })
+
+keymap.set({ "n", "x" }, "k", function()
+  return (vim.g.visual_wrap_nav and vim.v.count == 0) and "gk" or "k"
+end, { expr = true, silent = true, desc = "Smart move up" })
+
+keymap.set({ "n", "x" }, "0", function()
+  return vim.g.visual_wrap_nav and "g0" or "0"
+end, { expr = true, silent = true, desc = "Smart start of visual line" })
+
+keymap.set({ "n", "x" }, "^", function()
+  return vim.g.visual_wrap_nav and "g^" or "^"
+end, { expr = true, silent = true, desc = "Smart first non-blank of visual line" })
+
+keymap.set({ "n", "x" }, "$", function()
+  return vim.g.visual_wrap_nav and "g$" or "$"
+end, { expr = true, silent = true, desc = "Smart end of visual line" })
+
+keymap.set({ "n", "x" }, "<Home>", function()
+  return vim.g.visual_wrap_nav and "g<Home>" or "<Home>"
+end, { expr = true, silent = true, desc = "Smart Home" })
+
+keymap.set({ "n", "x" }, "<End>", function()
+  return vim.g.visual_wrap_nav and "g<End>" or "<End>"
+end, { expr = true, silent = true, desc = "Smart End" })

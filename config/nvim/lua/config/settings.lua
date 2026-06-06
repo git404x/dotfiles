@@ -1,6 +1,11 @@
 -- session restore opts
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
+-- cache core API structures
+local api = vim.api
+local fn = vim.fn
+local log = vim.log
+
 -- rocks_config
 -- local lazy = require("lazy")
 -- lazy.setup({
@@ -81,18 +86,28 @@ local binary_patterns = {
   "*.db",
 }
 
-vim.api.nvim_create_autocmd("BufReadCmd", {
+api.nvim_create_autocmd("BufReadCmd", {
   pattern = binary_patterns,
   callback = function(ctx)
     -- Fire the file to the OS
     open_in_external_app(ctx.file)
 
     -- Cleanly notify the user
-    vim.notify("Opened " .. vim.fn.fnamemodify(ctx.file, ":t") .. " in external viewer.", vim.log.levels.INFO)
+    vim.notify("Opened " .. fn.fnamemodify(ctx.file, ":t") .. " in external viewer.", log.levels.INFO)
 
     -- Erase the buffer so garbage data never touches the screen
-    vim.schedule(function()
-      vim.api.nvim_buf_delete(ctx.buf, { force = true })
+    api.nvim_schedule(function()
+      pcall(api.nvim_buf_delete, ctx.buf, { force = true })
     end)
   end,
 })
+
+-- LspLog command
+api.nvim_create_user_command("LspLog", function()
+  local log_path = vim.lsp.log.get_filename()
+  if fn.filereadable(log_path) == 1 then
+    vim.cmd("edit " .. log_path)
+  else
+    vim.notify("LSP log is empty or does not exist.", log.levels.WARN)
+  end
+end, { desc = "Open the active LSP log file" })
