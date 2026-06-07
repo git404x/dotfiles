@@ -1,17 +1,16 @@
 {
   pkgs,
-  lib,
-  config,
   ...
 }:
-
 let
   terminal = "footclient";
   launcher = "fuzzel";
   browser = "zen";
   fileManager = "nautilus";
   powermenu = "powermenu";
+  mainMod = "SUPER";
 in
+
 {
 
   imports = [
@@ -45,7 +44,7 @@ in
     systemd.enable = true;
     package = null;
     portalPackage = null;
-    # configType = "lua";
+    configType = "hyprlang";
 
     settings = {
 
@@ -181,55 +180,40 @@ in
           "linear, 1, 1, 1, 1"
         ];
 
-        # vars for animators
-        "$speed_fast" = "4";
-        "$speed_norm" = "6";
-        "$speed_slow" = "8";
-
-        "$active_speed" = "$speed_fast";
-        "$active_curve" = "fluid";
-        "$anim_style" = "popin 70%"; # or slide, popin, gnomed
-
         animation = [
-          # windows
-          "windows, 1, $active_speed, $active_curve, $anim_style"
-          "windowsOut, 1, $active_speed, $active_curve, $anim_style"
-          "windowsIn, 1, $active_speed, $active_curve, $anim_style"
-          # move
-          "windowsMove, 1, $active_speed, $active_curve"
-          "workspaces, 1, $active_speed, $active_curve, slide"
-          "specialWorkspace, 1, $active_speed, $active_curve, slidefadevert"
-          # borders
+          "windows, 1, 4, fluid, popin 70%"
+          "windowsOut, 1, 4, fluid, popin 70%"
+          "windowsIn, 1, 4, fluid, popin 70%"
+          "windowsMove, 1, 4, fluid"
+          "workspaces, 1, 4, fluid, slide"
+          "specialWorkspace, 1, 4, fluid, slidefadevert"
           "border, 1, 10, default"
           "borderangle, 1, 30, linear, loop"
-          "fade, 1, $active_speed, default"
+          "fade, 1, 4, default"
         ];
       };
 
-      # Keybinds
-      "$mainMod" = "SUPER";
-
       bind = [
         # System
-        "$mainMod, Q, killactive"
-        "$mainMod, F, fullscreen"
-        "$mainMod, G, togglegroup"
-        "$mainMod, T, layoutmsg, togglesplit"
-        "$mainMod SHIFT, P, pseudo"
-        "$mainMod SHIFT, F, togglefloating"
-        "$mainMod SHIFT, Q, exec, hyprctl kill"
-        "$mainMod ALT, M, exit"
+        "${mainMod}, Q, killactive"
+        "${mainMod}, F, fullscreen"
+        "${mainMod}, G, togglegroup"
+        "${mainMod}, T, layoutmsg, togglesplit"
+        "${mainMod} SHIFT, P, pseudo"
+        "${mainMod} SHIFT, F, togglefloating"
+        "${mainMod} SHIFT, Q, exec, hyprctl kill"
+        "${mainMod} ALT, M, exit"
 
         # Applications
-        "$mainMod, Return, exec, ${terminal}"
-        "$mainMod, SPACE, exec, ${launcher}"
-        "$mainMod, E, exec, ${fileManager}"
-        "$mainMod, B, exec, ${browser}"
-        "$mainMod, P, exec, ${powermenu}"
+        "${mainMod}, Return, exec, ${terminal}"
+        "${mainMod}, SPACE, exec, ${launcher}"
+        "${mainMod}, E, exec, ${fileManager}"
+        "${mainMod}, B, exec, ${browser}"
+        "${mainMod}, P, exec, ${powermenu}"
 
         # Clipboard & screen
-        "$mainMod, V, exec, clipboard-manager"
-        "$mainMod SHIFT, V, exec, clipboard-clear"
+        "${mainMod}, V, exec, clipboard-manager"
+        "${mainMod} SHIFT, V, exec, clipboard-clear"
 
         ", Print, exec, screenshot full"
         "SHIFT, Print, exec, screenshot region"
@@ -241,83 +225,83 @@ in
         ", XF86AudioPlay, exec, playerctl play-pause"
         ", XF86AudioPrev, exec, playerctl previous"
         ", XF86AudioNext, exec, playerctl next"
-        "$mainMod, BACKSLASH, exec, playerctl play-pause"
-        "$mainMod, bracketright, exec, playerctl next"
-        "$mainMod, bracketleft, exec, playerctl previous"
+        "${mainMod}, BACKSLASH, exec, playerctl play-pause"
+        "${mainMod}, bracketright, exec, playerctl next"
+        "${mainMod}, bracketleft, exec, playerctl previous"
 
         # Focus
-        "$mainMod, h, movefocus, l"
-        "$mainMod, j, movefocus, d"
-        "$mainMod, k, movefocus, u"
-        "$mainMod, l, movefocus, r"
-        "$mainMod, Tab, cyclenext"
+        "${mainMod}, h, movefocus, l"
+        "${mainMod}, j, movefocus, d"
+        "${mainMod}, k, movefocus, u"
+        "${mainMod}, l, movefocus, r"
+        "${mainMod}, Tab, cyclenext"
 
-        "$mainMod, left, movefocus, l"
-        "$mainMod, down, movefocus, d"
-        "$mainMod, up, movefocus, u"
-        "$mainMod, right, movefocus, r"
+        "${mainMod}, left, movefocus, l"
+        "${mainMod}, down, movefocus, d"
+        "${mainMod}, up, movefocus, u"
+        "${mainMod}, right, movefocus, r"
 
-        "$mainMod, Tab, cyclenext"
-        "$mainMod, Tab, bringactivetotop"
+        "${mainMod}, Tab, cyclenext"
+        "${mainMod}, Tab, bringactivetotop"
 
         # move
-        "$mainMod SHIFT, h, movewindow, l"
-        "$mainMod SHIFT, j, movewindow, d"
-        "$mainMod SHIFT, k, movewindow, u"
-        "$mainMod SHIFT, l, movewindow, r"
+        "${mainMod} SHIFT, h, movewindow, l"
+        "${mainMod} SHIFT, j, movewindow, d"
+        "${mainMod} SHIFT, k, movewindow, u"
+        "${mainMod} SHIFT, l, movewindow, r"
 
-        "$mainMod SHIFT, left, movewindow, l"
-        "$mainMod SHIFT, down, movewindow, d"
-        "$mainMod SHIFT, up, movewindow, u"
-        "$mainMod SHIFT, right, movewindow, r"
+        "${mainMod} SHIFT, left, movewindow, l"
+        "${mainMod} SHIFT, down, movewindow, d"
+        "${mainMod} SHIFT, up, movewindow, u"
+        "${mainMod} SHIFT, right, movewindow, r"
 
         # resize
-        "$mainMod ALT, h, resizeactive, -20 0"
-        "$mainMod ALT, j, resizeactive, 0 20"
-        "$mainMod ALT, k, resizeactive, 0 -20"
-        "$mainMod ALT, l, resizeactive, 20 0"
+        "${mainMod} ALT, h, resizeactive, -20 0"
+        "${mainMod} ALT, j, resizeactive, 0 20"
+        "${mainMod} ALT, k, resizeactive, 0 -20"
+        "${mainMod} ALT, l, resizeactive, 20 0"
 
-        "$mainMod ALT, left, resizeactive, -20 0"
-        "$mainMod ALT, down, resizeactive, 0 20"
-        "$mainMod ALT, up, resizeactive, 0 -20"
-        "$mainMod ALT, right, resizeactive, 20 0"
+        "${mainMod} ALT, left, resizeactive, -20 0"
+        "${mainMod} ALT, down, resizeactive, 0 20"
+        "${mainMod} ALT, up, resizeactive, 0 -20"
+        "${mainMod} ALT, right, resizeactive, 20 0"
 
         # workspaces
-        "$mainMod, 1, workspace, 1"
-        "$mainMod, 2, workspace, 2"
-        "$mainMod, 3, workspace, 3"
-        "$mainMod, 4, workspace, 4"
-        "$mainMod, 5, workspace, 5"
-        "$mainMod, 6, workspace, 6"
-        "$mainMod, 7, workspace, 7"
-        "$mainMod, 8, workspace, 8"
-        "$mainMod, 9, workspace, 9"
-        "$mainMod, 0, workspace, 10"
+        "${mainMod}, 1, workspace, 1"
+        "${mainMod}, 2, workspace, 2"
+        "${mainMod}, 3, workspace, 3"
+        "${mainMod}, 4, workspace, 4"
+        "${mainMod}, 5, workspace, 5"
+        "${mainMod}, 6, workspace, 6"
+        "${mainMod}, 7, workspace, 7"
+        "${mainMod}, 8, workspace, 8"
+        "${mainMod}, 9, workspace, 9"
+        "${mainMod}, 0, workspace, 10"
 
         # move to Workspace
-        "$mainMod SHIFT, 1, movetoworkspace, 1"
-        "$mainMod SHIFT, 2, movetoworkspace, 2"
-        "$mainMod SHIFT, 3, movetoworkspace, 3"
-        "$mainMod SHIFT, 4, movetoworkspace, 4"
-        "$mainMod SHIFT, 5, movetoworkspace, 5"
-        "$mainMod SHIFT, 6, movetoworkspace, 6"
-        "$mainMod SHIFT, 7, movetoworkspace, 7"
-        "$mainMod SHIFT, 8, movetoworkspace, 8"
-        "$mainMod SHIFT, 9, movetoworkspace, 9"
-        "$mainMod SHIFT, 0, movetoworkspace, 10"
+        "${mainMod} SHIFT, 1, movetoworkspace, 1"
+        "${mainMod} SHIFT, 2, movetoworkspace, 2"
+        "${mainMod} SHIFT, 3, movetoworkspace, 3"
+        "${mainMod} SHIFT, 4, movetoworkspace, 4"
+        "${mainMod} SHIFT, 5, movetoworkspace, 5"
+        "${mainMod} SHIFT, 6, movetoworkspace, 6"
+        "${mainMod} SHIFT, 7, movetoworkspace, 7"
+        "${mainMod} SHIFT, 8, movetoworkspace, 8"
+        "${mainMod} SHIFT, 9, movetoworkspace, 9"
+        "${mainMod} SHIFT, 0, movetoworkspace, 10"
 
         # scratchpad
-        "$mainMod, S, togglespecialworkspace, magic"
-        "$mainMod SHIFT, S, movetoworkspace, special:magic"
+        "${mainMod}, S, togglespecialworkspace, magic"
+        "${mainMod} SHIFT, S, movetoworkspace, special:magic"
 
         # relative workspace
-        "$mainMod, M, workspace, r+1"
-        "$mainMod, N, workspace, r-1"
-        "$mainMod SHIFT, M, movetoworkspace, r+1"
-        "$mainMod SHIFT, N, movetoworkspace, r-1"
+        "${mainMod}, M, workspace, r+1"
+        "${mainMod}, N, workspace, r-1"
+        "${mainMod} SHIFT, M, movetoworkspace, r+1"
+        "${mainMod} SHIFT, N, movetoworkspace, r-1"
 
         # first empty workspace
-        "$mainMod SHIFT, E, workspace, empty"
+        "${mainMod} SHIFT, E, workspace, empty"
       ];
 
       # media
@@ -332,165 +316,125 @@ in
 
       # mouse binds
       bindm = [
-        "$mainMod, mouse:272, movewindow"
-        "$mainMod, mouse:273, resizewindow"
+        "${mainMod}, mouse:272, movewindow"
+        "${mainMod}, mouse:273, resizewindow"
       ];
 
+      windowrule =
+        let
+          browserPattern = "(firefox|librewolf|zen|zen-beta|chromium|brave-browser)";
+        in
+        [
+          {
+            name = "DefaultFloating";
+            "match:class" = "^()$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.50) (monitor_h*0.50)";
+          }
+          {
+            name = "PictureInPicture";
+            "match:class" = "^${browserPattern}$";
+            "match:title" = "^(Picture-in-Picture)$";
+            float = true;
+            move = "(monitor_w-window_w-20) 20";
+            size = "(monitor_w*0.40) (monitor_h*0.40)";
+          }
+          {
+            name = "BrowserLibrary";
+            "match:class" = "^${browserPattern}$";
+            "match:title" = "^(Library)$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.60) (monitor_h*0.60)";
+          }
+          {
+            name = "BrowserExtensions";
+            "match:class" = "^${browserPattern}$";
+            "match:title" = "^((Extension:.*)|(moz-extension://.*))$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.30) (monitor_h*0.60)";
+          }
+          {
+            name = "FileDialogs";
+            "match:class" = "^((${browserPattern})|(xdg-desktop-portal-gtk.*)|(.*Telegram.*))$";
+            "match:title" = "^($|(Opening)(.*)|(Open Files)|(All Files)|(.*save.*)|(Save.*))$";
+            suppress_event = "maximize fullscreen";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.50) (monitor_h*0.50)";
+          }
+          {
+            name = "SystemTools";
+            "match:class" =
+              "^((.*blueman-manager.*)|(.*pavucontrol.*)|(.*nm-applet.*)|(.*nm-connection-editor.*))$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.40) (monitor_h*0.60)";
+            suppress_event = "maximize fullscreen";
+          }
+          {
+            name = "GParted";
+            "match:class" = "^(GParted)$";
+            "match:initial_title" = "^(GParted)$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.60) (monitor_h*0.60)";
+            suppress_event = "maximize fullscreen";
+          }
+          {
+            name = "MediaPlayers";
+            "match:class" = "^(.*mpv.*|.*imv.*|.*vlc.*|org.gnome.Loupe)$";
+            float = true;
+            center = true;
+            size = "(monitor_w*0.60) (monitor_h*0.60)";
+            suppress_event = "maximize";
+          }
+          {
+            name = "Steam";
+            "match:class" = "^(steam)$";
+            "match:title" = "^(Steam)$";
+            maximize = true;
+            opaque = true;
+            no_blur = true;
+            content = "game";
+            immediate = true;
+          }
+          {
+            name = "XWaylandGhostFix";
+            "match:class" = "^$";
+            "match:title" = "^$";
+            "match:xwayland" = true;
+            no_initial_focus = true;
+            suppress_event = "activatefocus";
+          }
+        ];
+
+      layerrule = [
+        {
+          name = "Bar";
+          "match:namespace" = "^(waybar)$";
+          blur = true;
+          ignore_alpha = 0;
+          animation = "slide";
+        }
+        {
+          name = "Notifications";
+          "match:namespace" = "^(notifications)$";
+          blur = true;
+          ignore_alpha = 0;
+          animation = "slide";
+        }
+        {
+          name = "Launcher";
+          "match:namespace" = "^(launcher|fuzzel|wofi|rofi|logout_dialog|wlogout|powermenu)$";
+          blur = true;
+          dim_around = true;
+          ignore_alpha = 0;
+          animation = "slide";
+        }
+      ];
     };
-
-    extraConfig = ''
-
-      windowrule {
-        name = DefaultFloating
-        match:class = ^()$
-        float = on
-        center = on
-        size = (monitor_w*0.50) (monitor_h*0.50)
-      }
-
-      $browser = ^(firefox|librewolf|zen|zen-beta|chromium|brave-browser)$
-
-      windowrule {
-        name = PictureInPicture
-        match:class = $browser
-        match:title = ^(Picture-in-Picture)$
-        float = on
-        move = (monitor_w-window_w-20) 20
-        size = (monitor_w*0.40) (monitor_h*0.40)
-      }
-
-      windowrule {
-        name = BrowserLibrary
-        match:class = $browser
-        match:title = ^(Library)$
-        float = on
-        center = on
-        size = (monitor_w*0.60) (monitor_h*0.60)
-      }
-
-      windowrule {
-        name = BrowserExtensions
-        match:class = $browser
-        match:title = ^((Extension:.*)|(moz-extension://.*))$
-        float = on
-        center = on
-        size = (monitor_w*0.30) (monitor_h*0.60)
-      }
-
-      windowrule {
-        name = FileDialogs
-        match:class = ^(($browser)|(xdg-desktop-portal-gtk.*)|(.*Telegram.*))$
-        match:title = ^($|(Opening)(.*)|(Open Files)|(All Files)|(.*save.*)|(Save.*))$
-        suppress_event = maximize fullscreen
-        float = on
-        center = on
-        size = (monitor_w*0.50) (monitor_h*0.50)
-      }
-
-      windowrule {
-        name = SystemTools
-        match:class = ^((.*blueman-manager.*)|(.*pavucontrol.*)|(.*nm-applet.*)|(.*nm-connection-editor.*))$
-        float = on
-        center = on
-        size = (monitor_w*0.40) (monitor_h*0.60)
-        suppress_event = maximize fullscreen
-      }
-
-      windowrule {
-        name = GParted
-        match:class = ^(GParted)$
-        match:initial_title = ^(GParted)$
-        float = on
-        center = on
-        size = (monitor_w*0.60) (monitor_h*0.60)
-        suppress_event = maximize fullscreen
-      }
-
-      windowrule {
-        name = Bitwarden
-        match:class = ^(Bitwarden)$
-        match:title = ^(Bitwarden)$
-        float = on
-        center = on
-        suppress_event = maximize fullscreen
-        no_screen_share = on
-        size = (monitor_w*0.70) (monitor_h*0.70)
-      }
-
-      windowrule {
-        name = MediaPlayers
-        match:class = ^(.*mpv.*|.*imv.*|.*vlc.*|org.gnome.Loupe)$
-        float = on
-        center = on
-        size = (monitor_w*0.60) (monitor_h*0.60)
-        suppress_event = maximize
-      }
-
-      # steam
-      windowrule {
-        name = SteamPopups
-        match:class = ^(steam)$
-        match:title = ^(?!Steam$).*$
-        float = on
-        center = on
-        content = game
-        size = (monitor_w*0.50) (monitor_h*0.50)
-      }
-
-      windowrule {
-        name = SteamMain
-        match:class = ^(steam)$
-        match:title = ^(Steam)$
-        tile = on
-        maximize = on
-        content = game
-        immediate = true
-      }
-
-      windowrule {
-        name = XWaylandGhostFix
-        match:class = ^$
-        match:title = ^$
-        match:xwayland = true
-        no_initial_focus = on
-        suppress_event = activatefocus
-      }
-
-      windowrule {
-        name = Gamescope
-        match:class = ^(gamescope)$
-        workspace = 10
-        fullscreen = on
-        idle_inhibit = focus
-        opaque = on
-        no_blur = on
-      }
-
-      layerrule {
-        name = Bar
-        match:namespace = ^(waybar)$
-        blur = on
-        ignore_alpha = 0
-        animation = slide
-      }
-
-      layerrule {
-        name = Notifications
-        match:namespace = ^(notifications)$
-        blur = on
-        ignore_alpha = 0
-        animation = slide
-      }
-
-      layerrule {
-        name = Launcher
-        match:namespace = ^(launcher|fuzzel|wofi|rofi|logout_dialog|wlogout|powermenu)$
-        blur = on
-        dim_around = on
-        ignore_alpha = 0
-        animation = slide
-      }
-    '';
-
   };
 }
