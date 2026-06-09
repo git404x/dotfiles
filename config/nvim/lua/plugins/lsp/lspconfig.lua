@@ -99,6 +99,7 @@ return {
         },
       },
       -- zero-config servers
+      marksman = {},
       pyright = {},
       bashls = {},
       cssls = {},

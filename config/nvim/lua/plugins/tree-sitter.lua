@@ -1,6 +1,5 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  branch = "master", -- fix 'configs not found' error
   event = { "BufReadPre", "BufNewFile" },
   build = ":TSUpdate",
   dependencies = {
@@ -9,7 +8,7 @@ return {
   },
   config = function()
     -- import nvim-treesitter plugin
-    local treesitter = require("nvim-treesitter.configs")
+    local treesitter = require("nvim-treesitter.config")
 
     -- configure treesitter
     treesitter.setup({

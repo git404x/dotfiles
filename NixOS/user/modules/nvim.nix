@@ -24,6 +24,8 @@ in
     # LSPs
     nixd
     lua-language-server
+    marksman
+
     pyright
     bash-language-server
     nginx-language-server
@@ -43,6 +45,10 @@ in
     prettier
     eslint_d
     pylint
+
+    # utils
+    pandoc
+    typst
   ];
 
   home.sessionVariables = {

@@ -58,6 +58,7 @@ return {
         { name = "buffer" }, -- text within current buffer
         { name = "luasnip" }, -- snippets
         { name = "nvim_lsp" }, -- LSP code completion
+        { name = "orgmode" }, -- org mode
       }),
 
       -- configure lspkind for vs-code like pictograms in completion menu
