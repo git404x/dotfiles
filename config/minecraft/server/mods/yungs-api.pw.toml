@@ -1,0 +1,13 @@
+name = "YUNG's API"
+filename = "YungsApi-26.1.2-Fabric-6.1.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/Ua7DFN59/versions/tg3ifUTK/YungsApi-26.1.2-Fabric-6.1.0.jar"
+hash-format = "sha512"
+hash = "2f834298ce45a98b7e5762958586eee3071f582bce6c510f9f5760310da5bfa885c56ccf35a796f124f716cdaafc28a2a1646bbc74b1ff6b86a88e31fff42e1a"
+
+[update]
+[update.modrinth]
+mod-id = "Ua7DFN59"
+version = "tg3ifUTK"

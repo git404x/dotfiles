@@ -14,8 +14,6 @@
       freeSwapThreshold = 5;
     };
 
-    nohang.enable = true;
-
     # CUPS to print documents
     printing.enable = true;
 

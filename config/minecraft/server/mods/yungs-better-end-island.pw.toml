@@ -1,0 +1,13 @@
+name = "YUNG's Better End Island"
+filename = "YungsBetterEndIsland-26.1.2-Fabric-4.1.0.jar"
+side = "server"
+
+[download]
+url = "https://cdn.modrinth.com/data/2BwBOmBQ/versions/NRGSdwmo/YungsBetterEndIsland-26.1.2-Fabric-4.1.0.jar"
+hash-format = "sha512"
+hash = "3d05be49fdd9ab0e0049f4754fadb44054ac1194e2607b1cdd2b892f4296c53c6008dbbdf7ce9ab24131147cf576fd2ec2119fea964978e6761643bb754f4cde"
+
+[update]
+[update.modrinth]
+mod-id = "2BwBOmBQ"
+version = "NRGSdwmo"

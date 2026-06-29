@@ -3,11 +3,11 @@ filename = "§8§lDarkmode §f§lColourful Containers§8.zip"
 side = "client"
 
 [download]
-url = "https://cdn.modrinth.com/data/PCGR5Y1W/versions/pIz2m6be/%C2%A78%C2%A7lDarkmode%20%C2%A7f%C2%A7lColourful%20Containers%C2%A78.zip"
+url = "https://cdn.modrinth.com/data/PCGR5Y1W/versions/YEnz0u36/%C2%A78%C2%A7lDarkmode%20%C2%A7f%C2%A7lColourful%20Containers%C2%A78.zip"
 hash-format = "sha512"
-hash = "ef275638bfb97d610b9d6f44cff21d7ce120065b0e6cb93f7b1d81ee58fe05f08db164b35a0100bf5eef5e1f62e5a99896b2f3275c36dac3d422e983f398bbd0"
+hash = "99f2eb36bd294e075e55fa298e93b189c08520391f619bdf92559a138966b756e9def306370a732ab427e56333dd7b19156c2b9220524452a87c06b98f961e83"
 
 [update]
 [update.modrinth]
 mod-id = "PCGR5Y1W"
-version = "pIz2m6be"
+version = "YEnz0u36"
