@@ -42,6 +42,12 @@ if [ -d "$P_CLIENT" ]; then
   TARGET_PATHS+=("$P_CLIENT|CONFIGS")
 fi
 
+P_HM_SERVER="$U_HOME/minecraft-server"
+if [ -d "$P_HM_SERVER" ]; then
+  TARGET_NAMES+=("minecraft-server (user)")
+  TARGET_PATHS+=("$P_HM_SERVER|SERVER")
+fi
+
 P_SERVER_BASE="/var/lib/minecraft"
 if [ -d "$P_SERVER_BASE" ]; then
   while IFS= read -r dir; do

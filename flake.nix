@@ -121,6 +121,22 @@
               ./NixOS/user/home.nix
             ];
           };
+
+          "minecraft" = home-manager.lib.homeManagerConfiguration {
+            # pkgs = nixpkgs.legacyPackages.x86_64-linux;
+            inherit pkgs;
+            extraSpecialArgs = globalArgs;
+            modules = [
+              {
+                home.username = "kaushikieee";
+                home.homeDirectory = "/home/kaushikieee";
+                home.stateVersion = "24.05";
+                programs.home-manager.enable = true;
+              }
+              ./NixOS/user/modules/shell.nix
+              ./NixOS/user/modules/minecraft.nix
+            ];
+          };
         };
       };
     };
