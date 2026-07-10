@@ -20,7 +20,7 @@ let
 
   packMods = mc-pkgs.fetchPackwizModpack {
     url = "file://${mc-config}/server/pack.toml";
-    packHash = "sha256-WbGXUyyhhWz5rgsGhfZN6hdcMpaEnTN7xiFjwFKIc/c=";
+    packHash = "sha256-KIzAValtcfIBQaRPwIy6eY75VXHxOW2usylRZBK+kh0=";
   };
 
   propertiesFormat = pkgs.formats.javaProperties { };
@@ -29,8 +29,12 @@ let
     server-port = "25565";
     online-mode = "false";
     motd = "[ERROR] The Archives of the Paradise; The Hell";
-    view-distance = "10";
-    simulation-distance = "5";
+    view-distance = "8";
+    simulation-distance = "4";
+    network-compression-threshold = "1024";
+    "enable-rcon" = "true";
+    "rcon.password" = "mc@2612";
+    "rcon.port" = "25575";
     max-players = "12";
     gamemode = "survival";
     difficulty = "normal";
@@ -40,6 +44,7 @@ in
   home.packages = with pkgs; [
     jre
     serverPkg
+    mcrcon
     zstd
     configBin.mc-bak
     configBin.flux-compiler
@@ -64,10 +69,29 @@ in
         "${serverPkg}/bin/minecraft-server"
         "-Xms4096M"
         "-Xmx6144M"
+
+        # dual-core OS lock
+        "-XX:ActiveProcessorCount=2"
+        "-XX:+AlwaysPreTouch"
+
+        # Aikar's Flags
         "-XX:+UseG1GC"
-        "-XX:MaxGCPauseMillis=50"
-        "-XX:+UseStringDeduplication"
-        "-XX:+UseCompactObjectHeaders"
+        "-XX:+ParallelRefProcEnabled"
+        "-XX:MaxGCPauseMillis=200"
+        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+DisableExplicitGC"
+        "-XX:G1NewSizePercent=30"
+        "-XX:G1MaxNewSizePercent=40"
+        "-XX:G1HeapRegionSize=8M"
+        "-XX:G1ReservePercent=20"
+        "-XX:G1HeapWastePercent=5"
+        "-XX:G1MixedGCCountTarget=4"
+        "-XX:InitiatingHeapOccupancyPercent=15"
+        "-XX:G1MixedGCLiveThresholdPercent=90"
+        "-XX:G1RSetUpdatingPauseTimePercent=5"
+        "-XX:SurvivorRatio=32"
+        "-XX:+PerfDisableSharedMem"
+        "-XX:MaxTenuringThreshold=1"
       ];
 
       Restart = "on-failure";

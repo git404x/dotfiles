@@ -45,8 +45,18 @@ hash = "069d81cab53c0141459ad4d70bcf3e10f17652f24cc62d3b4a0fc2cd2b700871"
 metafile = true
 
 [[files]]
+file = "mods/floodgate.pw.toml"
+hash = "02778469a6a4cbb1f21ccbeeed79589b1ee96c23ffecf624e17c920413158dd9"
+metafile = true
+
+[[files]]
 file = "mods/geophilic.pw.toml"
 hash = "543d2dac579c8de2e0035ffc0f33eff08c9b4267c981c397ecf14881a810a275"
+metafile = true
+
+[[files]]
+file = "mods/geyser.pw.toml"
+hash = "e1e3f6944fdce43831d5dcf4b7829fec776adddfb8b824ff59de965f7db93e73"
 metafile = true
 
 [[files]]
