@@ -14,6 +14,7 @@
     ./modules/dev.nix
     ./modules/chat.nix
     ./modules/game.nix
+    ./modules/stash.nix
 
     ./gui/fonts.nix
     ./gui/greetd.nix
