@@ -1,0 +1,178 @@
+diff --git a/launcher/LaunchController.cpp b/launcher/LaunchController.cpp
+index d263cc50a..c4adefe25 100644
+--- a/launcher/LaunchController.cpp
++++ b/launcher/LaunchController.cpp
+@@ -39,6 +39,7 @@
+ #include "launch/steps/PrintServers.h"
+ #include "minecraft/auth/AccountData.h"
+ #include "minecraft/auth/AccountList.h"
++#include "minecraft/auth/MinecraftAccount.h"
+ 
+ #include "ui/InstanceWindow.h"
+ #include "ui/dialogs/CustomMessageBox.h"
+@@ -128,89 +129,8 @@ void LaunchController::decideAccount()
+ 
+ LaunchDecision LaunchController::decideLaunchMode()
+ {
+-    if (!m_accountToUse || m_wantedLaunchMode == LaunchMode::Demo) {
+-        m_actualLaunchMode = LaunchMode::Demo;
+-        return LaunchDecision::Continue;
+-    }
+-
+-    if (m_wantedLaunchMode == LaunchMode::Normal) {
+-        if (m_accountToUse->shouldRefresh() || m_accountToUse->accountState() == AccountState::Offline) {
+-            // Force account refresh on the account used to launch the instance updating the AccountState
+-            // only on first try and if it is not meant to be offline
+-            m_accountToUse->refresh();
+-        }
+-    }
+-
+-    const auto* accounts = APPLICATION->accounts();
+-    MinecraftAccountPtr accountToCheck = nullptr;
+-
+-    if (m_accountToUse->accountType() != AccountType::Offline) {
+-        accountToCheck = m_accountToUse->ownsMinecraft() ? m_accountToUse : nullptr;
+-    } else if (const auto defaultAccount = accounts->defaultAccount(); defaultAccount && defaultAccount->ownsMinecraft()) {
+-        accountToCheck = defaultAccount;
+-    } else {
+-        for (int i = 0; i < accounts->count(); i++) {
+-            if (const auto account = accounts->at(i); account->ownsMinecraft()) {
+-                accountToCheck = account;
+-                break;
+-            }
+-        }
+-    }
+-
+-    if (!accountToCheck) {
+-        m_actualLaunchMode = LaunchMode::Demo;
+-        return LaunchDecision::Continue;
+-    }
+-
+-    auto state = accountToCheck->accountState();
+-    if (state == AccountState::Unchecked || state == AccountState::Errored) {
+-        accountToCheck->refresh();
+-        state = AccountState::Working;
+-    }
+-
+-    if (state == AccountState::Working) {
+-        // refresh is in progress, we need to wait for it to finish to proceed.
+-        ProgressDialog progDialog(m_parentWidget);
+-        progDialog.setSkipButton(true, tr("Abort"));
+-
+-        // TODO: this relies on tasks' synchronous signal dispatching nature
+-        // TODO: meaning currentTask can't complete and become null while this code is running
+-        // TODO: this code will produce a race condition when tasks become fully async
+-        auto task = accountToCheck->currentTask();
+-        progDialog.execWithTask(task.get());
+-
+-        if (task->getState() == State::AbortedByUser) {
+-            return LaunchDecision::Abort;
+-        }
+-
+-        state = accountToCheck->accountState();
+-    }
+-
+-    QString reauthReason;
+-    switch (state) {
+-        case AccountState::Errored:
+-            reauthReason = tr("An error occurred while refreshing '%1'").arg(accountToCheck->profileName());
+-            break;
+-        case AccountState::Expired:
+-            reauthReason = tr("'%1' has expired and needs to be reauthenticated").arg(accountToCheck->profileName());
+-            break;
+-        case AccountState::Disabled:
+-            reauthReason = tr("The launcher's client identification has changed");
+-            break;
+-        case AccountState::Gone:
+-            reauthReason = tr("'%1' no longer exists on the servers").arg(accountToCheck->profileName());
+-            break;
+-        default:
+-            m_actualLaunchMode =
+-                state == AccountState::Online && m_wantedLaunchMode == LaunchMode::Normal ? LaunchMode::Normal : LaunchMode::Offline;
+-            return LaunchDecision::Continue;  // All good to go
+-    }
+-
+-    if (reauthenticateAccount(accountToCheck, reauthReason)) {
+-        return LaunchDecision::Undecided;
+-    }
+-
+-    return LaunchDecision::Abort;
++    m_actualLaunchMode = LaunchMode::Normal;
++    return LaunchDecision::Continue;
+ }
+ 
+ bool LaunchController::askPlayDemo() const
+@@ -276,6 +196,11 @@ void LaunchController::login()
+ {
+     decideAccount();
+ 
++    if (!m_accountToUse) {
++        emitAborted();
++        return;
++    }
++
+     LaunchDecision decision = decideLaunchMode();
+     while (decision == LaunchDecision::Undecided) {
+         decision = decideLaunchMode();
+diff --git a/launcher/minecraft/MinecraftInstance.cpp b/launcher/minecraft/MinecraftInstance.cpp
+index e8fc642fa..6a36afc71 100644
+--- a/launcher/minecraft/MinecraftInstance.cpp
++++ b/launcher/minecraft/MinecraftInstance.cpp
+@@ -571,6 +571,13 @@ QStringList MinecraftInstance::javaArguments()
+     QStringList args;
+ 
+     args << "-Duser.language=en";
++    // blackhole telemetry and auth at the kernel routing layer
++    const QStringList blackholedEndpoints = {
++        "auth", "account", "session", "services"
++    };
++    for (const auto& endpoint : blackholedEndpoints) {
++        args << QString("-Dminecraft.api.%1.host=http://0.0.0.0").arg(endpoint);
++    }
+ 
+     // custom args go first. we want to override them if we have our own here.
+     args.append(extraArguments());
+diff --git a/launcher/minecraft/auth/AccountList.cpp b/launcher/minecraft/auth/AccountList.cpp
+index ac27b6bbc..af430c8e7 100644
+--- a/launcher/minecraft/auth/AccountList.cpp
++++ b/launcher/minecraft/auth/AccountList.cpp
+@@ -591,12 +591,7 @@ void AccountList::setListFilePath(QString path, bool autosave)
+ 
+ bool AccountList::anyAccountIsValid()
+ {
+-    for (auto account : m_accounts) {
+-        if (account->ownsMinecraft()) {
+-            return true;
+-        }
+-    }
+-    return false;
++    return true;
+ }
+ 
+ void AccountList::fillQueue()
+diff --git a/launcher/minecraft/auth/MinecraftAccount.h b/launcher/minecraft/auth/MinecraftAccount.h
+index 24608701d..8b6b00358 100644
+--- a/launcher/minecraft/auth/MinecraftAccount.h
++++ b/launcher/minecraft/auth/MinecraftAccount.h
+@@ -116,7 +116,7 @@ class MinecraftAccount : public QObject, public Usable {
+ 
+     AccountType accountType() const noexcept { return data.type; }
+ 
+-    bool ownsMinecraft() const { return data.type != AccountType::Offline && data.minecraftEntitlement.ownsMinecraft; }
++    bool ownsMinecraft() const { return true; }
+ 
+     bool hasProfile() const { return data.profileId().size() != 0; }
+ 
+diff --git a/program_info/CMakeLists.txt b/program_info/CMakeLists.txt
+index 3afd8a642..d1e091951 100644
+--- a/program_info/CMakeLists.txt
++++ b/program_info/CMakeLists.txt
+@@ -9,7 +9,7 @@ if(UNIX)
+ endif()
+ 
+ set(Launcher_CommonName "PrismLauncher")
+-set(Launcher_DisplayName "Prism Launcher")
++set(Launcher_DisplayName "Prism Launcher (mod)")
+ set(Launcher_AppID "org.prismlauncher.PrismLauncher")
+ set(Launcher_Domain "prismlauncher.org")
+ set(Launcher_Git "https://github.com/PrismLauncher/PrismLauncher")

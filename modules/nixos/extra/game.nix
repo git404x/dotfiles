@@ -144,6 +144,7 @@ in
     mcrcon
     packwiz
     mrpack-install
+    prism-launcher-mod
     openjdk25
     mgba
     ppsspp
