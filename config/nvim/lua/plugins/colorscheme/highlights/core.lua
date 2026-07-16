@@ -18,7 +18,7 @@ return function(c, opts)
     MatchParen = { fg = c.base0C, bg = c.base02, bold = true },
     Whitespace = { fg = c.base02 },
     NonText = { fg = c.base02 },
-    IblIndent = { fg = c.base02 }, 
+    IblIndent = { fg = c.base02 },
     IblScope = { fg = c.base03 },
 
     -- STANDARD SYNTAX

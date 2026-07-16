@@ -44,6 +44,19 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- window maximizer
+local maximized = false
+vim.keymap.set("n", "<leader>sm", function()
+  if maximized then
+    vim.cmd("wincmd =") -- equalize all windows
+    maximized = false
+  else
+    vim.cmd("wincmd |") -- maximize vertically
+    vim.cmd("wincmd _") -- maximize horizontally
+    maximized = true
+  end
+end, { desc = "Toggle maximize split" })
+
 -- wrapping
 
 -- -- soft wrap

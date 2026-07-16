@@ -4,7 +4,6 @@ return {
     "nvim-orgmode/orgmode",
     event = "VeryLazy",
     ft = { "org" },
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
     config = function()
       require("orgmode").setup({
         org_agenda_files = { "~/notes/org/**/*" },
@@ -21,14 +20,13 @@ return {
   {
     "delphinus/md-render.nvim",
     ft = { "markdown" },
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 
   -- Visual Inline AST Transformation Layout
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = { "markdown", "org" },
-    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" },
+    dependencies = { "echasnovski/mini.icons" },
     config = function()
       require("render-markdown").setup({
         enabled = false,
