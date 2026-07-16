@@ -1,5 +1,5 @@
 {
-  description = "ERROR nixos configuration";
+  description = "git404x nixos configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -11,79 +11,28 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    stylix.url = "github:danth/stylix";
-    hyprland.url = "github:hyprwm/Hyprland";
-
     programs-db = {
       url = "github:wamserma/flake-programs-sqlite";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
-
+    stylix.url = "github:danth/stylix";
+    hyprland.url = "github:hyprwm/Hyprland";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     nix-minecraft.url = "github:Infinidoge/nix-minecraft";
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-stable,
-      flake-parts,
-      home-manager,
-      stylix,
-      hyprland,
-      programs-db,
-      nix-flatpak,
-      ...
-    }@inputs:
+    inputs@{ self, flake-parts, ... }:
 
     let
-      system = "x86_64-linux";
-
-      # system
-      systemConfig = {
-        inherit system;
-        hostname = "nix";
-        timezone = "Asia/Kolkata";
-        locale = "en_US.UTF-8";
-      };
-
-      # user
-      userConfig = {
-        shell = "fish";
-        username = "px";
-        name = "px";
-      };
-
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-        overlays = [
-          (import ./NixOS/packages/overlays.nix {
-            inherit inputs system;
-          })
-        ];
-      };
-
-      pkgs-stable = import nixpkgs-stable {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
-      lib = nixpkgs.lib;
-      globalArgs = {
-        inherit
-          inputs
-          pkgs-stable
-          systemConfig
-          userConfig
-          ;
-      };
-
+      dotfiles = self;
+      lib = import "${dotfiles}/lib" { inherit inputs dotfiles; };
     in
+
     flake-parts.lib.mkFlake { inherit inputs; } {
+
       systems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -99,42 +48,42 @@
 
       flake = {
         nixosConfigurations = {
-          ${systemConfig.hostname} = lib.nixosSystem {
-            inherit system;
-            specialArgs = globalArgs;
-            modules = [
-              { nixpkgs.pkgs = pkgs; }
-              stylix.nixosModules.default
-              nix-flatpak.nixosModules.nix-flatpak
-              ./NixOS/system/configuration.nix
-              ./NixOS/system/hardware-configuration.nix
+
+          vivobook = lib.mkHost {
+            hostname = "vivobook";
+            username = "px";
+            extraModules = [
+              inputs.stylix.nixosModules.default
+              inputs.nix-flatpak.nixosModules.nix-flatpak
+              "${dotfiles}/hosts/vivobook/configuration.nix"
+              "${dotfiles}/hosts/vivobook/hardware.nix"
+            ];
+          };
+
+          iso = lib.mkHost {
+            extraModules = [
+              "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+              "${dotfiles}/hosts/iso/configuration.nix"
             ];
           };
         };
 
         homeConfigurations = {
-          "${userConfig.username}" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = globalArgs;
-            modules = [
-              stylix.homeModules.default
-              ./NixOS/user/home.nix
+
+          "px" = lib.mkHome {
+            username = "px";
+            hostname = "vivobook";
+            extraModules = [
+              inputs.stylix.homeModules.default
+              "${dotfiles}/hosts/vivobook/home.nix"
             ];
           };
 
-          "minecraft" = home-manager.lib.homeManagerConfiguration {
-            # pkgs = nixpkgs.legacyPackages.x86_64-linux;
-            inherit pkgs;
-            extraSpecialArgs = globalArgs;
-            modules = [
-              {
-                home.username = "kaushikieee";
-                home.homeDirectory = "/home/kaushikieee";
-                home.stateVersion = "24.05";
-                programs.home-manager.enable = true;
-              }
-              ./NixOS/user/modules/shell.nix
-              ./NixOS/user/modules/minecraft.nix
+          "minecraft" = lib.mkHome {
+            username = "kaushikieee";
+            hostname = "imac";
+            extraModules = [
+              "${dotfiles}/hosts/imac/home.nix"
             ];
           };
         };
