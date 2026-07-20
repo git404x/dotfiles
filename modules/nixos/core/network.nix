@@ -6,7 +6,7 @@
       enable = true;
       wifi.macAddress = "random";
       wifi.backend = "iwd";
-      dns = "systemd-resolved";
+      dns = "none";
     };
 
     # network firewall
@@ -16,42 +16,57 @@
       allowedTCPPorts = [ ];
       allowedTCPPortRanges = [ ];
       allowedUDPPortRanges = [ ];
-      trustedInterfaces = [ ];
-    };
+      trustedInterfaces = [ "lo" ];
 
-    # manual config
-    extraHosts = ''
-      185.199.111.133 raw.githubusercontent.com
-    '';
+      interfaces."tailscale0" = {
+        allowedTCPPorts = [ 53 ];
+        allowedUDPPorts = [ 53 ];
+      };
+    };
+  };
+
+  # DNS
+  services.dnscrypt-proxy = {
+    enable = true;
+    settings = {
+      listen_addresses = [ "127.0.0.1:5300" ];
+      server_names = [
+        "cloudflare"
+        "quad9-dnscrypt-ip4-filter-pri"
+        "scaleway-fr"
+      ];
+      require_dnssec = true;
+      require_nolog = true;
+      require_nofilter = false;
+    };
+  };
+
+  # filtering
+  services.adguardhome = {
+    enable = true;
+    openFirewall = false;
+    mutableSettings = false;
+    settings = {
+      http = {
+        address = "127.0.0.1:3000";
+      };
+      dns = {
+        bind_hosts = [ "0.0.0.0" ];
+        port = 53;
+        bootstrap_dns = [ "127.0.0.1:5300" ];
+        upstream_dns = [ "127.0.0.1:5300" ];
+
+        # latency optimizations
+        aaaa_disabled = true;
+        upstream_mode = "parallel";
+      };
+    };
   };
 
   # tailscale mesh
-  services.tailscale.enable = true;
-
-  # DNS & TLS
-  networking = {
-    nameservers = [
-      "1.1.1.1"
-      "1.0.0.1" # Cloudflare
-      "9.9.9.9"
-      "149.112.112.112" # Quad9
-    ];
-  };
-
-  services.resolved = {
+  services.tailscale = {
     enable = true;
-    settings = {
-      Resolve = {
-        DNSSEC = "true";
-        Domains = [ "~." ];
-        FallbackDNS = [
-          "1.1.1.1"
-          "9.9.9.9"
-        ];
-        DNSOverTLS = "yes";
-        LLMNR = "false"; # disable local multicast resolution
-      };
-    };
+    useRoutingFeatures = "both";
   };
 
   # disable local discovery
