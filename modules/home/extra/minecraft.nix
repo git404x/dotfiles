@@ -13,15 +13,14 @@ let
     overlays = [ inputs.nix-minecraft.overlay ];
   };
 
-  mc-config = "${dotfiles}/config/minecraft";
   serverDir = "minecraft-server";
 
   jre = pkgs.openjdk25_headless;
   serverPkg = mc-pkgs.fabricServers.fabric-26_1_2.override { jre_headless = jre; };
 
   packMods = mc-pkgs.fetchPackwizModpack {
-    url = "file://${mc-config}/server/pack.toml";
-    packHash = "sha256-KIzAValtcfIBQaRPwIy6eY75VXHxOW2usylRZBK+kh0=";
+    url = "file://${inputs.nixium}/server/pack.toml";
+    packHash = (builtins.fromJSON (builtins.readFile "${inputs.nixium}/versions.json")).server.hash;
   };
 
   propertiesFormat = pkgs.formats.javaProperties { };

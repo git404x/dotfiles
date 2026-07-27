@@ -29,6 +29,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixium = {
+      url = "github:git404x/nixium";
+      flake = false;
+    };
+
     brave-browser = {
       url = "github:git404x/brave-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";

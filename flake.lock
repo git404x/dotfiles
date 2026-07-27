@@ -269,11 +269,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785119578,
-        "narHash": "sha256-3VMVuOJ6fK+RNOXVmqusqUwQ1sDfPeddNKaM2JR/4Y0=",
+        "lastModified": 1785158503,
+        "narHash": "sha256-vEhDKc9JYVGH5CO4nbfqIZmsWiDKLPFReYK6emsFK5U=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "e83dffa86cccb6237fe194d4eeb47f41557749d1",
+        "rev": "0c486d2b21bb1e4d0e5a11e374deb51587267387",
         "type": "github"
       },
       "original": {
@@ -660,6 +660,22 @@
         "type": "github"
       }
     },
+    "nixium": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785159279,
+        "narHash": "sha256-sfNpwXN9qexLBJG6XBd2dnZLTvvq4No9FCRiiUn06Cg=",
+        "owner": "git404x",
+        "repo": "nixium",
+        "rev": "0b570468a6a20f7ae01abb5ba0b8ec36b3468cd5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "git404x",
+        "repo": "nixium",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1784356753,
@@ -799,6 +815,7 @@
         "hyprland": "hyprland",
         "nix-flatpak": "nix-flatpak",
         "nix-minecraft": "nix-minecraft",
+        "nixium": "nixium",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-stable": "nixpkgs-stable",
         "programs-db": "programs-db",

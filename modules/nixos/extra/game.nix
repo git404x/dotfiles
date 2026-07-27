@@ -7,11 +7,14 @@
   ...
 }:
 let
-  mc-config = "${dotfiles}/config/minecraft";
   serverConfig = {
-    minRam = "1800M";
-    maxRam = "1800M";
+    minRam = "1024M";
+    maxRam = "2048M";
     regionSize = "8M";
+  };
+  packMods = pkgs.fetchPackwizModpack {
+    url = "file://${inputs.nixium}/server/pack.toml";
+    packHash = (builtins.fromJSON (builtins.readFile "${inputs.nixium}/versions.json")).server.hash;
   };
 in
 {
@@ -25,10 +28,11 @@ in
     interfaces."tailscale0" = {
       allowedUDPPorts = [
         24454 # voicechat
+        25566 # bedrock
       ];
 
       allowedTCPPorts = [
-        25568 # mc
+        25565 # mc
         25569 # mc
       ];
     };
@@ -41,25 +45,34 @@ in
 
     servers = {
 
-      isekai = {
+      arcade = {
         enable = true;
         autoStart = false;
-        package = pkgs.purpurServers.purpur-1_21_11;
-        jvmOpts = "-Xms1500M -Xmx1500M -XX:+UseZGC -XX:+ZGenerational";
+        package = pkgs.purpurServers.purpur-26_2;
+        jvmOpts = lib.concatStringsSep " " [
+          "-Xms${serverConfig.minRam}"
+          "-Xmx${serverConfig.maxRam}"
+          "-XX:+UseZGC"
+          "-XX:+ZGenerational"
+          "-XX:+AlwaysPreTouch"
+          "-XX:+UseCompactObjectHeaders"
+          "-XX:+UseStringDeduplication"
+          "-XX:AllocatePrefetchStyle=1"
+        ];
 
         serverProperties = {
           # connection
           server-ip = "0.0.0.0";
-          server-port = 25569;
+          server-port = 25565;
           online-mode = false;
 
           # game-config
-          motd = "[INFO] Reincarnated as a Block in Another World";
+          motd = "[ARCADE] Reincarnated as a Block in Another World";
           view-distance = 6;
           simulation-distance = 4;
-          max-players = 5;
+          max-players = 8;
           gamemode = "survival";
-          difficulty = "hard";
+          difficulty = "normal";
         };
       };
 
@@ -81,11 +94,11 @@ in
         serverProperties = {
           # connection
           server-ip = "0.0.0.0";
-          server-port = 25568;
+          server-port = 25569;
           online-mode = false;
 
           # game-config
-          motd = "[ERROR] The Archives of the Paradise; The Hell";
+          motd = "[SURVIVAL] The Archives of the Paradise; The Hell";
           view-distance = 4;
           simulation-distance = 4;
           max-players = 6;
@@ -94,12 +107,7 @@ in
         };
 
         symlinks = {
-          "mods" = "${
-            pkgs.fetchPackwizModpack {
-              url = "file://${mc-config}/server/pack.toml";
-              packHash = "sha256-WbGXUyyhhWz5rgsGhfZN6hdcMpaEnTN7xiFjwFKIc/c=";
-            }
-          }/mods";
+          "mods" = "${packMods}/mods";
         };
       };
     };
