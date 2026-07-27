@@ -14,6 +14,24 @@ in
     portalPackage = hyprPkgs.xdg-desktop-portal-hyprland;
   };
 
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    config = {
+      common.default = [
+        "hyprland"
+        "gtk"
+      ];
+      hyprland.default = [
+        "hyprland"
+        "gtk"
+      ];
+    };
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk # for GTK file pickers
+    ];
+  };
+
   # security services
   services.gnome.gnome-keyring.enable = true;
   security.pam.services = {

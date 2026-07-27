@@ -8,6 +8,7 @@ let
     import (if isStable then inputs.nixpkgs-stable else inputs.nixpkgs) {
       inherit system;
       config.allowUnfree = true;
+      config.android_sdk.accept_license = true;
       overlays =
         if isStable then
           [ ]

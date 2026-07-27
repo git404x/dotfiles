@@ -60,10 +60,8 @@ in
       ];
 
       exec-once = [
-        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-        "systemctl --user import-environment QT_QPA_PLATFORMTHEME"
         "start-polkit-agent"
-        "dunst & avizo-service & nm-applet --indicator & blueman-applet"
+        "dunst & avizo-service & nm-applet --indicator &"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
       ];

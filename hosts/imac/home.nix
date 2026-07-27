@@ -9,7 +9,7 @@
   programs.home-manager.enable = true;
 
   imports = [
-    "${dotfiles}/modules/home/shell.nix"
-    "${dotfiles}/modules/home/minecraft.nix"
+    "${dotfiles}/modules/home/core/shell.nix"
+    "${dotfiles}/modules/home/extra/minecraft.nix"
   ];
 }

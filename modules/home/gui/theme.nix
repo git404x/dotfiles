@@ -6,11 +6,10 @@
   ];
 
   stylix.targets = {
+    qt.enable = true;
     hyprlock.enable = false;
     waybar.enable = false;
     neovim.enable = false;
-    kde.enable = false;
-    xfce.enable = false;
   };
 
   # suppress deprecation warn

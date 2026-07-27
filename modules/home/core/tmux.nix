@@ -24,8 +24,6 @@ in
         extraConfig = ''
           bind-key b set-option status # toggle statusbar
           set -g @plugin 'niksingh710/minimal-tmux-status'
-          set -g @minimal-tmux-status-left "#(whoami)@#H"
-          set -g @minimal-tmux-status-right "%R #S"
           set -g @minimal-tmux-indicator false
           set -g @minimal-tmux-fg "${c.base00}"
           set -g @minimal-tmux-bg "${c.base08}"

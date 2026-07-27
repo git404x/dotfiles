@@ -34,6 +34,7 @@
       gparted
       cryptsetup
       gnome-disk-utility
+      smartmontools
       ntfs3g
       os-prober
       htop
@@ -65,18 +66,35 @@
       imv
       loupe
       tectonic
+      gimp
+      qbittorrent
+
+      # engg
+      nmap
+      wireshark
+      aircrack-ng
+      ghidra
+      frida-tools
+      objection
+      apktool
+      apksigner
+      jadx
+      hashcat
+      john
 
       # applications
       obsidian
+      proton-vpn
+      zathura
+      stirling-pdf-desktop
+      onlyoffice-desktopeditors
+      telegram-desktop
+      brave-origin
+      qutebrowser
       librewolf
       zen-browser
-      telegram-desktop
-      onlyoffice-desktopeditors
-      stirling-pdf-desktop
-      gimp
-      proton-vpn
-      qbittorrent
-      antigravity
+      antigravity-cli
+      antigravity-ide
 
     ])
     ++ (with pkgs-stable; [

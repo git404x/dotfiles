@@ -24,10 +24,6 @@ in
 {
   imports = [ inputs.zen-browser.homeModules.default ];
 
-  home.sessionVariables = {
-    BROWSER = "zen";
-  };
-
   stylix.targets.zen-browser.profileNames = [ "default" ];
 
   programs.zen-browser = {
@@ -80,7 +76,6 @@ in
       (mkExtension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}" true)
       (mkExtension "ublock-origin" "uBlock0@raymondhill.net" true)
       (mkExtension "tampermonkey" "firefox@tampermonkey.net" false)
-      (mkExtension "chrome-mask" "chrome-mask@overengineer.dev" false)
     ];
   };
 

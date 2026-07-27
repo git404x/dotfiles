@@ -30,10 +30,10 @@
   # microcode patches
   boot.kernelParams = [
     "amdgpu.noretry=0"
-    "processor.max_cstate=1"
-    "idle=nomwait"
+    "rcu_nocbs=0-7"
     "amdgpu.sg_display=0"
     "iommu=pt"
+    "8250.nr_uarts=0"
   ];
 
   # tpm block
