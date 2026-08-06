@@ -69,6 +69,10 @@ in
       settings = {
         add_newline = true;
         line_break.disabled = true;
+        command_timeout = 1000;
+        git_status = {
+          ignore_submodules = true;
+        };
       };
     };
 
@@ -137,6 +141,9 @@ in
     onefetch
     fzf
     ripgrep
+    fd
+    duf
+    dust
   ];
 
 }
