@@ -1,0 +1,43 @@
+name: nix-cache
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0" # Run weekly
+  push:
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+
+jobs:
+  build-and-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: git404x-dotfiles
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Build All Configurations
+        run: |
+          echo ">> Discovering NixOS Configurations..."
+          for host in $(nix eval --json .#nixosConfigurations --apply builtins.attrNames | jq -r '.[]'); do
+            echo "Building NixOS host: $host"
+            nix build .#nixosConfigurations."$host".config.system.build.toplevel --print-build-logs
+          done
+
+          echo ">> Discovering Home Manager Configurations..."
+          for user in $(nix eval --json .#homeConfigurations --apply builtins.attrNames | jq -r '.[]'); do
+            echo "Building Home Manager profile: $user"
+            nix build .#homeConfigurations."$user".activationPackage --print-build-logs
+          done
