@@ -1,6 +1,16 @@
 { pkgs, ... }:
 
 {
+  nix-install = pkgs.writeShellApplication {
+    name = "nix-install";
+    runtimeInputs = with pkgs; [
+      gum
+      jq
+      git
+    ];
+    text = builtins.readFile ./nix-install.sh;
+  };
+
   gamerun = pkgs.writeShellApplication {
     name = "gamerun";
     runtimeInputs = with pkgs; [

@@ -9,6 +9,7 @@
   ];
 
   environment.systemPackages = with pkgs; [
+    bin.nix-install
     git
     neovim
     helix
