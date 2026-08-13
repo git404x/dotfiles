@@ -1,5 +1,14 @@
-{ pkgs, hostname, ... }:
 {
+  pkgs,
+  hostname,
+  dotfiles,
+  ...
+}:
+{
+  imports = [
+    "${dotfiles}/modules/nixos/core/config.nix"
+  ];
+
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
 

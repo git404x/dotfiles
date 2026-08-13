@@ -156,6 +156,7 @@ in
     openjdk25
     mgba
     ppsspp
+    moonlight-qt
 
   ];
 }

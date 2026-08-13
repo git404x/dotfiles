@@ -1,6 +1,19 @@
 {
   description = "git404x nixos configuration";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://hyprland.cachix.org"
+      "https://nix-community.cachix.org"
+      "https://git404x-dotfiles.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "git404x-dotfiles.cachix.org-1:LRBnrDoxA1OGdwGHgr2ecJY16Kq3KhzGObQEZf4qTjY="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
