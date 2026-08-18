@@ -41,6 +41,7 @@ in
           timezone
           locale
           ;
+        hyprLib = import "${dotfiles}/lib/hyprLib.nix" { inherit (inputs.nixpkgs) lib; };
         pkgs-stable = mkPkgs {
           inherit system;
           isStable = true;
@@ -75,6 +76,7 @@ in
           timezone
           locale
           ;
+        hyprLib = import "${dotfiles}/lib/hyprLib.nix" { inherit (inputs.nixpkgs) lib; };
         pkgs-stable = mkPkgs {
           inherit system;
           isStable = true;
