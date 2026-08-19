@@ -1,3 +1,6 @@
 logs/
 *.log
 
+result
+result/
+

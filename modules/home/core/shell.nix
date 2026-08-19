@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
 
@@ -12,10 +12,9 @@ let
     dir = "dir --color=auto";
     jctl = "journalctl -p 3 -xb";
     cat = "bat --style full";
-    grep = "rg";
-    find = "fd";
     cd = "z";
 
+    l = "eza --icons --group-directories-first";
     ls = "eza --icons --group-directories-first";
     ll = "eza -l --icons --group-directories-first";
     la = "eza -la --icons --group-directories-first";
@@ -67,9 +66,13 @@ in
     starship = {
       enable = true;
       settings = {
-        add_newline = true;
+        add_newline = false;
+        package.disabled = true;
         line_break.disabled = true;
         command_timeout = 1000;
+        git_branch = {
+          symbol = " ";
+        };
         git_status = {
           ignore_submodules = true;
         };
@@ -123,6 +126,19 @@ in
 
   };
 
+  # aria2
+  programs.aria2 = {
+    enable = true;
+    settings = {
+      dir = "${config.home.homeDirectory}/Downloads";
+      split = 4;
+      max-connection-per-server = 4;
+      file-allocation = "falloc";
+      max-concurrent-downloads = 4;
+      min-split-size = "5M";
+    };
+  };
+
   # nix helper
   programs.nh = {
     enable = true;
@@ -136,7 +152,6 @@ in
     nh
     nvd
     nix-output-monitor
-    fastfetch
     nitch
     onefetch
     fzf
