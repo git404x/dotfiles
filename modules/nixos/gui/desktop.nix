@@ -14,6 +14,9 @@ in
     portalPackage = hyprPkgs.xdg-desktop-portal-hyprland;
   };
 
+  # GNOME
+  services.desktopManager.gnome.enable = true;
+
   xdg.portal = {
     enable = true;
     xdgOpenUsePortal = true;
@@ -44,6 +47,7 @@ in
   services.gvfs.enable = true;
   services.blueman.enable = true;
   programs.dconf.enable = true;
+  programs.seahorse.enable = true;
 
   # environment vars
   environment.sessionVariables = {
