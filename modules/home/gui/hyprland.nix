@@ -4,38 +4,21 @@
   ...
 }:
 let
-  terminal = "footclient";
-  launcher = "fuzzel";
-  browser = "zen";
-  fileManager = "nautilus";
-  powermenu = "powermenu";
+  cmdTerminal = "footclient";
+  cmdLauncher = "fuzzel";
+  cmdBrowser = "zen";
+  cmdFileManager = "nautilus";
+  cmdPowermenu = "powermenu";
 in
 {
 
-  imports = [
-    ./dunst.nix
-    ./fuzzel.nix
-    ./hyprutils.nix
-    ./waybar.nix
-    ./wrappers.nix
-  ];
-
-  home.packages = with pkgs; [
-    hyprpaper
-    hyprlock
-    hypridle
-    avizo
-    networkmanagerapplet
-    playerctl
-
-    # dependencies for wrappers
-    wl-clipboard
-    cliphist
-    grim
-    slurp
-    swappy
-    wl-screenrec
-    polkit_gnome
+  home.packages = with pkgs.sysUtils; [
+    start-polkit-agent
+    cam-toggle
+    screenshot
+    record-screen
+    clipboard
+    powermenu
   ];
 
   wayland.windowManager.hyprland = {
@@ -51,6 +34,7 @@ in
         mainMod = "SUPER";
         shiftMod = "${mainMod} + SHIFT";
         altMod = "${mainMod} + ALT";
+        ctrlMod = "${mainMod} + CTRL";
       };
 
       env = {
@@ -216,19 +200,19 @@ in
         [ "altMod" "M" "exit()" ]
 
         # Applications
-        [ "mainMod" "RETURN" "exec_cmd('${terminal}')" ]
-        [ "mainMod" "SPACE" "exec_cmd('${launcher}')" ]
-        [ "mainMod" "E" "exec_cmd('${fileManager}')" ]
-        [ "mainMod" "B" "exec_cmd('${browser}')" ]
-        [ "mainMod" "P" "exec_cmd('${powermenu}')" ]
+        [ "mainMod" "RETURN" "exec_cmd('${cmdTerminal}')" ]
+        [ "mainMod" "SPACE" "exec_cmd('${cmdLauncher}')" ]
+        [ "mainMod" "E" "exec_cmd('${cmdFileManager}')" ]
+        [ "mainMod" "B" "exec_cmd('${cmdBrowser}')" ]
+        [ "mainMod" "P" "exec_cmd('${cmdPowermenu}')" ]
 
         # Clipboard & screen
-        [ "mainMod" "V" "exec_cmd('clipboard-manager')" ]
-        [ "shiftMod" "V" "exec_cmd('clipboard-clear')" ]
-        [ "" "Print" "exec_cmd('screenshot full')" ]
-        [ "" "SHIFT + Print" "exec_cmd('screenshot region')" ]
-        [ "" "ALT + Print" "exec_cmd('record-screen full')" ]
-        [ "" "ALT + SHIFT + Print" "exec_cmd('record-screen region')" ]
+        [ "mainMod" "V" "exec_cmd('clipboard --manage')" ]
+        [ "mainMod" "C" "exec_cmd('clipboard --clear')" ]
+        [ "mainMod" "PRINT" "exec_cmd('screenshot --region')" ]
+        [ "" "PRINT" "exec_cmd('screenshot --full')" ]
+        [ "shiftMod" "R" "exec_cmd('record-screen --region')" ]
+        [ "altMod" "R" "exec_cmd('record-screen --full')" ]
 
         # Media
         [ "mainMod" "BACKSLASH" "exec_cmd('playerctl play-pause')" ]

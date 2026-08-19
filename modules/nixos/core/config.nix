@@ -22,6 +22,7 @@ in
         "flakes"
       ];
       auto-optimise-store = true;
+      trusted-users = [ "root" "@wheel" ];
 
       # cache
       substituters = [ "https://cache.nixos.org/" ];

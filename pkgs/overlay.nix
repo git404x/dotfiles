@@ -5,6 +5,7 @@
 
 final: prev: {
   bin = import ./bin/default.nix { pkgs = final; };
+  sysUtils = import ./utils/default.nix { pkgs = final; };
   bravePackages = inputs.brave-browser.packages."${system}";
   brave = final.bravePackages.brave;
   brave-beta = final.bravePackages.brave-beta;

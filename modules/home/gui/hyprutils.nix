@@ -12,6 +12,9 @@ in
   # wallpaper
   services.hyprpaper.enable = true;
 
+  # idle daemon
+  services.hypridle.enable = true;
+
   # lockscreen
   programs.hyprlock = {
     enable = true;
