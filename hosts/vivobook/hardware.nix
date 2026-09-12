@@ -30,10 +30,10 @@
   # microcode patches
   boot.kernelParams = [
     "amdgpu.noretry=0"
-    "rcu_nocbs=0-7"
+    "processor.max_cstate=1"
+    "idle=nomwait"
     "amdgpu.sg_display=0"
     "iommu=pt"
-    "8250.nr_uarts=0"
   ];
 
   # tpm block
@@ -42,45 +42,15 @@
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/NIXROOT";
-    fsType = "btrfs";
-    options = [
-      "subvol=/root"
-      "compress=zstd"
-      "noatime"
-      "discard=async"
-      "space_cache=v2"
-    ];
-  };
-
-  fileSystems."/home" = {
-    device = "/dev/disk/by-label/NIXROOT";
-    fsType = "btrfs";
-    options = [
-      "subvol=/home"
-      "compress=zstd"
-      "noatime"
-      "discard=async"
-      "space_cache=v2"
-    ];
-  };
-
-  fileSystems."/nix" = {
-    device = "/dev/disk/by-label/NIXROOT";
-    fsType = "btrfs";
-    options = [
-      "subvol=/nix"
-      "compress=zstd"
-      "noatime"
-      "discard=async"
-      "space_cache=v2"
-    ];
+    fsType = "ext4";
   };
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-label/BOOT";
     fsType = "vfat";
     options = [
-      "umask=0077"
+      "fmask=0077"
+      "dmask=0077"
     ];
   };
 

@@ -93,8 +93,6 @@
       qutebrowser
       librewolf
       zen-browser
-      antigravity-cli
-      antigravity-ide
 
     ])
     ++ (with pkgs-stable; [
