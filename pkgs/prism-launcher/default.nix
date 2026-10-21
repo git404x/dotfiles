@@ -18,9 +18,17 @@ let
       hash = "sha256-tluzn1QZxjVhIPJUOx0kgrvy5mVgj+Ie5YOVSb5y/+M=";
     };
 
-    patches = [
+    patches = (old.patches or [ ]) ++ [
       ./mod.patch
     ];
+
+    # Downgrade the new GCC SFINAE incomplete-type warning from an error,
+    # and globally disable -Werror to prevent future toolchain bumps from breaking 11.0.2.
+    env = (old.env or { }) // {
+      NIX_CFLAGS_COMPILE = toString (
+        (old.env.NIX_CFLAGS_COMPILE or "") + " -Wno-error=sfinae-incomplete -Wno-error"
+      );
+    };
   });
 in
 

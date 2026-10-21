@@ -17,10 +17,4 @@
   home.stateVersion = "24.05";
   programs.home-manager.enable = true;
 
-  programs.vcam = {
-    enable = true;
-    device = "/dev/video10";
-    startSource = "black";
-  };
-
 }
