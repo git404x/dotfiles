@@ -17,8 +17,13 @@
     "sd_mod"
   ];
   boot.initrd.kernelModules = [ "amdgpu" ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  boot.kernelModules = [
+    "kvm-amd"
+    "ryzen_smu"
+  ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    ryzen-smu
+  ];
   boot.blacklistedKernelModules = [
     "tpm"
     "tpm_crb"

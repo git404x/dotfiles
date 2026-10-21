@@ -1,32 +1,27 @@
 #!/usr/bin/env bash
 
-DRIVER="/sys/bus/usb/drivers/uvcvideo"
-if lsmod | grep -q "uvcvideo"; then
-  for dev in "$DRIVER"/*:*; do
-    if [ -e "$dev" ]; then
-      basename "$dev" | sudo tee "$DRIVER/unbind" >/dev/null
-    fi
-  done
-  sudo fuser -k -9 /dev/video* /dev/media* >/dev/null 2>&1 || true
-  sleep 0.5
+# vcamd holds the real camera open; ask it to let go before we rmmod, and to
+# re-attach after we modprobe. No-op when vcam isn't installed/running.
+vcam_release() { command -v vcam-toggle >/dev/null && vcam-toggle --release >/dev/null 2>&1 || true; }
+vcam_rescan() { command -v vcam-toggle >/dev/null && vcam-toggle --rescan >/dev/null 2>&1 || true; }
 
-  if sudo modprobe -r uvcvideo; then
-    notify-send -u normal "Camera Disabled"
+notify() { command -v notify-send >/dev/null && notify-send -u normal "$1" "$2" || true; }
+
+if lsmod | grep -q "uvcvideo"; then
+  vcam_release
+  sleep 0.2
+
+  if sudo /run/current-system/sw/bin/vcam-hw unbind; then
+    notify "Camera Disabled" "Hardware unplugged"
   else
-    systemctl --user stop wireplumber.service
-    sleep 0.5
-    if sudo modprobe -r uvcvideo; then
-      notify-send -u normal "Camera Disabled (Forced)"
-    else
-      notify-send -u critical "Failed: Module Locked"
-    fi
-    systemctl --user start wireplumber.service
+    notify "Camera Disable Failed" "Check logs"
   fi
 else
-  if sudo modprobe uvcvideo; then
+  if sudo /run/current-system/sw/bin/vcam-hw bind; then
     sleep 0.5
-    notify-send -u normal "Camera Enabled"
+    vcam_rescan
+    notify "Camera Enabled" "Hardware connected"
   else
-    notify-send -u critical "Failed to Load"
+    notify "Camera Enable Failed" "Check logs"
   fi
 fi

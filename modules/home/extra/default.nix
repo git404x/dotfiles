@@ -13,5 +13,7 @@
     "${dotfiles}/modules/home/extra/librewolf.nix"
     "${dotfiles}/modules/home/extra/chromium.nix"
     "${dotfiles}/modules/home/extra/zen-browser.nix"
+    "${dotfiles}/modules/home/extra/vcam.nix"
+    "${dotfiles}/modules/home/extra/iso-run.nix"
   ];
 }

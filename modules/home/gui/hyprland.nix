@@ -202,6 +202,7 @@ in
         # Applications
         [ "mainMod" "RETURN" "exec_cmd('${cmdTerminal}')" ]
         [ "mainMod" "SPACE" "exec_cmd('${cmdLauncher}')" ]
+        [ "shiftMod" "SPACE" "exec_cmd('iso-launcher')" ]
         [ "mainMod" "E" "exec_cmd('${cmdFileManager}')" ]
         [ "mainMod" "B" "exec_cmd('${cmdBrowser}')" ]
         [ "mainMod" "P" "exec_cmd('${cmdPowermenu}')" ]
@@ -209,6 +210,8 @@ in
         # Clipboard & screen
         [ "mainMod" "V" "exec_cmd('clipboard --manage')" ]
         [ "mainMod" "C" "exec_cmd('clipboard --clear')" ]
+        [ "shiftMod" "V" "exec_cmd('vcam-toggle --gui')" ]
+        [ "shiftMod" "C" "exec_cmd('cam-toggle')" ]
         [ "mainMod" "PRINT" "exec_cmd('screenshot --region')" ]
         [ "" "PRINT" "exec_cmd('screenshot --full')" ]
         [ "shiftMod" "R" "exec_cmd('record-screen --region')" ]

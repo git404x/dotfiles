@@ -7,13 +7,13 @@
 {
   home.packages = with pkgs; [
     opencode
-    antigravity-ide
     antigravity-cli
-    claude-code
-    cursor-cli
-    codex
-    kiro
-    kiro-cli
+    # antigravity-ide
+    # claude-code
+    # cursor-cli
+    # codex
+    # kiro
+    # kiro-cli
 
     uv
     nodejs

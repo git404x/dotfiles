@@ -147,6 +147,7 @@ in
   environment.systemPackages = with pkgs; [
     mangohud
     goldberg-emu
+    heroic
     bin.gamerun
     bin.mc-bak
     mcrcon

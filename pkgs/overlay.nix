@@ -13,4 +13,5 @@ final: prev: {
   brave-origin-beta = final.bravePackages.brave-origin-beta;
   zen-browser = inputs.zen-browser.packages."${system}".default;
   prism-launcher-mod = final.callPackage ./prism-launcher/default.nix { };
+  vcam = final.callPackage ./vcam/default.nix { };
 }
