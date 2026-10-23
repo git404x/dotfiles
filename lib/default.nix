@@ -83,6 +83,9 @@ in
         };
       }
       // extraArgs;
-      modules = extraModules;
+      modules = [
+        "${dotfiles}/modules/home/core/config.nix"
+      ]
+      ++ extraModules;
     };
 }
