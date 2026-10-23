@@ -21,8 +21,14 @@
     "kvm-amd"
     "ryzen_smu"
   ];
+
   boot.extraModulePackages = with config.boot.kernelPackages; [
-    ryzen-smu
+    (ryzen-smu.overrideAttrs (old: {
+      # dummy certificate to satisfy module aggregation script
+      postInstall = (old.postInstall or "") + ''
+        find $out/lib/modules -name "ryzen_smu.ko" -execdir touch {}.cer \;
+      '';
+    }))
   ];
   boot.blacklistedKernelModules = [
     "tpm"
