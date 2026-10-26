@@ -53,7 +53,6 @@
 
       # terminal
       tmux
-      tmate
       yazi
       foot
 
@@ -68,6 +67,8 @@
       tectonic
       gimp
       qbittorrent
+      kdePackages.kdenlive
+      mediainfo
 
       # engg
       nmap

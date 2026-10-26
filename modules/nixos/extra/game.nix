@@ -117,6 +117,7 @@ in
     enable = true;
     extraCompatPackages = with pkgs; [
       proton-ge-bin
+      proton-cachyos
     ];
   };
 
@@ -147,12 +148,13 @@ in
   environment.systemPackages = with pkgs; [
     mangohud
     goldberg-emu
+    heroic
     bin.gamerun
     bin.mc-bak
     mcrcon
     packwiz
     mrpack-install
-    prism-launcher-mod
+    # prism-launcher-mod
     openjdk25
     mgba
     ppsspp

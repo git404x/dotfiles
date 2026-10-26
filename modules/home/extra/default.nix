@@ -1,7 +1,6 @@
 { dotfiles, ... }:
 {
   imports = [
-    "${dotfiles}/modules/home/extra/xdg.nix"
     "${dotfiles}/modules/home/extra/nvim.nix"
     "${dotfiles}/modules/home/extra/helix.nix"
     "${dotfiles}/modules/home/extra/git.nix"
