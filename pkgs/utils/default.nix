@@ -35,4 +35,16 @@
     runtimeInputs = with pkgs; [ fuzzel hyprlock systemd ];
     text = builtins.readFile ./powermenu.sh;
   };
+
+  cage-run = pkgs.writeShellApplication {
+    name = "cage-run";
+    runtimeInputs = with pkgs; [ cage ];
+    text = builtins.readFile ./cage-run.sh;
+  };
+
+  cage-launcher = pkgs.writeShellApplication {
+    name = "cage-launcher";
+    runtimeInputs = with pkgs; [ fuzzel ];
+    text = builtins.readFile ./cage-launcher.sh;
+  };
 }

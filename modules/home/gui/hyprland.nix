@@ -19,6 +19,8 @@ in
     record-screen
     clipboard
     powermenu
+    cage-run
+    cage-launcher
   ];
 
   wayland.windowManager.hyprland = {
@@ -202,6 +204,7 @@ in
         # Applications
         [ "mainMod" "RETURN" "exec_cmd('${cmdTerminal}')" ]
         [ "mainMod" "SPACE" "exec_cmd('${cmdLauncher}')" ]
+        [ "shiftMod" "SPACE" "exec_cmd('cage-launcher')" ]
         [ "mainMod" "E" "exec_cmd('${cmdFileManager}')" ]
         [ "mainMod" "B" "exec_cmd('${cmdBrowser}')" ]
         [ "mainMod" "P" "exec_cmd('${cmdPowermenu}')" ]
