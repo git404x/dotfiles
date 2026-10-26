@@ -30,6 +30,12 @@ if [ "${1:-}" = "install" ]; then
   fi
 fi
 
+if [ -x "/run/wrappers/bin/ryzenadj" ]; then
+  RYZENADJ="/run/wrappers/bin/ryzenadj"
+else
+  RYZENADJ="ryzenadj"
+fi
+
 # POWER MANAGEMENT
 if [ "${1:-}" = "power" ]; then
   if [ -z "${2:-}" ]; then
@@ -41,23 +47,23 @@ if [ "${1:-}" = "power" ]; then
 
   case "$PROFILE" in
   default)
-    ryzenadj --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000 --tctl-temp=75
+    $RYZENADJ --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000 --tctl-temp=75
     echo "[+] Power profile reset to DEFAULT (15W / 75C)"
     ;;
   cool)
-    ryzenadj --stapm-limit=10000 --fast-limit=12000 --slow-limit=10000 --tctl-temp=70
+    $RYZENADJ --stapm-limit=10000 --fast-limit=12000 --slow-limit=10000 --tctl-temp=70
     echo "[+] Power profile set to COOL (10W Limit)"
     ;;
   balanced)
-    ryzenadj --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --tctl-temp=80
+    $RYZENADJ --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --tctl-temp=80
     echo "[+] Power profile set to BALANCED (15W Limit)"
     ;;
   max)
-    ryzenadj --stapm-limit=20000 --fast-limit=20000 --slow-limit=20000 --tctl-temp=85
+    $RYZENADJ --stapm-limit=20000 --fast-limit=20000 --slow-limit=20000 --tctl-temp=85
     echo "[+] Power profile set to MAX (20W Limit / 85C)"
     ;;
   hyper)
-    ryzenadj --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000 --tctl-temp=95
+    $RYZENADJ --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000 --tctl-temp=95
     echo "[+] Power profile set to HYPER (25W Limit / 95C)"
     ;;
   *)
