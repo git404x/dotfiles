@@ -5,11 +5,13 @@
     extra-substituters = [
       "https://hyprland.cachix.org"
       "https://nix-community.cachix.org"
+      "https://nyx-cache.chaotic.cx/"
       "https://git404x-dotfiles.cachix.org"
     ];
     extra-trusted-public-keys = [
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "nyx-cache.chaotic.cx:dJxTrgMC3V3cFfyIiBQDQorG6k1LsqurH/srpMSq7qk="
       "git404x-dotfiles.cachix.org-1:LRBnrDoxA1OGdwGHgr2ecJY16Kq3KhzGObQEZf4qTjY="
     ];
   };
@@ -18,6 +20,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable"; # IMPORTANT
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -92,6 +95,7 @@
             hostname = "vivobook";
             username = "px";
             extraModules = [
+              inputs.chaotic.nixosModules.default
               inputs.stylix.nixosModules.default
               inputs.nix-flatpak.nixosModules.nix-flatpak
               "${dotfiles}/hosts/vivobook/configuration.nix"
@@ -113,6 +117,7 @@
             username = "px";
             hostname = "vivobook";
             extraModules = [
+              inputs.chaotic.homeModules.default
               inputs.stylix.homeModules.default
               "${dotfiles}/hosts/vivobook/home.nix"
             ];
