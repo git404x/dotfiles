@@ -53,8 +53,6 @@ in
       onStart = [
         "start-polkit-agent"
         "dunst & avizo-service & nm-applet --indicator &"
-        "wl-paste --type text --watch cliphist store"
-        "wl-paste --type image --watch cliphist store"
       ];
 
       monitor = {
