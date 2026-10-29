@@ -6,7 +6,10 @@
   programs = {
     eza.enable = true;
     bat.enable = true;
-    yazi.enable = true;
+    yazi = {
+      enable = true;
+      shellWrapperName = "y";
+    };
     helix.enable = true;
   };
 

@@ -14,6 +14,8 @@
   networking.hostName = hostname;
   networking.networkmanager.enable = true;
 
+  boot.zfs.forceImportRoot = false;
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"

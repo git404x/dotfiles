@@ -10,6 +10,7 @@
     hyprlock.enable = false;
     waybar.enable = false;
     neovim.enable = false;
+    rofi.enable = false;
   };
 
   # suppress deprecation warn

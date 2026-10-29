@@ -12,6 +12,9 @@ let
   rootVault = "/var/lib/stash";
 in
 {
+  # Prevent systemd-tmpfiles from prematurely creating the mount directory on root tmpfs
+  systemd.tmpfiles.settings."10-stash-datadir" = lib.mkForce { };
+
   networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 9999 ];
   users.users.stash.extraGroups = [ "users" ];
 
@@ -58,11 +61,22 @@ in
     };
   };
 
+  # Automatically start stash when the external drive is mounted
+  systemd.paths.stash = {
+    description = "Watch for Stash external drive mount";
+    wantedBy = [ "multi-user.target" ];
+    pathConfig = {
+      PathExists = "${vaultPath}/index";
+      Unit = "stash.service";
+    };
+  };
+
   systemd.services.stash = {
     wantedBy = lib.mkForce [ ];
 
     unitConfig = {
       AssertPathIsMountPoint = vaultPath;
+      # auto-stop whenever the drive is unmounted
       BindsTo = [ mountUnit ];
       After = [ mountUnit ];
     };

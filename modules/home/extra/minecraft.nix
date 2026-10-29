@@ -8,7 +8,7 @@
 let
 
   mc-pkgs = import inputs.nixpkgs {
-    system = pkgs.system;
+    system = pkgs.stdenv.hostPlatform.system;
     config.allowUnfree = true;
     overlays = [ inputs.nix-minecraft.overlay ];
   };
