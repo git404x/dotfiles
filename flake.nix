@@ -60,6 +60,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    prism-launcher = {
+      type = "github";
+      owner = "git404x";
+      repo = "PrismLauncher";
+      ref = "patch";
+      flake = false;
+    };
+
     yazi-plugins = {
       url = "github:yazi-rs/plugins";
       flake = false;

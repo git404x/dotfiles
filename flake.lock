@@ -852,6 +852,23 @@
         "type": "github"
       }
     },
+    "prism-launcher": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793277309,
+        "narHash": "sha256-5yom2V1AqW0dB/w1KcGpq+Gg3y4bLuHz7moVNBJGxQE=",
+        "owner": "git404x",
+        "repo": "PrismLauncher",
+        "rev": "ed690f9a729ff23f6ff6f1600b01ff255b233af6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "git404x",
+        "ref": "patch",
+        "repo": "PrismLauncher",
+        "type": "github"
+      }
+    },
     "programs-db": {
       "inputs": {
         "nixpkgs": [
@@ -884,6 +901,7 @@
         "nixium": "nixium",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-stable": "nixpkgs-stable",
+        "prism-launcher": "prism-launcher",
         "programs-db": "programs-db",
         "stylix": "stylix",
         "yazi-plugins": "yazi-plugins",
