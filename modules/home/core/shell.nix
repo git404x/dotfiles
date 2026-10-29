@@ -39,9 +39,9 @@ let
     htop = "btop";
 
     # nix related
-    nix-switch = "nh os switch ~/dotfiles";
-    nix-switch-impure = "nh os switch ~/dotfiles --show-trace --impure --option --eval-cache false";
-    home-switch = "nh home switch ~/dotfiles";
+    nix-switch = "nh os switch";
+    nix-switch-impure = "nh os switch --show-trace --impure --option --eval-cache false";
+    home-switch = "nh home switch";
     nix-clean = "nh clean all";
   };
 

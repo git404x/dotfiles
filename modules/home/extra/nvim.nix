@@ -1,12 +1,9 @@
 {
   pkgs,
-  config,
+  dotfiles,
   ...
 }:
 
-let
-  nvimPath = "${config.home.homeDirectory}/dotfiles/config/nvim";
-in
 {
 
   home.packages = with pkgs; [
@@ -55,6 +52,9 @@ in
   };
 
   # source nvim config
-  xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink nvimPath;
+  xdg.configFile."nvim" = {
+    source = "${dotfiles}/config/nvim";
+    recursive = true;
+  };
 
 }
