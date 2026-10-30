@@ -347,12 +347,16 @@ launch_test_bench() {
     exit 1
   fi
 
-  if pgrep -f "vcam-web" >/dev/null 2>&1; then
+  if pgrep -f "vcam-web" >/dev/null 2>&1 || (command -v systemctl >/dev/null 2>&1 && systemctl --user is-active --quiet vcam-web.service 2>/dev/null); then
     notify low "Test Bench" "Server running on http://localhost:8080"
     echo "Test bench server running at: http://localhost:8080"
   else
-    nohup vcam-web 8080 "$HTML_CANDIDATE" >/dev/null 2>&1 &
-    disown || true
+    if command -v systemd-run >/dev/null 2>&1; then
+      systemd-run --user --unit=vcam-web vcam-web 8080 "$HTML_CANDIDATE" >/dev/null 2>&1
+    else
+      nohup vcam-web 8080 "$HTML_CANDIDATE" >/dev/null 2>&1 &
+      disown || true
+    fi
     sleep 0.4
     notify low "Test Bench" "Server started on http://localhost:8080"
     echo "Started test bench server at: http://localhost:8080"
@@ -364,8 +368,19 @@ launch_test_bench() {
 }
 
 stop_test_bench() {
+  local stopped=0
+  if command -v systemctl >/dev/null 2>&1; then
+    if systemctl --user is-active --quiet vcam-web.service 2>/dev/null; then
+      systemctl --user stop vcam-web.service 2>/dev/null || true
+      stopped=1
+    fi
+  fi
   if pgrep -f "vcam-web" >/dev/null 2>&1; then
     pkill -f "vcam-web" 2>/dev/null || true
+    stopped=1
+  fi
+
+  if [ "$stopped" -eq 1 ]; then
     notify low "Test Bench" "Server stopped"
     echo "Test bench server stopped."
   else
