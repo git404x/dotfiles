@@ -202,18 +202,20 @@ int main(int argc, char **argv) {
         snprintf(home_profile_path, sizeof(home_profile_path), "%s/.nix-profile/share/vcam/index.html", home);
     }
 
-    if (!html_path || access(html_path, R_OK) != 0) {
+    if (html_path && access(html_path, R_OK) == 0) {
+        // valid path passed via argv
+    } else {
         const char *candidates[] = {
-            html_path,
             env_share_path[0] ? env_share_path : NULL,
             home_profile_path[0] ? home_profile_path : NULL,
             "/home/px/dev/dotfiles/pkgs/vcam/web/index.html",
             "/etc/profiles/per-user/px/share/vcam/index.html",
             "../share/vcam/index.html",
             "./web/index.html",
-            NULL
         };
-        for (int i = 0; candidates[i]; i++) {
+        size_t n_cands = sizeof(candidates) / sizeof(candidates[0]);
+        html_path = NULL;
+        for (size_t i = 0; i < n_cands; i++) {
             if (candidates[i] && access(candidates[i], R_OK) == 0) {
                 html_path = candidates[i];
                 break;
