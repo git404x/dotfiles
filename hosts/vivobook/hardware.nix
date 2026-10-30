@@ -35,7 +35,6 @@
     "tpm_crb"
     "tpm_tis"
     "tpm_tis_core" # fix tpm
-    "uvcvideo" # camera module
   ];
 
   # microcode patches

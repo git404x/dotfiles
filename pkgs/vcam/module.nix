@@ -32,6 +32,12 @@ in
       description = "Name of the PipeWire virtual microphone source.";
     };
 
+    blacklistOnBoot = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Blacklist physical webcam driver on boot for hardware privacy.";
+    };
+
     width = mkOption {
       type = types.int;
       default = 1280;
@@ -58,6 +64,9 @@ in
       options v4l2loopback devices=1 video_nr=${toString cfg.deviceNr} card_label="${cfg.webcamLabel}" exclusive_caps=1 max_buffers=2
     '';
 
+    # blacklist physical webcam driver on boot if configured
+    boot.blacklistedKernelModules = mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
+
     # passwordless sudo rules for hardware webcam control
     security.sudo.extraRules = [
       {
@@ -72,6 +81,14 @@ in
             options = [ "NOPASSWD" ];
           }
           {
+            command = "/run/current-system/sw/bin/modprobe uvcvideo";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/modprobe -r uvcvideo";
+            options = [ "NOPASSWD" ];
+          }
+          {
             command = "${pkgs.coreutils}/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
             options = [ "NOPASSWD" ];
           }
@@ -80,7 +97,11 @@ in
             options = [ "NOPASSWD" ];
           }
           {
-            command = "${pkgs.psmisc}/bin/fuser -k -9 /dev/video* /dev/media*";
+            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/bind";
             options = [ "NOPASSWD" ];
           }
         ];

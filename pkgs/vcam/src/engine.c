@@ -98,7 +98,7 @@ static gboolean on_bus_message(GstBus *bus, GstMessage *msg, gpointer user_data)
     return TRUE;
 }
 
-/* initialize loopback pipeline and static branches */
+/* initialize loopback pipeline and default privacy branch */
 gboolean engine_init(VCamApp *app) {
     app->pipeline = gst_pipeline_new("vcam_pipeline");
     app->sel = gst_element_factory_make("input-selector", "sel");
@@ -129,14 +129,13 @@ gboolean engine_init(VCamApp *app) {
     g_signal_connect(bus, "message", G_CALLBACK(on_bus_message), app);
     gst_object_unref(bus);
 
-    /* initialize default blackout branch */
-    app->bin_black = effects_build_black(app->cfg.caps_str);
-    app->pad_black = attach_branch(app, app->bin_black, "branch_black");
+    /* initialize default privacy branch */
+    app->bin_privacy = effects_build_privacy(app->cfg.caps_str);
+    app->pad_privacy = attach_branch(app, app->bin_privacy, "branch_privacy");
 
-    /* pre-select blackout frame */
-    if (app->pad_black) {
-        g_object_set(app->sel, "active-pad", app->pad_black, NULL);
-        strncpy(app->current_feed, "black", sizeof(app->current_feed) - 1);
+    if (app->pad_privacy) {
+        g_object_set(app->sel, "active-pad", app->pad_privacy, NULL);
+        strncpy(app->current_feed, "privacy", sizeof(app->current_feed) - 1);
     }
 
     /* start pipeline state */
@@ -152,31 +151,22 @@ gboolean engine_init(VCamApp *app) {
 gboolean engine_switch_feed(VCamApp *app, const char *feed, const char *arg, char **err_out) {
     if (!feed) return FALSE;
 
-    if (strcmp(feed, "black") == 0) {
-        if (!app->pad_black) {
-            app->bin_black = effects_build_black(app->cfg.caps_str);
-            app->pad_black = attach_branch(app, app->bin_black, "branch_black");
-        }
-        if (!app->pad_black) {
-            if (err_out) *err_out = strdup("failed to build black branch");
-            return FALSE;
-        }
-        g_object_set(app->sel, "active-pad", app->pad_black, NULL);
-        strncpy(app->current_feed, "black", sizeof(app->current_feed) - 1);
-        return TRUE;
+    /* release hardware camera if switching away from real feed */
+    if (strcmp(feed, "real") != 0 && app->bin_real) {
+        detach_branch(app, &app->bin_real, &app->pad_real);
     }
 
-    if (strcmp(feed, "smpte") == 0) {
-        if (!app->pad_smpte) {
-            app->bin_smpte = effects_build_smpte(app->cfg.caps_str);
-            app->pad_smpte = attach_branch(app, app->bin_smpte, "branch_smpte");
+    if (strcmp(feed, "privacy") == 0) {
+        if (!app->pad_privacy) {
+            app->bin_privacy = effects_build_privacy(app->cfg.caps_str);
+            app->pad_privacy = attach_branch(app, app->bin_privacy, "branch_privacy");
         }
-        if (!app->pad_smpte) {
-            if (err_out) *err_out = strdup("failed to build smpte branch");
+        if (!app->pad_privacy) {
+            if (err_out) *err_out = strdup("failed to build privacy branch");
             return FALSE;
         }
-        g_object_set(app->sel, "active-pad", app->pad_smpte, NULL);
-        strncpy(app->current_feed, "smpte", sizeof(app->current_feed) - 1);
+        g_object_set(app->sel, "active-pad", app->pad_privacy, NULL);
+        strncpy(app->current_feed, "privacy", sizeof(app->current_feed) - 1);
         return TRUE;
     }
 
@@ -205,6 +195,48 @@ gboolean engine_switch_feed(VCamApp *app, const char *feed, const char *arg, cha
         }
         g_object_set(app->sel, "active-pad", app->pad_crt, NULL);
         strncpy(app->current_feed, "crt", sizeof(app->current_feed) - 1);
+        return TRUE;
+    }
+
+    if (strcmp(feed, "bars") == 0 || strcmp(feed, "smpte") == 0) {
+        if (!app->pad_bars) {
+            app->bin_bars = effects_build_bars(app->cfg.caps_str);
+            app->pad_bars = attach_branch(app, app->bin_bars, "branch_bars");
+        }
+        if (!app->pad_bars) {
+            if (err_out) *err_out = strdup("failed to build bars branch");
+            return FALSE;
+        }
+        g_object_set(app->sel, "active-pad", app->pad_bars, NULL);
+        strncpy(app->current_feed, "bars", sizeof(app->current_feed) - 1);
+        return TRUE;
+    }
+
+    if (strcmp(feed, "shapes") == 0 || strcmp(feed, "ball") == 0) {
+        if (!app->pad_shapes) {
+            app->bin_shapes = effects_build_shapes(app->cfg.caps_str);
+            app->pad_shapes = attach_branch(app, app->bin_shapes, "branch_shapes");
+        }
+        if (!app->pad_shapes) {
+            if (err_out) *err_out = strdup("failed to build shapes branch");
+            return FALSE;
+        }
+        g_object_set(app->sel, "active-pad", app->pad_shapes, NULL);
+        strncpy(app->current_feed, "shapes", sizeof(app->current_feed) - 1);
+        return TRUE;
+    }
+
+    if (strcmp(feed, "black") == 0) {
+        if (!app->pad_black) {
+            app->bin_black = effects_build_black(app->cfg.caps_str);
+            app->pad_black = attach_branch(app, app->bin_black, "branch_black");
+        }
+        if (!app->pad_black) {
+            if (err_out) *err_out = strdup("failed to build black branch");
+            return FALSE;
+        }
+        g_object_set(app->sel, "active-pad", app->pad_black, NULL);
+        strncpy(app->current_feed, "black", sizeof(app->current_feed) - 1);
         return TRUE;
     }
 

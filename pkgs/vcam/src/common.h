@@ -46,17 +46,23 @@ typedef struct {
     char current_file[1024];
 
     /* static preset bins and selector pads */
-    GstElement *bin_black;
-    GstPad *pad_black;
-
-    GstElement *bin_smpte;
-    GstPad *pad_smpte;
+    GstElement *bin_privacy;
+    GstPad *pad_privacy;
 
     GstElement *bin_glitch;
     GstPad *pad_glitch;
 
     GstElement *bin_crt;
     GstPad *pad_crt;
+
+    GstElement *bin_bars;
+    GstPad *pad_bars;
+
+    GstElement *bin_shapes;
+    GstPad *pad_shapes;
+
+    GstElement *bin_black;
+    GstPad *pad_black;
 
     GstElement *bin_real;
     GstPad *pad_real;
