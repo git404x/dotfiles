@@ -122,7 +122,7 @@ set_mic_video() {
     return 0
   fi
 
-  if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" 2>/dev/null | grep -q "codec_type=audio"; then
+  if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" 2>/dev/null | grep "codec_type=audio" >/dev/null 2>&1; then
     kill_audio
     ( ffmpeg -loglevel error -nostdin -re -stream_loop -1 -i "$file" -vn -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
     echo $! > "$PID_FILE"
@@ -212,11 +212,24 @@ set_feed_file() {
 # hardware webcam unbind / bind toggle
 
 hw_find_device_bus() {
-  find /sys/bus/usb/devices/ -maxdepth 2 -name "idVendor" -exec grep -l "13d3" {} + 2>/dev/null | head -n 1 | xargs -r dirname | xargs -r basename || true
+  local dev
+  for dev in /sys/bus/usb/devices/*; do
+    if [ -f "$dev/idVendor" ] && [ "$(cat "$dev/idVendor" 2>/dev/null)" = "13d3" ]; then
+      basename "$dev"
+      return 0
+    fi
+  done
+  for dev in /sys/bus/usb/devices/*; do
+    if [ -f "$dev/product" ] && grep -qi "webcam\|camera" "$dev/product" 2>/dev/null; then
+      basename "$dev"
+      return 0
+    fi
+  done
+  return 1
 }
 
 hw_is_active() {
-  if ! lsmod | grep -q "uvcvideo"; then
+  if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
     return 1
   fi
   if [ -d "$DRIVER" ] && compgen -G "$DRIVER/*:1.0" >/dev/null; then
@@ -249,7 +262,7 @@ hw_disable() {
 }
 
 hw_enable() {
-  if ! lsmod | grep -q "uvcvideo"; then
+  if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
     sudo -n modprobe uvcvideo >/dev/null 2>&1 || true
     sleep 0.3
   fi
@@ -519,7 +532,7 @@ Virtual Microphone:
   Mode:       $([ -f "$PID_FILE" ] && echo "Streaming" || echo "Idle/Muted")
 
 Hardware Camera:
-  Driver:     $(lsmod | grep -q uvcvideo && echo "Loaded" || echo "Unloaded")
+  Driver:     $(lsmod | grep "uvcvideo" >/dev/null 2>&1 && echo "Loaded" || echo "Unloaded")
   Interface:  $(hw_is_active && echo "Active" || echo "Disabled/Unbound")
 EOF
 }
