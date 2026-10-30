@@ -1,149 +1,186 @@
 #include "ipc.h"
-#include "engine.h"
+#include "hw.h"
+#include "pipe_worker.h"
 
-/* process single client message line */
-static void handle_client_cmd(VCamApp *app, GIOChannel *source, const char *line) {
-    char resp[2048] = {0};
-    char *cmd_buf = strdup(line);
-    g_strstrip(cmd_buf);
+static pthread_t s_ipc_thread;
 
-    char *cmd = cmd_buf;
+static void handle_client(int client_fd) {
+    char buf[2048] = {0};
+    ssize_t n = read(client_fd, buf, sizeof(buf) - 1);
+    if (n <= 0) {
+        close(client_fd);
+        return;
+    }
+
+    /* strip trailing whitespace/newlines */
+    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r' || buf[n - 1] == ' ')) {
+        buf[--n] = '\0';
+    }
+
+    char *cmd = buf;
     char *arg = NULL;
-    char *space = strchr(cmd_buf, ' ');
+    char *space = strchr(buf, ' ');
     if (space) {
         *space = '\0';
         arg = space + 1;
         while (*arg == ' ') arg++;
     }
 
+    char resp[2048] = {0};
+
     if (strcmp(cmd, "status") == 0) {
         snprintf(resp, sizeof(resp),
             "{\"ok\":true,\"feed\":\"%s\",\"file\":\"%s\",\"device\":\"%s\",\"resolution\":\"%dx%d@%d\"}\n",
-            app->current_feed, app->current_file, app->cfg.device,
-            app->cfg.width, app->cfg.height, app->cfg.fps
+            feed_type_to_string(g_vcam.feed),
+            g_vcam.current_file,
+            g_vcam.device,
+            g_vcam.width,
+            g_vcam.height,
+            g_vcam.fps
         );
     } else if (strcmp(cmd, "feed") == 0) {
-        char *sub_cmd = arg;
-        char *sub_arg = NULL;
-        if (sub_cmd) {
-            char *s2 = strchr(sub_cmd, ' ');
+        if (!arg || *arg == '\0') {
+            snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"missing feed parameter\"}\n");
+        } else {
+            char *sub_cmd = arg;
+            char *sub_arg = NULL;
+            char *s2 = strchr(arg, ' ');
             if (s2) {
                 *s2 = '\0';
                 sub_arg = s2 + 1;
                 while (*sub_arg == ' ') sub_arg++;
             }
-        }
 
-        char *err_msg = NULL;
-        if (engine_switch_feed(app, sub_cmd, sub_arg, &err_msg)) {
-            snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"%s\",\"file\":\"%s\"}\n",
-                app->current_feed, app->current_file
-            );
-        } else {
-            snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"%s\"}\n",
-                err_msg ? err_msg : "switch failed"
-            );
-            if (err_msg) free(err_msg);
+            if (strcmp(sub_cmd, "privacy") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_PRIVACY;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"privacy\"}\n");
+            } else if (strcmp(sub_cmd, "black") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_BLACK;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"black\"}\n");
+            } else if (strcmp(sub_cmd, "bars") == 0 || strcmp(sub_cmd, "smpte") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_BARS;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"bars\"}\n");
+            } else if (strcmp(sub_cmd, "crt") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_CRT;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"crt\"}\n");
+            } else if (strcmp(sub_cmd, "glitch") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_GLITCH;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"glitch\"}\n");
+            } else if (strcmp(sub_cmd, "shapes") == 0 || strcmp(sub_cmd, "ball") == 0) {
+                pipe_worker_stop();
+                g_vcam.feed = FEED_SHAPES;
+                g_vcam.current_file[0] = '\0';
+                snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"shapes\"}\n");
+            } else if (strcmp(sub_cmd, "real") == 0) {
+                char dev[256] = {0};
+                if (hw_detect_camera(dev, sizeof(dev), g_vcam.device) != 0) {
+                    snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"hardware camera not found or disabled\"}\n");
+                } else if (pipe_worker_start_real(dev) != 0) {
+                    snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"failed to start real camera stream\"}\n");
+                } else {
+                    g_vcam.feed = FEED_REAL;
+                    g_vcam.current_file[0] = '\0';
+                    snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"real\",\"device\":\"%s\"}\n", dev);
+                }
+            } else if (strcmp(sub_cmd, "file") == 0) {
+                if (!sub_arg || access(sub_arg, R_OK) != 0) {
+                    snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"file not accessible: %s\"}\n", sub_arg ? sub_arg : "none");
+                } else if (pipe_worker_start_file(sub_arg) != 0) {
+                    snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"failed to start video file stream\"}\n");
+                } else {
+                    g_vcam.feed = FEED_FILE;
+                    strncpy(g_vcam.current_file, sub_arg, sizeof(g_vcam.current_file) - 1);
+                    snprintf(resp, sizeof(resp), "{\"ok\":true,\"feed\":\"file\",\"file\":\"%s\"}\n", sub_arg);
+                }
+            } else {
+                snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"unknown feed '%s'\"}\n", sub_cmd);
+            }
         }
     } else if (strcmp(cmd, "quit") == 0 || strcmp(cmd, "stop") == 0) {
         snprintf(resp, sizeof(resp), "{\"ok\":true,\"msg\":\"stopping vcamd\"}\n");
-        if (app->loop) g_main_loop_quit(app->loop);
+        g_vcam.running = false;
     } else {
         snprintf(resp, sizeof(resp), "{\"ok\":false,\"err\":\"unknown command '%s'\"}\n", cmd);
     }
 
-    g_io_channel_write_chars(source, resp, -1, NULL, NULL);
-    g_io_channel_flush(source, NULL);
-    free(cmd_buf);
+    ssize_t w = write(client_fd, resp, strlen(resp));
+    (void)w;
+    close(client_fd);
 }
 
-/* read client data callback */
-static gboolean on_client_data(GIOChannel *source, GIOCondition cond, gpointer data) {
-    VCamApp *app = (VCamApp *)data;
-    if (cond & (G_IO_HUP | G_IO_ERR)) {
-        g_io_channel_shutdown(source, TRUE, NULL);
-        g_io_channel_unref(source);
-        return FALSE;
+static void *ipc_thread_func(void *arg) {
+    (void)arg;
+    while (g_vcam.running && g_vcam.server_fd >= 0) {
+        struct sockaddr_un client_addr;
+        socklen_t client_len = sizeof(client_addr);
+        int client_fd = accept(g_vcam.server_fd, (struct sockaddr *)&client_addr, &client_len);
+        if (client_fd < 0) {
+            if (errno == EINTR || errno == EAGAIN) continue;
+            break;
+        }
+        handle_client(client_fd);
     }
-
-    gchar *line = NULL;
-    gsize length = 0;
-    if (g_io_channel_read_line(source, &line, &length, NULL, NULL) == G_IO_STATUS_NORMAL && line) {
-        handle_client_cmd(app, source, line);
-        g_free(line);
-    }
-
-    g_io_channel_shutdown(source, TRUE, NULL);
-    g_io_channel_unref(source);
-    return FALSE;
+    return NULL;
 }
 
-/* accept socket connection callback */
-static gboolean on_socket_accept(GIOChannel *source, GIOCondition cond, gpointer data) {
-    VCamApp *app = (VCamApp *)data;
-    if (!(cond & G_IO_IN)) return TRUE;
+int ipc_init(void) {
+    unlink(g_vcam.socket_path);
 
-    int fd = g_io_channel_unix_get_fd(source);
-    struct sockaddr_un client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    int client_fd = accept(fd, (struct sockaddr *)&client_addr, &client_len);
-    if (client_fd < 0) return TRUE;
-
-    GIOChannel *client_channel = g_io_channel_unix_new(client_fd);
-    g_io_channel_set_close_on_unref(client_channel, TRUE);
-    g_io_channel_set_encoding(client_channel, NULL, NULL);
-    g_io_add_watch(client_channel, G_IO_IN | G_IO_HUP | G_IO_ERR, on_client_data, app);
-
-    return TRUE;
-}
-
-/* initialize unix domain socket server */
-gboolean ipc_init(VCamApp *app) {
-    unlink(app->cfg.socket_path);
-
-    app->server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (app->server_fd < 0) {
+    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0) {
         perror("[vcamd] socket");
-        return FALSE;
+        return -1;
     }
 
     struct sockaddr_un saddr;
     memset(&saddr, 0, sizeof(saddr));
     saddr.sun_family = AF_UNIX;
-    strncpy(saddr.sun_path, app->cfg.socket_path, sizeof(saddr.sun_path) - 1);
+    snprintf(saddr.sun_path, sizeof(saddr.sun_path), "%s", g_vcam.socket_path);
 
-    if (bind(app->server_fd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
+    if (bind(fd, (struct sockaddr *)&saddr, sizeof(saddr)) < 0) {
         perror("[vcamd] bind");
-        close(app->server_fd);
-        app->server_fd = -1;
-        return FALSE;
+        close(fd);
+        return -1;
     }
 
-    if (listen(app->server_fd, 8) < 0) {
+    if (listen(fd, 8) < 0) {
         perror("[vcamd] listen");
-        close(app->server_fd);
-        app->server_fd = -1;
-        return FALSE;
+        close(fd);
+        return -1;
     }
 
-    app->server_channel = g_io_channel_unix_new(app->server_fd);
-    app->server_watch_id = g_io_add_watch(app->server_channel, G_IO_IN, on_socket_accept, app);
-    return TRUE;
+    g_vcam.server_fd = fd;
+
+    if (pthread_create(&s_ipc_thread, NULL, ipc_thread_func, NULL) != 0) {
+        perror("[vcamd] pthread_create ipc");
+        close(fd);
+        g_vcam.server_fd = -1;
+        return -1;
+    }
+
+    return 0;
 }
 
-/* close socket server and clean up socket file */
-void ipc_cleanup(VCamApp *app) {
-    if (app->server_watch_id) {
-        g_source_remove(app->server_watch_id);
-        app->server_watch_id = 0;
+void ipc_cleanup(void) {
+    if (g_vcam.server_fd >= 0) {
+        int fd = g_vcam.server_fd;
+        g_vcam.server_fd = -1;
+        shutdown(fd, SHUT_RDWR);
+        close(fd);
     }
-    if (app->server_channel) {
-        g_io_channel_unref(app->server_channel);
-        app->server_channel = NULL;
+    unlink(g_vcam.socket_path);
+    if (s_ipc_thread) {
+        pthread_join(s_ipc_thread, NULL);
+        s_ipc_thread = 0;
     }
-    if (app->server_fd >= 0) {
-        close(app->server_fd);
-        app->server_fd = -1;
-    }
-    unlink(app->cfg.socket_path);
 }

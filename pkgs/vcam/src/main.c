@@ -1,127 +1,174 @@
 #include "common.h"
-#include "engine.h"
+#include "v4l2_sink.h"
+#include "procedural.h"
+#include "pipe_worker.h"
 #include "ipc.h"
-#include <getopt.h>
 
-VCamApp g_app;
+VCamState g_vcam;
 
-/* graceful termination signal handler */
-static void on_signal(int sig) {
-    (void)sig;
-    if (g_app.loop) {
-        g_main_loop_quit(g_app.loop);
+const char *feed_type_to_string(FeedType feed) {
+    switch (feed) {
+        case FEED_PRIVACY: return "privacy";
+        case FEED_BLACK:   return "black";
+        case FEED_BARS:    return "bars";
+        case FEED_CRT:     return "crt";
+        case FEED_GLITCH:  return "glitch";
+        case FEED_SHAPES:  return "shapes";
+        case FEED_REAL:    return "real";
+        case FEED_FILE:    return "file";
+        default:           return "unknown";
     }
 }
 
-/* print daemon cli help */
-static void print_usage(const char *prog) {
-    printf("usage: %s [options]\n\n"
-           "options:\n"
-           "  -d, --device <path>       v4l2 loopback sink device (default: %s)\n"
-           "  -r, --real-device <path>  physical camera device node or 'auto'\n"
-           "  -w, --width <pixels>      frame width (default: %d)\n"
-           "  -h, --height <pixels>     frame height (default: %d)\n"
-           "  -f, --fps <rate>          framerate (default: %d)\n"
-           "  --help                    show this help\n",
-           prog, DEFAULT_DEVICE, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FPS);
+FeedType feed_type_from_string(const char *str) {
+    if (!str) return FEED_PRIVACY;
+    if (strcmp(str, "privacy") == 0) return FEED_PRIVACY;
+    if (strcmp(str, "black") == 0)   return FEED_BLACK;
+    if (strcmp(str, "bars") == 0 || strcmp(str, "smpte") == 0) return FEED_BARS;
+    if (strcmp(str, "crt") == 0)     return FEED_CRT;
+    if (strcmp(str, "glitch") == 0)  return FEED_GLITCH;
+    if (strcmp(str, "shapes") == 0 || strcmp(str, "ball") == 0) return FEED_SHAPES;
+    if (strcmp(str, "real") == 0)    return FEED_REAL;
+    if (strcmp(str, "file") == 0)    return FEED_FILE;
+    return FEED_PRIVACY;
 }
 
-int main(int argc, char *argv[]) {
-    gst_init(&argc, &argv);
-    memset(&g_app, 0, sizeof(g_app));
+static void sig_handler(int sig) {
+    (void)sig;
+    g_vcam.running = false;
+}
 
-    signal(SIGINT, on_signal);
-    signal(SIGTERM, on_signal);
+int main(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
 
-    /* initialize default configuration */
-    const char *env_dev = getenv("VCAM_DEVICE");
-    strncpy(g_app.cfg.device, env_dev ? env_dev : DEFAULT_DEVICE, sizeof(g_app.cfg.device) - 1);
+    memset(&g_vcam, 0, sizeof(g_vcam));
 
-    const char *env_real = getenv("VCAM_REAL_DEVICE");
-    strncpy(g_app.cfg.real_device, env_real ? env_real : "auto", sizeof(g_app.cfg.real_device) - 1);
+    /* configuration defaults and environment overrides */
+    const char *dev_env = getenv("VCAM_DEVICE");
+    strncpy(g_vcam.device, dev_env ? dev_env : DEFAULT_DEVICE, sizeof(g_vcam.device) - 1);
 
-    const char *env_w = getenv("VCAM_WIDTH");
-    g_app.cfg.width = env_w ? atoi(env_w) : DEFAULT_WIDTH;
+    const char *w_env = getenv("VCAM_WIDTH");
+    g_vcam.width = w_env ? atoi(w_env) : DEFAULT_WIDTH;
 
-    const char *env_h = getenv("VCAM_HEIGHT");
-    g_app.cfg.height = env_h ? atoi(env_h) : DEFAULT_HEIGHT;
+    const char *h_env = getenv("VCAM_HEIGHT");
+    g_vcam.height = h_env ? atoi(h_env) : DEFAULT_HEIGHT;
 
-    const char *env_fps = getenv("VCAM_FPS");
-    g_app.cfg.fps = env_fps ? atoi(env_fps) : DEFAULT_FPS;
+    const char *fps_env = getenv("VCAM_FPS");
+    g_vcam.fps = fps_env ? atoi(fps_env) : DEFAULT_FPS;
 
-    const char *env_fmt = getenv("VCAM_FORMAT");
-    strncpy(g_app.cfg.format, env_fmt ? env_fmt : DEFAULT_FORMAT, sizeof(g_app.cfg.format) - 1);
+    const char *sock_env = getenv("VCAM_SOCKET");
+    if (sock_env) {
+        strncpy(g_vcam.socket_path, sock_env, sizeof(g_vcam.socket_path) - 1);
+    } else {
+        const char *rt = getenv("XDG_RUNTIME_DIR");
+        snprintf(g_vcam.socket_path, sizeof(g_vcam.socket_path), "%s/vcam.sock", rt ? rt : "/tmp");
+    }
 
-    /* parse command line options */
-    static struct option long_opts[] = {
-        {"device", required_argument, 0, 'd'},
-        {"real-device", required_argument, 0, 'r'},
-        {"width", required_argument, 0, 'w'},
-        {"height", required_argument, 0, 'h'},
-        {"fps", required_argument, 0, 'f'},
-        {"help", no_argument, 0, '?'},
-        {0, 0, 0, 0}
-    };
+    g_vcam.frame_size = (size_t)g_vcam.width * g_vcam.height * 2;
+    g_vcam.feed = FEED_PRIVACY;
+    g_vcam.running = true;
+    g_vcam.worker_pipe_fd = -1;
+    g_vcam.server_fd = -1;
 
-    int opt;
-    while ((opt = getopt_long(argc, argv, "d:r:w:h:f:?", long_opts, NULL)) != -1) {
-        switch (opt) {
-            case 'd':
-                strncpy(g_app.cfg.device, optarg, sizeof(g_app.cfg.device) - 1);
+    pthread_mutex_init(&g_vcam.frame_mutex, NULL);
+    g_vcam.active_frame = malloc(g_vcam.frame_size);
+    uint8_t *output_frame = malloc(g_vcam.frame_size);
+
+    if (!g_vcam.active_frame || !output_frame) {
+        fprintf(stderr, "[vcamd] failed to allocate frame buffers\n");
+        return 1;
+    }
+
+    /* initialize default privacy frame */
+    procedural_render_privacy(g_vcam.active_frame, g_vcam.width, g_vcam.height, 0);
+
+    /* open v4l2loopback sink */
+    g_vcam.sink_fd = v4l2_sink_open(g_vcam.device, g_vcam.width, g_vcam.height);
+    if (g_vcam.sink_fd < 0) {
+        fprintf(stderr, "[vcamd] error: unable to open loopback device %s\n", g_vcam.device);
+        return 1;
+    }
+
+    /* setup signals */
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = sig_handler;
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    signal(SIGPIPE, SIG_IGN);
+
+    /* start ipc server */
+    if (ipc_init() != 0) {
+        fprintf(stderr, "[vcamd] warning: failed to start ipc server at %s\n", g_vcam.socket_path);
+    }
+
+    printf("[vcamd] daemon running (sink: %s, %dx%d@%d, socket: %s)\n",
+        g_vcam.device, g_vcam.width, g_vcam.height, g_vcam.fps, g_vcam.socket_path
+    );
+    fflush(stdout);
+
+    /* precise monotonic frame timer */
+    struct timespec next_frame;
+    clock_gettime(CLOCK_MONOTONIC, &next_frame);
+    long frame_ns = 1000000000L / g_vcam.fps;
+
+    /* main continuous output loop */
+    while (g_vcam.running) {
+        switch (g_vcam.feed) {
+            case FEED_PRIVACY:
+                procedural_render_privacy(output_frame, g_vcam.width, g_vcam.height, g_vcam.frame_counter);
                 break;
-            case 'r':
-                strncpy(g_app.cfg.real_device, optarg, sizeof(g_app.cfg.real_device) - 1);
+            case FEED_BLACK:
+                procedural_render_black(output_frame, g_vcam.width, g_vcam.height);
                 break;
-            case 'w':
-                g_app.cfg.width = atoi(optarg);
+            case FEED_BARS:
+                procedural_render_bars(output_frame, g_vcam.width, g_vcam.height);
                 break;
-            case 'h':
-                g_app.cfg.height = atoi(optarg);
+            case FEED_CRT:
+                procedural_render_crt(output_frame, g_vcam.width, g_vcam.height, g_vcam.frame_counter);
                 break;
-            case 'f':
-                g_app.cfg.fps = atoi(optarg);
+            case FEED_GLITCH:
+                procedural_render_glitch(output_frame, g_vcam.width, g_vcam.height, g_vcam.frame_counter);
                 break;
-            case '?':
-                print_usage(argv[0]);
-                return 0;
-            default:
+            case FEED_SHAPES:
+                procedural_render_shapes(output_frame, g_vcam.width, g_vcam.height, g_vcam.frame_counter);
+                break;
+            case FEED_REAL:
+            case FEED_FILE:
+                pthread_mutex_lock(&g_vcam.frame_mutex);
+                memcpy(output_frame, g_vcam.active_frame, g_vcam.frame_size);
+                pthread_mutex_unlock(&g_vcam.frame_mutex);
                 break;
         }
+
+        /* write frame to v4l2 loopback sink */
+        if (v4l2_sink_write(g_vcam.sink_fd, output_frame, g_vcam.frame_size) < 0) {
+            if (errno == ENODEV || errno == EBADF) {
+                fprintf(stderr, "[vcamd] loopback device disconnected\n");
+                break;
+            }
+        }
+
+        g_vcam.frame_counter++;
+
+        /* wait until next frame period */
+        next_frame.tv_nsec += frame_ns;
+        while (next_frame.tv_nsec >= 1000000000L) {
+            next_frame.tv_nsec -= 1000000000L;
+            next_frame.tv_sec += 1;
+        }
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_frame, NULL);
     }
 
-    snprintf(g_app.cfg.caps_str, sizeof(g_app.cfg.caps_str),
-        "video/x-raw,format=%s,width=%d,height=%d,framerate=%d/1",
-        g_app.cfg.format, g_app.cfg.width, g_app.cfg.height, g_app.cfg.fps
-    );
-
-    const char *runtime_dir = getenv("XDG_RUNTIME_DIR");
-    if (!runtime_dir) runtime_dir = "/tmp";
-    snprintf(g_app.cfg.socket_path, sizeof(g_app.cfg.socket_path), "%s/vcam.sock", runtime_dir);
-
-    /* start engine and ipc */
-    if (!engine_init(&g_app)) {
-        g_printerr("[vcamd] failed to initialize engine\n");
-        return 1;
-    }
-
-    if (!ipc_init(&g_app)) {
-        g_printerr("[vcamd] failed to initialize ipc server\n");
-        engine_cleanup(&g_app);
-        return 1;
-    }
-
-    g_print("[vcamd] daemon running (sink: %s, caps: %s, socket: %s)\n",
-        g_app.cfg.device, g_app.cfg.caps_str, g_app.cfg.socket_path
-    );
-
-    g_app.loop = g_main_loop_new(NULL, FALSE);
-    g_main_loop_run(g_app.loop);
-
-    /* clean shutdown */
-    g_print("[vcamd] shutting down\n");
-    ipc_cleanup(&g_app);
-    engine_cleanup(&g_app);
-    g_main_loop_unref(g_app.loop);
+    /* shutdown cleanup */
+    printf("[vcamd] shutting down cleanly...\n");
+    pipe_worker_stop();
+    ipc_cleanup();
+    v4l2_sink_close(g_vcam.sink_fd);
+    pthread_mutex_destroy(&g_vcam.frame_mutex);
+    free(g_vcam.active_frame);
+    free(output_frame);
 
     return 0;
 }

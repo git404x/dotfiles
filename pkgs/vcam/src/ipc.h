@@ -3,10 +3,7 @@
 
 #include "common.h"
 
-/* initialize unix domain socket server */
-gboolean ipc_init(VCamApp *app);
-
-/* close socket server and remove socket file */
-void ipc_cleanup(VCamApp *app);
+int ipc_init(void);
+void ipc_cleanup(void);
 
 #endif

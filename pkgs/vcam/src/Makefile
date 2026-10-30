@@ -1,21 +1,18 @@
 CC ?= gcc
-CFLAGS ?= -Wall -Wextra -O2 -std=c11
-PKG_CONFIG ?= pkg-config
+CFLAGS ?= -O2 -Wall -Wextra -D_GNU_SOURCE
+LDFLAGS ?= -pthread
 
-GST_CFLAGS := $(shell $(PKG_CONFIG) --cflags gstreamer-1.0 glib-2.0)
-GST_LIBS := $(shell $(PKG_CONFIG) --libs gstreamer-1.0 glib-2.0)
-
-SRCS = main.c engine.c effects.c hw.c ipc.c
+SRCS = main.c v4l2_sink.c procedural.c pipe_worker.c hw.c ipc.c
 OBJS = $(SRCS:.c=.o)
 TARGET = vcamd
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET) $(GST_LIBS)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 %.o: %.c common.h
-	$(CC) $(CFLAGS) $(GST_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS) $(TARGET)

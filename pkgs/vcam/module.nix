@@ -58,16 +58,16 @@ in
   };
 
   config = mkIf cfg.enable {
-    # kernel-level loopback camera device
+    # kernel loopback camera device
     boot.kernelModules = [ "v4l2loopback" ];
     boot.extraModprobeConfig = ''
       options v4l2loopback devices=1 video_nr=${toString cfg.deviceNr} card_label="${cfg.webcamLabel}" exclusive_caps=1 max_buffers=2
     '';
 
-    # blacklist physical webcam driver on boot if configured
+    # blacklist physical webcam driver on boot for hardware privacy if configured
     boot.blacklistedKernelModules = mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
 
-    # passwordless sudo rules for hardware webcam control
+    # minimal scope passwordless sudo rules strictly for webcam driver bind/unbind
     security.sudo.extraRules = [
       {
         groups = [ "wheel" ];
@@ -77,19 +77,7 @@ in
             options = [ "NOPASSWD" ];
           }
           {
-            command = "${pkgs.kmod}/bin/modprobe -r uvcvideo";
-            options = [ "NOPASSWD" ];
-          }
-          {
             command = "/run/current-system/sw/bin/modprobe uvcvideo";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/modprobe -r uvcvideo";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "${pkgs.coreutils}/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
             options = [ "NOPASSWD" ];
           }
           {
@@ -97,11 +85,15 @@ in
             options = [ "NOPASSWD" ];
           }
           {
-            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
+            command = "${pkgs.coreutils}/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
             options = [ "NOPASSWD" ];
           }
           {
             command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/bind";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
             options = [ "NOPASSWD" ];
           }
         ];
@@ -155,8 +147,8 @@ in
       };
       serviceConfig = {
         ExecStart = "${pkgs.vcam}/bin/vcamd";
-        Restart = "on-failure";
-        RestartSec = "2s";
+        Restart = "always";
+        RestartSec = "1s";
       };
     };
 

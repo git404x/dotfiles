@@ -6,6 +6,7 @@ set -euo pipefail
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCK="${VCAM_SOCKET:-${RUNTIME_DIR}/vcam.sock}"
 DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
+TEST_DIR="$HOME/dev/vcam-test"
 MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
 MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
 PID_FILE="${RUNTIME_DIR}/vcam-audio.pid"
@@ -37,11 +38,41 @@ send_ipc() {
     return 0
   fi
 
-  printf '%s\n' "$cmd" | socat -t 2 - "UNIX-CONNECT:$SOCK" 2>/dev/null || echo '{"ok":false,"err":"ipc connection failed"}'
+  if command -v socat >/dev/null 2>&1; then
+    printf '%s\n' "$cmd" | socat -t 2 - "UNIX-CONNECT:$SOCK" 2>/dev/null || echo '{"ok":false,"err":"ipc connection failed"}'
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -c "
+import socket, sys
+try:
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.connect('$SOCK')
+    s.sendall(sys.argv[1].encode() + b'\n')
+    print(s.recv(2048).decode().strip())
+    s.close()
+except Exception as e:
+    print('{\"ok\":false,\"err\":\"ipc failed: ' + str(e) + '\"}')
+" "$cmd"
+  else
+    echo '{"ok":false,"err":"no ipc client available"}'
+  fi
 }
 
 field() {
-  jq -r "$1 // empty" 2>/dev/null || true
+  if command -v jq >/dev/null 2>&1; then
+    jq -r "$1 // empty" 2>/dev/null || true
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    f = sys.argv[1].lstrip('.')
+    print(d.get(f, ''))
+except Exception:
+    pass
+" "$1"
+  else
+    cat
+  fi
 }
 
 # audio process lifecycle management
@@ -55,7 +86,7 @@ kill_audio() {
     fi
     rm -f "$PID_FILE"
   fi
-  pkill -9 -f "pw-play.*${MIC_SINK}" 2>/dev/null || true
+  pkill -9 -f "pw-cat.*${MIC_SINK}" 2>/dev/null || true
   pkill -9 -f "pw-loopback.*${MIC_SINK}" 2>/dev/null || true
   pkill -9 -f "ffmpeg.*anoisesrc" 2>/dev/null || true
   pkill -9 -f "ffmpeg.*sine" 2>/dev/null || true
@@ -70,16 +101,16 @@ set_mic_real() {
 
 set_mic_stub() {
   kill_audio
-  # inaudible pink noise carrier (-60db) to satisfy webrtc vad without audible sound
-  ( ffmpeg -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.0005" -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+  # inaudible pink noise floor to satisfy webrtc vad without audible sound
+  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.001" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
   echo $! > "$PID_FILE"
   notify low "Microphone" "Silent Stub Active (Inaudible Privacy)"
 }
 
 set_mic_crt() {
   kill_audio
-  # modulated 60hz hum with crackle and static to bypass meeting noise gates
-  ( ffmpeg -nostdin -re -f lavfi -i "sine=frequency=60:beep_factor=4:sample_rate=48000[s];anoisesrc=c=white:r=48000:a=0.08[n];[s][n]amix=inputs=2:duration=first" -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+  # active modulated 60hz hum and static crackle (-20db) to register on visualizers
+  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "sine=frequency=60:sample_rate=48000[s];anoisesrc=c=white:r=48000:a=0.3[n];[s][n]amix=inputs=2:duration=first" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
   echo $! > "$PID_FILE"
   notify low "Microphone" "CRT Electrical Hum & Static Active"
 }
@@ -93,7 +124,7 @@ set_mic_video() {
 
   if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" 2>/dev/null | grep -q "codec_type=audio"; then
     kill_audio
-    ( ffmpeg -nostdin -re -stream_loop -1 -i "$file" -vn -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+    ( ffmpeg -loglevel error -nostdin -re -stream_loop -1 -i "$file" -vn -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
     echo $! > "$PID_FILE"
     notify low "Microphone" "Video Audio Track Routed"
   else
@@ -109,10 +140,9 @@ set_mic_mute() {
 # video feed management
 
 set_feed_real() {
-  if ! lsmod | grep -q "uvcvideo"; then
-    notify normal "Hardware Camera" "Loading uvcvideo driver..."
-    sudo modprobe uvcvideo >/dev/null 2>&1 || true
-    sleep 0.8
+  if ! hw_is_active; then
+    hw_enable
+    sleep 0.5
   fi
 
   local resp
@@ -120,47 +150,41 @@ set_feed_real() {
   local ok
   ok=$(printf '%s' "$resp" | field '.ok')
   if [ "$ok" = "true" ]; then
-    notify normal "Virtual Camera" "Feed: Real Camera"
+    notify normal "Virtual Camera" "Feed: Real Hardware Camera"
   else
     local err
     err=$(printf '%s' "$resp" | field '.err')
-    notify critical "Virtual Camera Failed" "${err:-unknown error}"
+    notify critical "Virtual Camera Failed" "${err:-hardware camera unavailable}"
   fi
 }
 
 set_feed_privacy() {
-  local resp
-  resp=$(send_ipc "feed privacy")
+  send_ipc "feed privacy" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: Privacy Sensor Noise (Meet-Safe)"
 }
 
 set_feed_glitch() {
-  local resp
-  resp=$(send_ipc "feed glitch")
+  send_ipc "feed glitch" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: Digital Glitch (Diced Color Blocks)"
 }
 
 set_feed_crt() {
-  local resp
-  resp=$(send_ipc "feed crt")
+  send_ipc "feed crt" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: CRT Retro Scanlines"
 }
 
 set_feed_bars() {
-  local resp
-  resp=$(send_ipc "feed bars")
+  send_ipc "feed bars" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: SMPTE Color Bars"
 }
 
 set_feed_shapes() {
-  local resp
-  resp=$(send_ipc "feed shapes")
+  send_ipc "feed shapes" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: Animated Retro Shapes"
 }
 
 set_feed_black() {
-  local resp
-  resp=$(send_ipc "feed black")
+  send_ipc "feed black" >/dev/null 2>&1 || true
   notify normal "Virtual Camera" "Feed: Blackout"
 }
 
@@ -187,52 +211,55 @@ set_feed_file() {
 
 # hardware webcam unbind / bind toggle
 
+hw_find_device_bus() {
+  find /sys/bus/usb/devices/ -maxdepth 2 -name "idVendor" -exec grep -l "13d3" {} + 2>/dev/null | head -n 1 | xargs -r dirname | xargs -r basename || true
+}
+
 hw_is_active() {
   if ! lsmod | grep -q "uvcvideo"; then
     return 1
   fi
-  if compgen -G "$DRIVER/*:*" >/dev/null; then
+  if [ -d "$DRIVER" ] && compgen -G "$DRIVER/*:1.0" >/dev/null; then
     return 0
   fi
   return 1
 }
 
 hw_disable() {
-  # switch virtual camera to privacy noise first so /dev/video1 is released
+  # switch virtual camera to privacy sensor noise first so hardware node is released
   send_ipc "feed privacy" >/dev/null 2>&1 || true
-  sleep 0.2
+  sleep 0.1
 
-  local unbound=0
-  if [ -d "$DRIVER" ]; then
+  local dev_bus
+  dev_bus=$(hw_find_device_bus)
+
+  if [ -n "$dev_bus" ] && [ -d "$DRIVER/${dev_bus}:1.0" ]; then
+    echo "${dev_bus}:1.0" | sudo -n tee "$DRIVER/unbind" >/dev/null 2>&1 || true
+  elif [ -d "$DRIVER" ]; then
     for dev in "$DRIVER"/*:*; do
       if [ -e "$dev" ]; then
         local name
         name="$(basename "$dev")"
-        echo "$name" | sudo tee "$DRIVER/unbind" >/dev/null 2>&1 || true
-        unbound=1
+        echo "$name" | sudo -n tee "$DRIVER/unbind" >/dev/null 2>&1 || true
       fi
     done
   fi
 
-  if lsmod | grep -q "uvcvideo"; then
-    sudo modprobe -r uvcvideo >/dev/null 2>&1 || true
-  fi
-
-  notify normal "Hardware Camera" "Camera Disabled (Power Cut)"
+  notify normal "Hardware Camera" "Camera Disabled (Hardware Disconnected)"
 }
 
 hw_enable() {
   if ! lsmod | grep -q "uvcvideo"; then
-    sudo modprobe uvcvideo >/dev/null 2>&1 || true
-    sleep 0.5
+    sudo -n modprobe uvcvideo >/dev/null 2>&1 || true
+    sleep 0.3
   fi
 
-  # bind usb camera interface if unbound
   local dev_bus
-  dev_bus=$(find /sys/bus/usb/devices/ -maxdepth 2 -name "idVendor" -exec grep -l "13d3" {} + 2>/dev/null | head -n 1 | xargs -r dirname | xargs -r basename || true)
+  dev_bus=$(hw_find_device_bus)
+
   if [ -n "$dev_bus" ] && [ -d "/sys/bus/usb/devices/${dev_bus}:1.0" ]; then
-    echo "${dev_bus}:1.0" | sudo tee "$DRIVER/bind" >/dev/null 2>&1 || true
-    sleep 0.3
+    echo "${dev_bus}:1.0" | sudo -n tee "$DRIVER/bind" >/dev/null 2>&1 || true
+    sleep 0.2
   fi
 
   notify normal "Hardware Camera" "Camera Enabled (Active)"
@@ -299,6 +326,32 @@ apply_preset() {
       exit 1
       ;;
   esac
+}
+
+# test suite launcher
+
+launch_test_bench() {
+  if [ ! -d "$TEST_DIR" ]; then
+    notify critical "VCAM Test Bench" "Test directory not found at $TEST_DIR"
+    echo "error: test directory not found at $TEST_DIR" >&2
+    exit 1
+  fi
+
+  # check if server is already running
+  if pgrep -f "python.*vcam-test.*serve.py" >/dev/null 2>&1; then
+    notify normal "VCAM Test Bench" "Test server already running at http://localhost:8080"
+    echo "Test server running at: http://localhost:8080"
+  else
+    ( cd "$TEST_DIR" && python3 serve.py >/dev/null 2>&1 ) &
+    sleep 0.5
+    notify normal "VCAM Test Bench" "Launched test bench at http://localhost:8080"
+    echo "Launched test bench at: http://localhost:8080"
+  fi
+
+  # try to open in default browser if xdg-open exists
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "http://localhost:8080" >/dev/null 2>&1 || true
+  fi
 }
 
 # categorized fuzzel gui menu
@@ -420,6 +473,7 @@ gui_main() {
     "camera feeds"
     "microphone feeds"
     "hardware power toggle"
+    "diagnostics & test bench"
     "status"
   )
   local sel
@@ -431,14 +485,13 @@ gui_main() {
     "camera feeds") gui_menu_feeds ;;
     "microphone feeds") gui_menu_mics ;;
     "hardware power toggle") hw_toggle ;;
+    "diagnostics & test bench") launch_test_bench ;;
     "status")
       local st
       st=$(send_ipc "status")
-      local feed
+      local feed dev res
       feed=$(printf '%s' "$st" | field '.feed')
-      local dev
       dev=$(printf '%s' "$st" | field '.device')
-      local res
       res=$(printf '%s' "$st" | field '.resolution')
       notify normal "Virtual Camera Status" "Feed: ${feed:-offline}\nDevice: ${dev:-none}\nResolution: ${res:-unknown}"
       ;;
@@ -483,6 +536,7 @@ options:
   -f, --feed <target>        switch video feed (real|privacy|glitch|crt|bars|shapes|black|file <path>)
   -m, --mic <mode>           switch microphone (real|crt|stub|video <path>|mute)
   -p, --preset <name>        apply preset (live|stealth|playback|privacy|crt|glitch|shapes|off)
+  -t, --test                 launch web diagnostic test bench (http://localhost:8080)
   --hw <action>              hardware camera control (toggle|enable|disable)
   -d, --daemon <action>      daemon management (start|stop|restart|log)
   -h, --help                 show this help
@@ -514,6 +568,10 @@ while [ $# -gt 0 ]; do
       else
         show_status
       fi
+      exit 0
+      ;;
+    -t|--test|test)
+      launch_test_bench
       exit 0
       ;;
     -f|--feed|feed)

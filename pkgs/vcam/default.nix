@@ -1,10 +1,7 @@
 {
   lib,
   stdenv,
-  pkg-config,
   makeWrapper,
-  glib,
-  gst_all_1,
   pipewire,
   ffmpeg,
   socat,
@@ -17,19 +14,10 @@
   findutils,
   gnugrep,
   systemd,
+  python3,
 }:
 
 let
-  gstPlugins = with gst_all_1; [
-    gstreamer
-    gst-plugins-base
-    gst-plugins-good
-    gst-plugins-bad
-    gst-libav
-  ];
-
-  gstPluginPath = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" gstPlugins;
-
   binPath = lib.makeBinPath [
     pipewire
     ffmpeg
@@ -43,23 +31,17 @@ let
     findutils
     gnugrep
     systemd
+    python3
   ];
 in
 stdenv.mkDerivation {
   pname = "vcam";
-  version = "1.0.0";
+  version = "1.1.0";
   src = ./.;
 
   nativeBuildInputs = [
-    pkg-config
     makeWrapper
   ];
-
-  buildInputs = [
-    glib
-    gst_all_1.gstreamer
-    gst_all_1.gst-plugins-base
-  ] ++ gstPlugins;
 
   buildPhase = ''
     runHook preBuild
@@ -74,11 +56,10 @@ stdenv.mkDerivation {
     install -Dm755 vcam.sh $out/bin/vcam
 
     wrapProgram $out/bin/vcamd \
-      --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : "${gstPluginPath}"
+      --prefix PATH : "${binPath}"
 
     wrapProgram $out/bin/vcam \
-      --prefix PATH : "${binPath}:$out/bin" \
-      --prefix GST_PLUGIN_SYSTEM_PATH_1_0 : "${gstPluginPath}"
+      --prefix PATH : "${binPath}:$out/bin"
 
     runHook postInstall
   '';
