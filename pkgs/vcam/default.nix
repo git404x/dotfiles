@@ -14,7 +14,6 @@
   findutils,
   gnugrep,
   systemd,
-  python3,
 }:
 
 let
@@ -31,12 +30,11 @@ let
     findutils
     gnugrep
     systemd
-    python3
   ];
 in
 stdenv.mkDerivation {
   pname = "vcam";
-  version = "1.1.0";
+  version = "1.2.0";
   src = ./.;
 
   nativeBuildInputs = [
@@ -53,13 +51,19 @@ stdenv.mkDerivation {
     runHook preInstall
 
     install -Dm755 src/vcamd $out/bin/vcamd
+    install -Dm755 src/vcam-web $out/bin/vcam-web
     install -Dm755 vcam.sh $out/bin/vcam
+    install -Dm644 web/index.html $out/share/vcam/index.html
 
     wrapProgram $out/bin/vcamd \
       --prefix PATH : "${binPath}"
 
-    wrapProgram $out/bin/vcam \
+    wrapProgram $out/bin/vcam-web \
       --prefix PATH : "${binPath}:$out/bin"
+
+    wrapProgram $out/bin/vcam \
+      --prefix PATH : "${binPath}:$out/bin" \
+      --set VCAM_SHARE_DIR "$out/share/vcam"
 
     runHook postInstall
   '';

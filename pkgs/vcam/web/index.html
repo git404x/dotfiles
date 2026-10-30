@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VCAM Test Bench - Virtual Media Diagnostic Suite</title>
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: #11131a;
+      --card-border: #1f2330;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.2);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      background: var(--card-border);
+      color: var(--accent);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .overlay-stats {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: flex;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item {
+      display: flex;
+      gap: 6px;
+    }
+
+    .stat-val {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .select-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    select, button {
+      background: #171a24;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    select:focus, button:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: #2563eb;
+    }
+
+    button.danger {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: #fff;
+    }
+
+    button.secondary:hover {
+      background: #222634;
+    }
+
+    .vu-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .meter-bar-track {
+      height: 16px;
+      background: #0d0f14;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--card-border);
+    }
+
+    .meter-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, var(--success) 0%, var(--success) 65%, var(--warning) 85%, var(--danger) 100%);
+      transition: width 0.05s ease-out;
+    }
+
+    .meter-peak-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #fff;
+      left: 0%;
+      transition: left 0.1s ease-out;
+    }
+
+    .db-readout {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100px;
+      background: #0a0c12;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+    }
+
+    .quick-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-group">
+      <h2>VCAM DIAGNOSTIC BENCH</h2>
+      <span class="badge">Hardware & Loopback Validator</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span id="streamIndicator" class="live-dot" style="display: none;"></span>
+      <span id="streamStatusText" style="font-size: 12px; color: var(--text-muted);">STANDBY</span>
+      <button class="secondary" style="padding: 4px 10px; font-size: 11px;" onclick="shutdownServer()">Stop Server</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Left Column: Video Feed & Metrics -->
+    <div class="card">
+      <div class="card-title">
+        <span>Video Monitor</span>
+        <span id="codecInfo" style="font-size: 11px; color: var(--accent);">IDLE</span>
+      </div>
+
+      <div class="video-container">
+        <video id="videoPreview" autoplay playsinline muted></video>
+        <div class="overlay-stats">
+          <div class="stat-item">
+            <span>RES:</span>
+            <span id="statResolution" class="stat-val">-- x --</span>
+          </div>
+          <div class="stat-item">
+            <span>FPS:</span>
+            <span id="statFps" class="stat-val">--</span>
+          </div>
+          <div class="stat-item">
+            <span>FORMAT:</span>
+            <span id="statFormat" class="stat-val">YUYV</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <div class="select-group">
+          <label for="cameraSelect">Camera Device</label>
+          <select id="cameraSelect">
+            <option value="">Searching video devices...</option>
+          </select>
+        </div>
+
+        <div class="select-group" style="flex: 0 0 160px;">
+          <label>&nbsp;</label>
+          <button id="toggleStreamBtn" class="primary" onclick="toggleStream()">Start Capture</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Microphone & Audio Metrics -->
+    <div class="card">
+      <div class="card-title">
+        <span>Audio Monitor</span>
+        <span id="micClass" style="font-size: 11px; color: var(--accent);">PIPEWIRE</span>
+      </div>
+
+      <div class="select-group">
+        <label for="micSelect">Audio Input Source</label>
+        <select id="micSelect">
+          <option value="">Searching audio inputs...</option>
+        </select>
+      </div>
+
+      <div class="vu-container">
+        <label>Microphone VU Meter</label>
+        <div class="meter-bar-track">
+          <div id="vuFill" class="meter-bar-fill"></div>
+          <div id="vuPeak" class="meter-peak-line"></div>
+        </div>
+        <div class="db-readout">
+          <span>RMS: <strong id="rmsDb" style="color: var(--text);">-inf dB</strong></span>
+          <span>PEAK: <strong id="peakDb" style="color: var(--text);">-inf dB</strong></span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label>Audio Waveform Scope</label>
+        <canvas id="scopeCanvas" width="400" height="100"></canvas>
+      </div>
+
+      <div class="card-title" style="margin-top: 8px;">
+        <span>Presets & Feeds</span>
+      </div>
+      <div class="quick-bar">
+        <button class="secondary quick-btn" onclick="runCli('preset live')">Live Cam+Mic</button>
+        <button class="secondary quick-btn" onclick="runCli('preset stealth')">Stealth Noise</button>
+        <button class="secondary quick-btn" onclick="runCli('preset crt')">CRT Preset</button>
+        <button class="secondary quick-btn" onclick="runCli('preset glitch')">Glitch Preset</button>
+      </div>
+      <div class="quick-bar">
+        <button class="secondary quick-btn" onclick="runCli('feed bars')">Color Bars</button>
+        <button class="secondary quick-btn" onclick="runCli('feed shapes')">Retro Shapes</button>
+        <button class="secondary quick-btn" onclick="runCli('feed black')">Blackout</button>
+        <button class="secondary quick-btn" onclick="runCli('hw toggle')">HW Cam Toggle</button>
+      </div>
+      <div class="quick-bar">
+        <button class="secondary quick-btn" onclick="runCli('mic crt')">CRT Noise Mic</button>
+        <button class="secondary quick-btn" onclick="runCli('mic stub')">Silent Stub Mic</button>
+        <button class="secondary quick-btn" onclick="runCli('mic real')">Real Pass-thru</button>
+        <button class="secondary quick-btn" onclick="runCli('mic mute')">Mute Mic</button>
+      </div>
+      <div id="cliOutput" style="font-size: 11px; color: var(--text-muted); background: #0a0c12; padding: 8px; border-radius: 4px; border: 1px solid var(--card-border); min-height: 28px;">
+        Ready for commands.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeStream = null;
+    let audioContext = null;
+    let analyser = null;
+    let animId = null;
+    let peakHold = 0;
+    let peakHoldTimer = 0;
+    let frameCount = 0;
+    let lastFpsTime = performance.now();
+    let currentFps = 0;
+
+    const videoEl = document.getElementById('videoPreview');
+    const cameraSelect = document.getElementById('cameraSelect');
+    const micSelect = document.getElementById('micSelect');
+    const toggleBtn = document.getElementById('toggleStreamBtn');
+    const streamIndicator = document.getElementById('streamIndicator');
+    const streamStatusText = document.getElementById('streamStatusText');
+    const statRes = document.getElementById('statResolution');
+    const statFps = document.getElementById('statFps');
+    const vuFill = document.getElementById('vuFill');
+    const vuPeak = document.getElementById('vuPeak');
+    const rmsDbText = document.getElementById('rmsDb');
+    const peakDbText = document.getElementById('peakDb');
+    const canvas = document.getElementById('scopeCanvas');
+    const ctx = canvas.getContext('2d');
+    const cliOutput = document.getElementById('cliOutput');
+
+    async function enumerateDevices() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        cameraSelect.innerHTML = '';
+        micSelect.innerHTML = '';
+
+        devices.forEach(dev => {
+          if (dev.kind === 'videoinput') {
+            const opt = document.createElement('option');
+            opt.value = dev.deviceId;
+            opt.text = dev.label || `Camera ${cameraSelect.length + 1}`;
+            if (dev.label.toLowerCase().includes('hd webcam') || dev.label.toLowerCase().includes('loopback')) {
+              opt.selected = true;
+            }
+            cameraSelect.appendChild(opt);
+          } else if (dev.kind === 'audioinput') {
+            const opt = document.createElement('option');
+            opt.value = dev.deviceId;
+            opt.text = dev.label || `Microphone ${micSelect.length + 1}`;
+            if (dev.label.toLowerCase().includes('virtual') || dev.label.toLowerCase().includes('vcam')) {
+              opt.selected = true;
+            }
+            micSelect.appendChild(opt);
+          }
+        });
+
+        if (cameraSelect.options.length === 0) {
+          cameraSelect.innerHTML = '<option value="">No cameras detected</option>';
+        }
+        if (micSelect.options.length === 0) {
+          micSelect.innerHTML = '<option value="">No microphones detected</option>';
+        }
+      } catch (err) {
+        console.error('enumerateDevices error:', err);
+      }
+    }
+
+    async function startStream() {
+      stopStream();
+
+      const videoConstraints = cameraSelect.value ? {
+        deviceId: { exact: cameraSelect.value },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        frameRate: { ideal: 30 }
+      } : { width: 1280, height: 720, frameRate: 30 };
+
+      const audioConstraints = micSelect.value ? {
+        deviceId: { exact: micSelect.value },
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      } : true;
+
+      try {
+        activeStream = await navigator.mediaDevices.getUserMedia({
+          video: videoConstraints,
+          audio: audioConstraints
+        });
+
+        videoEl.srcObject = activeStream;
+        await enumerateDevices();
+        setupAudioAnalyser(activeStream);
+
+        toggleBtn.textContent = 'Stop Capture';
+        toggleBtn.className = 'danger';
+        streamIndicator.style.display = 'inline-block';
+        streamStatusText.textContent = 'ACTIVE STREAM';
+        streamStatusText.style.color = 'var(--success)';
+
+        startFpsTracker();
+      } catch (err) {
+        alert('Failed to start stream: ' + err.message);
+        console.error('getUserMedia error:', err);
+      }
+    }
+
+    function stopStream() {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        activeStream = null;
+      }
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close();
+        audioContext = null;
+      }
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+
+      videoEl.srcObject = null;
+      toggleBtn.textContent = 'Start Capture';
+      toggleBtn.className = 'primary';
+      streamIndicator.style.display = 'none';
+      streamStatusText.textContent = 'STANDBY';
+      streamStatusText.style.color = 'var(--text-muted)';
+      statRes.textContent = '-- x --';
+      statFps.textContent = '--';
+      vuFill.style.width = '0%';
+      vuPeak.style.left = '0%';
+      rmsDbText.textContent = '-inf dB';
+      peakDbText.textContent = '-inf dB';
+
+      ctx.fillStyle = '#0a0c12';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function toggleStream() {
+      if (activeStream) stopStream();
+      else startStream();
+    }
+
+    function setupAudioAnalyser(stream) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+      const source = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.3;
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const timeData = new Uint8Array(bufferLength);
+
+      function drawScope() {
+        if (!analyser) return;
+        animId = requestAnimationFrame(drawScope);
+
+        analyser.getByteTimeDomainData(timeData);
+
+        let sum = 0;
+        let peak = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const val = (timeData[i] - 128) / 128;
+          const abs = Math.abs(val);
+          if (abs > peak) peak = abs;
+          sum += val * val;
+        }
+
+        const rms = Math.sqrt(sum / bufferLength);
+        const rmsDb = rms > 0.00001 ? 20 * Math.log10(rms) : -100;
+        const peakDb = peak > 0.00001 ? 20 * Math.log10(peak) : -100;
+
+        const vuPercent = Math.max(0, Math.min(100, ((rmsDb + 60) / 60) * 100));
+        vuFill.style.width = vuPercent + '%';
+
+        if (peakDb > peakHold || performance.now() - peakHoldTimer > 1000) {
+          peakHold = peakDb;
+          peakHoldTimer = performance.now();
+        }
+        const peakPercent = Math.max(0, Math.min(100, ((peakHold + 60) / 60) * 100));
+        vuPeak.style.left = peakPercent + '%';
+
+        rmsDbText.textContent = `${rmsDb.toFixed(1)} dB`;
+        peakDbText.textContent = `${peakDb.toFixed(1)} dB`;
+
+        ctx.fillStyle = '#0a0c12';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#3b82f6';
+        ctx.beginPath();
+
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = timeData[i] / 128.0;
+          const y = (v * canvas.height) / 2;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        ctx.stroke();
+      }
+
+      drawScope();
+    }
+
+    function startFpsTracker() {
+      function checkStats() {
+        if (!activeStream) return;
+
+        if (videoEl.videoWidth && videoEl.videoHeight) {
+          statRes.textContent = `${videoEl.videoWidth} x ${videoEl.videoHeight}`;
+        }
+
+        frameCount++;
+        const now = performance.now();
+        const delta = now - lastFpsTime;
+        if (delta >= 1000) {
+          currentFps = Math.round((frameCount * 1000) / delta);
+          statFps.textContent = currentFps;
+          frameCount = 0;
+          lastFpsTime = now;
+        }
+
+        requestAnimationFrame(checkStats);
+      }
+      requestAnimationFrame(checkStats);
+    }
+
+    async function runCli(command) {
+      cliOutput.textContent = `Running: vcam ${command}...`;
+      try {
+        const resp = await fetch('/api/cli', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cmd: command })
+        });
+        const text = await resp.text();
+        try {
+          const data = JSON.parse(text);
+          cliOutput.textContent = data.ok ? `Success: ${data.stdout || command}` : `Error: ${data.err || data.stderr}`;
+        } catch {
+          cliOutput.textContent = `Response: ${text.substring(0, 100)}`;
+        }
+      } catch (err) {
+        cliOutput.textContent = `Server communication error: ${err.message}`;
+      }
+    }
+
+    async function shutdownServer() {
+      if (confirm('Stop the diagnostic web server?')) {
+        try {
+          await fetch('/api/quit', { method: 'POST' });
+        } catch {}
+        stopStream();
+        document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #9ca3af; font-family: monospace;"><h3>Test bench server stopped.</h3><p style="margin-top: 10px;">You can close this tab.</p></div>';
+      }
+    }
+
+    navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+    enumerateDevices();
+  </script>
+</body>
+</html>

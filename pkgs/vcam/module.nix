@@ -61,7 +61,7 @@ in
     # kernel loopback camera device
     boot.kernelModules = [ "v4l2loopback" ];
     boot.extraModprobeConfig = ''
-      options v4l2loopback devices=1 video_nr=${toString cfg.deviceNr} card_label="${cfg.webcamLabel}" exclusive_caps=1 max_buffers=2
+      options v4l2loopback devices=1 video_nr=${toString cfg.deviceNr} card_label="${cfg.webcamLabel}" exclusive_caps=0 max_buffers=2
     '';
 
     # blacklist physical webcam driver on boot for hardware privacy if configured
