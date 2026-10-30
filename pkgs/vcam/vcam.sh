@@ -344,7 +344,7 @@ launch_test_bench() {
     exit 1
   fi
 
-  if pgrep -x "vcam-web" >/dev/null 2>&1; then
+  if pgrep -f "vcam-web" >/dev/null 2>&1; then
     notify low "Test Bench" "Server running on http://localhost:8080"
     echo "Test bench server running at: http://localhost:8080"
   else
@@ -361,8 +361,8 @@ launch_test_bench() {
 }
 
 stop_test_bench() {
-  if pgrep -x "vcam-web" >/dev/null 2>&1; then
-    pkill -x "vcam-web" 2>/dev/null || true
+  if pgrep -f "vcam-web" >/dev/null 2>&1; then
+    pkill -f "vcam-web" 2>/dev/null || true
     notify low "Test Bench" "Server stopped"
     echo "Test bench server stopped."
   else
