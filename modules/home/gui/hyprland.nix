@@ -21,6 +21,8 @@ in
     powermenu
     cage-run
     cage-launcher
+  ] ++ [
+    pkgs.vcam
   ];
 
   wayland.windowManager.hyprland = {
@@ -207,9 +209,11 @@ in
         [ "mainMod" "B" "exec_cmd('${cmdBrowser}')" ]
         [ "mainMod" "P" "exec_cmd('${cmdPowermenu}')" ]
 
-        # Clipboard & screen
+        # Clipboard & screen & camera
         [ "mainMod" "V" "exec_cmd('clipboard --manage')" ]
         [ "mainMod" "C" "exec_cmd('clipboard --clear')" ]
+        [ "shiftMod" "V" "exec_cmd('vcam')" ]
+        [ "shiftMod" "C" "exec_cmd('vcam hw toggle')" ]
         [ "mainMod" "PRINT" "exec_cmd('screenshot --region')" ]
         [ "" "PRINT" "exec_cmd('screenshot --full')" ]
         [ "shiftMod" "R" "exec_cmd('record-screen --region')" ]

@@ -15,4 +15,5 @@ final: prev: {
   prism-launcher-mod = final.callPackage ./prism-launcher/default.nix {
     src = inputs.prism-launcher;
   };
+  vcam = final.callPackage ./vcam/default.nix { };
 }
