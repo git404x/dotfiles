@@ -354,11 +354,12 @@ launch_test_bench() {
   fi
 
   # check if server is already running
-  if pgrep -f "python.*vcam-test.*serve.py" >/dev/null 2>&1; then
-    notify normal "VCAM Test Bench" "Test server already running at http://localhost:8080"
+  if pgrep -f "python.*serve.py" >/dev/null 2>&1; then
+    notify normal "VCAM Test Bench" "Test server running at http://localhost:8080"
     echo "Test server running at: http://localhost:8080"
   else
-    ( cd "$TEST_DIR" && python3 serve.py >/dev/null 2>&1 ) &
+    nohup python3 "$TEST_DIR/serve.py" >/dev/null 2>&1 &
+    disown || true
     sleep 0.5
     notify normal "VCAM Test Bench" "Launched test bench at http://localhost:8080"
     echo "Launched test bench at: http://localhost:8080"
