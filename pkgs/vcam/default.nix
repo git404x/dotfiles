@@ -6,13 +6,13 @@
   glib,
   gst_all_1,
   pipewire,
-  pulseaudio,
   ffmpeg,
   socat,
   jq,
   fuzzel,
   libnotify,
   kmod,
+  psmisc,
   coreutils,
   findutils,
   gnugrep,
@@ -32,13 +32,13 @@ let
 
   binPath = lib.makeBinPath [
     pipewire
-    pulseaudio
     ffmpeg
     socat
     jq
     fuzzel
     libnotify
     kmod
+    psmisc
     coreutils
     findutils
     gnugrep
@@ -84,7 +84,7 @@ stdenv.mkDerivation {
   '';
 
   meta = with lib; {
-    description = "Ultra-low latency virtual webcam and privacy microphone suite";
+    description = "Virtual webcam and privacy microphone suite";
     platforms = platforms.linux;
     mainProgram = "vcam";
   };

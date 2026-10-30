@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# -----------------------------------------------------------------------------
-# vcam - Unified Virtual Webcam & Privacy Microphone Control
-# -----------------------------------------------------------------------------
+# vcam - virtual camera and privacy microphone controller
 
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCK="${VCAM_SOCKET:-${RUNTIME_DIR}/vcam.sock}"
 DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
-VIRTUAL_SINK="VirtualMicSink"
+MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
+MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
 UNIT="vcam.service"
+DRIVER="/sys/bus/usb/drivers/uvcvideo"
 
 notify() {
   local urgency="${1:-normal}"
@@ -23,8 +23,9 @@ notify() {
 send_ipc() {
   local cmd="$*"
   if [ ! -S "$SOCK" ]; then
-    # Auto-start user daemon if enabled
-    if systemctl --user is-enabled "$UNIT" >/dev/null 2>&1; then
+    if systemctl --user is-active "$UNIT" >/dev/null 2>&1; then
+      sleep 0.3
+    elif systemctl --user is-enabled "$UNIT" >/dev/null 2>&1; then
       systemctl --user start "$UNIT" >/dev/null 2>&1 || true
       sleep 0.5
     fi
@@ -35,51 +36,39 @@ send_ipc() {
     return 0
   fi
 
-  printf '%s\n' "$cmd" | socat -t 3 - "UNIX-CONNECT:$SOCK" 2>/dev/null || echo '{"ok":false,"err":"IPC connection failed"}'
+  printf '%s\n' "$cmd" | socat -t 2 - "UNIX-CONNECT:$SOCK" 2>/dev/null || echo '{"ok":false,"err":"ipc connection failed"}'
 }
 
 field() {
   jq -r "$1 // empty" 2>/dev/null || true
 }
 
-# -----------------------------------------------------------------------------
-# PipeWire Virtual Microphone Subsystem
-# -----------------------------------------------------------------------------
-
-setup_virtual_mic() {
-  if ! pactl list sinks short 2>/dev/null | grep -q "$VIRTUAL_SINK"; then
-    pactl load-module module-null-sink \
-      sink_name="$VIRTUAL_SINK" \
-      sink_properties=device.description="Virtual_Microphone" >/dev/null 2>&1 || true
-  fi
-}
+# audio stream management
 
 kill_audio_feed() {
-  pkill -f "pw-loopback.*${VIRTUAL_SINK}" 2>/dev/null || true
-  pkill -f "ffmpeg.*${VIRTUAL_SINK}" 2>/dev/null || true
+  pkill -f "pw-loopback.*${MIC_SINK}" 2>/dev/null || true
+  pkill -f "pw-play.*${MIC_SINK}" 2>/dev/null || true
+  pkill -f "ffmpeg.*${MIC_SINK}" 2>/dev/null || true
 }
 
 set_mic_real() {
   kill_audio_feed
-  setup_virtual_mic
-  pw-loopback -m '[FL FR]' --capture-props='media.class=Audio/Source' --playback-props="node.target=$VIRTUAL_SINK" >/dev/null 2>&1 &
-  notify low "Virtual Microphone" "Switched to Real Microphone Pass-through"
+  pw-loopback -m '[FL FR]' --capture-props='media.class=Audio/Source' --playback-props="node.target=$MIC_SINK" >/dev/null 2>&1 &
+  notify low "microphone" "switched to real microphone"
 }
 
 set_mic_stub() {
   kill_audio_feed
-  setup_virtual_mic
-  # Ultra-low level pink noise (-60dB): inaudible to humans, prevents WebRTC VAD disconnects
-  ffmpeg -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.0005" -f pulse "$VIRTUAL_SINK" >/dev/null 2>&1 &
-  notify low "Virtual Microphone" "Silent Stub Active (Inaudible Privacy)"
+  # ultra-low pink noise carrier (-60db) satisfies webrtc vad without human audibility
+  ffmpeg -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.0005" -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 &
+  notify low "microphone" "silent stub active (inaudible vad-active)"
 }
 
 set_mic_crt() {
   kill_audio_feed
-  setup_virtual_mic
-  # CRT monitor electrical buzz + radio static simulation
-  ffmpeg -nostdin -re -f lavfi -i "anoisesrc=c=white:r=48000:a=0.03,volume=0.2" -f pulse "$VIRTUAL_SINK" >/dev/null 2>&1 &
-  notify low "Virtual Microphone" "CRT Interference Static Active"
+  # electrical hum and static interference
+  ffmpeg -nostdin -re -f lavfi -i "anoisesrc=c=white:r=48000:a=0.03,volume=0.2" -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 &
+  notify low "microphone" "crt interference static active"
 }
 
 set_mic_video() {
@@ -89,33 +78,27 @@ set_mic_video() {
     return 0
   fi
 
-  # Check if file has an audio stream
-  if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" | grep -q "codec_type=audio"; then
+  if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" 2>/dev/null | grep -q "codec_type=audio"; then
     kill_audio_feed
-    setup_virtual_mic
-    ffmpeg -nostdin -re -stream_loop -1 -i "$file" -vn -f pulse "$VIRTUAL_SINK" >/dev/null 2>&1 &
-    notify low "Virtual Microphone" "Video Audio Track Routed"
+    ffmpeg -nostdin -re -stream_loop -1 -i "$file" -vn -f wav - 2>/dev/null | pw-play --target="$MIC_SINK" - >/dev/null 2>&1 &
+    notify low "microphone" "video audio soundtrack routed"
   else
-    # Fallback to silent stub if video lacks audio track
     set_mic_stub
   fi
 }
 
 set_mic_mute() {
   kill_audio_feed
-  notify low "Virtual Microphone" "Microphone Muted (Zero Signal)"
+  notify low "microphone" "muted"
 }
 
-# -----------------------------------------------------------------------------
-# Video Feed Subsystem
-# -----------------------------------------------------------------------------
+# video feed management
 
 set_feed_real() {
-  # If uvcvideo is not loaded, attempt to enable it via passwordless sudo
   if ! lsmod | grep -q "uvcvideo"; then
-    notify normal "Hardware Camera" "Enabling uvcvideo kernel driver..."
+    notify normal "hardware camera" "enabling uvcvideo driver..."
     sudo modprobe uvcvideo >/dev/null 2>&1 || true
-    sleep 1.2
+    sleep 1.0
   fi
 
   local resp
@@ -123,9 +106,9 @@ set_feed_real() {
   local ok
   ok=$(printf '%s' "$resp" | field '.ok')
   if [ "$ok" = "true" ]; then
-    notify normal "Virtual Camera" "Feed: Real Physical Webcam"
+    notify normal "virtual camera" "feed: real camera"
   else
-    notify critical "Virtual Camera Failed" "$(printf '%s' "$resp" | field '.err')"
+    notify critical "virtual camera failed" "$(printf '%s' "$resp" | field '.err')"
   fi
   printf '%s\n' "$resp"
 }
@@ -133,21 +116,35 @@ set_feed_real() {
 set_feed_black() {
   local resp
   resp=$(send_ipc "feed black")
-  notify normal "Virtual Camera" "Feed: Blackout (Privacy)"
+  notify normal "virtual camera" "feed: blackout"
+  printf '%s\n' "$resp"
+}
+
+set_feed_smpte() {
+  local resp
+  resp=$(send_ipc "feed smpte")
+  notify normal "virtual camera" "feed: smpte color bars"
   printf '%s\n' "$resp"
 }
 
 set_feed_glitch() {
   local resp
   resp=$(send_ipc "feed glitch")
-  notify normal "Virtual Camera" "Feed: Glitch / SMPTE Test Pattern"
+  notify normal "virtual camera" "feed: digital glitch"
+  printf '%s\n' "$resp"
+}
+
+set_feed_crt() {
+  local resp
+  resp=$(send_ipc "feed crt")
+  notify normal "virtual camera" "feed: crt scanlines"
   printf '%s\n' "$resp"
 }
 
 set_feed_file() {
   local file="${1:-}"
   if [ -z "$file" ] || [ ! -f "$file" ]; then
-    echo "Error: Video file not found: $file" >&2
+    echo "error: file not found: $file" >&2
     exit 1
   fi
   local abs_file
@@ -157,33 +154,51 @@ set_feed_file() {
   local ok
   ok=$(printf '%s' "$resp" | field '.ok')
   if [ "$ok" = "true" ]; then
-    notify normal "Virtual Camera" "Looping: $(basename "$abs_file")"
+    notify normal "virtual camera" "looping: $(basename "$abs_file")"
   else
-    notify critical "Virtual Camera Failed" "$(printf '%s' "$resp" | field '.err')"
+    notify critical "virtual camera failed" "$(printf '%s' "$resp" | field '.err')"
   fi
   printf '%s\n' "$resp"
 }
 
-# -----------------------------------------------------------------------------
-# Hardware Camera Toggle
-# -----------------------------------------------------------------------------
+# hardware power toggle
 
-hw_enable() {
-  if sudo modprobe uvcvideo; then
-    notify normal "Camera Driver" "uvcvideo driver enabled"
+hw_disable() {
+  send_ipc "feed black" >/dev/null 2>&1 || true
+  sleep 0.2
+
+  if lsmod | grep -q "uvcvideo"; then
+    for dev in "$DRIVER"/*:*; do
+      if [ -e "$dev" ]; then
+        basename "$dev" | sudo tee "$DRIVER/unbind" >/dev/null 2>&1 || true
+      fi
+    done
+    sudo fuser -k -9 /dev/video* /dev/media* >/dev/null 2>&1 || true
+    sleep 0.4
+
+    if sudo modprobe -r uvcvideo 2>/dev/null; then
+      notify normal "camera disabled" "hardware camera off"
+    else
+      systemctl --user stop wireplumber.service >/dev/null 2>&1 || true
+      sleep 0.3
+      if sudo modprobe -r uvcvideo 2>/dev/null; then
+        notify normal "camera disabled" "forced unload"
+      else
+        notify critical "camera disable failed" "driver module locked"
+      fi
+      systemctl --user start wireplumber.service >/dev/null 2>&1 || true
+    fi
   else
-    notify critical "Camera Driver" "Failed to load uvcvideo"
+    notify normal "camera disabled" "driver not loaded"
   fi
 }
 
-hw_disable() {
-  # Switch feed to black before pulling hardware device
-  send_ipc "feed black" >/dev/null 2>&1 || true
-  sleep 0.2
-  if sudo modprobe -r uvcvideo 2>/dev/null; then
-    notify normal "Camera Driver" "uvcvideo driver disabled"
+hw_enable() {
+  if sudo modprobe uvcvideo; then
+    sleep 0.5
+    notify normal "camera enabled" "hardware camera active"
   else
-    notify critical "Camera Driver" "Could not unload uvcvideo (in use)"
+    notify critical "camera enable failed" "failed to load uvcvideo"
   fi
 }
 
@@ -195,9 +210,7 @@ hw_toggle() {
   fi
 }
 
-# -----------------------------------------------------------------------------
-# Preset Combos
-# -----------------------------------------------------------------------------
+# preset combinations
 
 apply_preset() {
   local preset="$1"
@@ -233,96 +246,25 @@ apply_preset() {
       set_feed_glitch
       set_mic_crt
       ;;
+    crt)
+      set_feed_crt
+      set_mic_crt
+      ;;
     off)
       set_feed_black
       set_mic_mute
       ;;
     *)
-      echo "Unknown preset '$preset'. Choose: live, stealth, playback, privacy, glitch, off." >&2
+      echo "unknown preset '$preset'" >&2
       exit 1
       ;;
   esac
 }
 
-# -----------------------------------------------------------------------------
-# Fuzzel GUI Menu
-# -----------------------------------------------------------------------------
-
-gui_picker() {
-  # Locate video directories dynamically
-  local search_dirs=()
-  [ -d "$DEFAULT_VIDEO_DIR" ] && search_dirs+=("$DEFAULT_VIDEO_DIR")
-  [ -d "${XDG_VIDEOS_DIR:-$HOME/Videos}" ] && search_dirs+=("${XDG_VIDEOS_DIR:-$HOME/Videos}")
-
-  local menu=(
-    "★ Preset: Live (Webcam + Real Mic)"
-    "★ Preset: Stealth (Video File + Silent Stub Mic)"
-    "★ Preset: Playback (Video File + Video Audio)"
-    "★ Preset: Privacy (Blackout + Silent Stub Mic)"
-    "★ Preset: Glitch (Test Pattern + CRT Noise)"
-    "📹 Cam: Real Webcam"
-    "📹 Cam: Blackout"
-    "📹 Cam: Glitch Pattern"
-    "📹 Cam: Choose Video File..."
-    "🎙️ Mic: Real Microphone"
-    "🎙️ Mic: Silent Stub (Inaudible Privacy)"
-    "🎙️ Mic: CRT Interference Noise"
-    "🎙️ Mic: Full Mute"
-    "⚡ Hardware: Toggle Physical Webcam Power"
-  )
-
-  local sel
-  sel=$(printf '%s\n' "${menu[@]}" | fuzzel --dmenu --prompt "vcam > " || true)
-  [ -z "$sel" ] && exit 0
-
-  case "$sel" in
-    "★ Preset: Live"*)
-      apply_preset live
-      ;;
-    "★ Preset: Stealth"*)
-      gui_select_video "stealth"
-      ;;
-    "★ Preset: Playback"*)
-      gui_select_video "playback"
-      ;;
-    "★ Preset: Privacy"*)
-      apply_preset privacy
-      ;;
-    "★ Preset: Glitch"*)
-      apply_preset glitch
-      ;;
-    "📹 Cam: Real Webcam")
-      set_feed_real
-      ;;
-    "📹 Cam: Blackout")
-      set_feed_black
-      ;;
-    "📹 Cam: Glitch Pattern")
-      set_feed_glitch
-      ;;
-    "📹 Cam: Choose Video File...")
-      gui_select_video "feed"
-      ;;
-    "🎙️ Mic: Real Microphone")
-      set_mic_real
-      ;;
-    "🎙️ Mic: Silent Stub"*)
-      set_mic_stub
-      ;;
-    "🎙️ Mic: CRT Interference"*)
-      set_mic_crt
-      ;;
-    "🎙️ Mic: Full Mute")
-      set_mic_mute
-      ;;
-    "⚡ Hardware: Toggle Physical Webcam Power")
-      hw_toggle
-      ;;
-  esac
-}
+# clean fuzzel gui menu
 
 gui_select_video() {
-  local action="$1"
+  local target_action="$1"
   local search_dirs=()
   [ -d "$DEFAULT_VIDEO_DIR" ] && search_dirs+=("$DEFAULT_VIDEO_DIR")
   [ -d "${XDG_VIDEOS_DIR:-$HOME/Videos}" ] && search_dirs+=("${XDG_VIDEOS_DIR:-$HOME/Videos}")
@@ -336,137 +278,222 @@ gui_select_video() {
   fi
 
   if [ ${#files[@]} -eq 0 ]; then
-    notify normal "Virtual Camera" "No videos found in $DEFAULT_VIDEO_DIR"
+    notify normal "virtual camera" "no videos found in $DEFAULT_VIDEO_DIR"
     return 0
   fi
 
   local file_sel
-  file_sel=$(printf '%s\n' "${files[@]}" | fuzzel --dmenu --prompt "select video > " || true)
+  file_sel=$(printf '%s\n' "${files[@]}" | fuzzel --dmenu --prompt "video > " || true)
   [ -z "$file_sel" ] && exit 0
 
-  case "$action" in
-    feed)
-      set_feed_file "$file_sel"
-      ;;
-    stealth)
-      apply_preset stealth "$file_sel"
-      ;;
-    playback)
-      apply_preset playback "$file_sel"
+  case "$target_action" in
+    feed) set_feed_file "$file_sel" ;;
+    stealth) apply_preset stealth "$file_sel" ;;
+    playback) apply_preset playback "$file_sel" ;;
+  esac
+}
+
+gui_menu_presets() {
+  local opts=(
+    "live: webcam + real microphone"
+    "stealth: video file + silent stub"
+    "playback: video file + audio track"
+    "privacy: blackout + silent stub"
+    "crt retro: crt scanlines + crt hum"
+    "glitch: digital glitch + crt noise"
+    "off: blackout + mute"
+    "< back"
+  )
+  local sel
+  sel=$(printf '%s\n' "${opts[@]}" | fuzzel --dmenu --prompt "preset > " || true)
+  [ -z "$sel" ] && exit 0
+
+  case "$sel" in
+    "live:"*) apply_preset live ;;
+    "stealth:"*) gui_select_video "stealth" ;;
+    "playback:"*) gui_select_video "playback" ;;
+    "privacy:"*) apply_preset privacy ;;
+    "crt retro:"*) apply_preset crt ;;
+    "glitch:"*) apply_preset glitch ;;
+    "off:"*) apply_preset off ;;
+    "< back") gui_main ;;
+  esac
+}
+
+gui_menu_feeds() {
+  local opts=(
+    "real camera"
+    "video file loop..."
+    "crt scanline effect"
+    "digital glitch effect"
+    "blackout"
+    "smpte color bars"
+    "< back"
+  )
+  local sel
+  sel=$(printf '%s\n' "${opts[@]}" | fuzzel --dmenu --prompt "feed > " || true)
+  [ -z "$sel" ] && exit 0
+
+  case "$sel" in
+    "real camera") set_feed_real ;;
+    "video file loop...") gui_select_video "feed" ;;
+    "crt scanline effect") set_feed_crt ;;
+    "digital glitch effect") set_feed_glitch ;;
+    "blackout") set_feed_black ;;
+    "smpte color bars") set_feed_smpte ;;
+    "< back") gui_main ;;
+  esac
+}
+
+gui_menu_mics() {
+  local opts=(
+    "real microphone"
+    "silent stub (inaudible vad-active)"
+    "crt electrical static"
+    "video soundtrack..."
+    "mute"
+    "< back"
+  )
+  local sel
+  sel=$(printf '%s\n' "${opts[@]}" | fuzzel --dmenu --prompt "microphone > " || true)
+  [ -z "$sel" ] && exit 0
+
+  case "$sel" in
+    "real microphone") set_mic_real ;;
+    "silent stub"*) set_mic_stub ;;
+    "crt electrical static") set_mic_crt ;;
+    "video soundtrack...") gui_select_video "playback" ;;
+    "mute") set_mic_mute ;;
+    "< back") gui_main ;;
+  esac
+}
+
+gui_main() {
+  local categories=(
+    "presets"
+    "camera feeds"
+    "microphone feeds"
+    "hardware power toggle"
+    "status"
+  )
+  local sel
+  sel=$(printf '%s\n' "${categories[@]}" | fuzzel --dmenu --prompt "vcam > " || true)
+  [ -z "$sel" ] && exit 0
+
+  case "$sel" in
+    "presets") gui_menu_presets ;;
+    "camera feeds") gui_menu_feeds ;;
+    "microphone feeds") gui_menu_mics ;;
+    "hardware power toggle") hw_toggle ;;
+    "status")
+      local st
+      st=$(send_ipc "status")
+      notify normal "vcam status" "$st"
       ;;
   esac
 }
 
-# -----------------------------------------------------------------------------
-# CLI Entrypoint & Argument Parsing
-# -----------------------------------------------------------------------------
+# cli argument handling
 
 usage() {
   cat <<'EOF'
-Usage: vcam [command] [options]
+usage: vcam [options] [command] [args]
 
-Commands:
-  gui / menu             Launch interactive Fuzzel controller
-  status                 Show current feed and pipeline information
-
-Video Feed:
-  feed real              Switch to physical webcam
-  feed file <path>       Switch to seamlessly looping video file
-  feed black             Switch to blackout frame
-  feed glitch            Switch to SMPTE test pattern
-
-Microphone:
-  mic real               Route physical microphone to Virtual_Microphone
-  mic stub               Inaudible pink noise (prevents VAD disconnects)
-  mic crt                CRT monitor static and electrical hum
-  mic video <path>       Route video audio track to Virtual_Microphone
-  mic mute               Mute virtual microphone
-
-Preset Combos:
-  preset live            Real Webcam + Real Microphone
-  preset stealth [file]  Video File + Silent Stub Mic
-  preset playback [file] Video File + Video Audio Track
-  preset privacy         Blackout + Silent Stub Mic
-  preset glitch          Glitch Pattern + CRT Noise
-  preset off             Blackout + Full Mute
-
-Hardware:
-  hw enable              Load uvcvideo kernel driver
-  hw disable             Safely unload uvcvideo kernel driver
-  hw toggle              Toggle physical webcam power
-
-Daemon:
-  daemon start           Start background vcamd user service
-  daemon stop            Stop background vcamd user service
-  daemon restart         Restart background vcamd user service
-  daemon log             Follow daemon logs via journalctl
+options:
+  -g, --gui [category]       launch categorized fuzzel menu (presets|feeds|mics)
+  -s, --status               show pipeline and feed status
+  -f, --feed <target>        switch video feed (real|black|glitch|crt|smpte|file <path>)
+  -m, --mic <mode>           switch microphone (real|stub|crt|video <path>|mute)
+  -p, --preset <name>        apply preset (live|stealth|playback|privacy|crt|glitch|off)
+  --hw <action>              hardware camera control (toggle|enable|disable)
+  -d, --daemon <action>      daemon management (start|stop|restart|log)
+  -h, --help                 show this help
 EOF
 }
 
 if [ $# -eq 0 ]; then
-  gui_picker
+  gui_main
   exit 0
 fi
 
-case "$1" in
-  gui|menu)
-    gui_picker
-    ;;
-  status)
-    send_ipc "status"
-    ;;
-  feed)
-    shift
-    [ $# -eq 0 ] && { echo "Error: specify real, black, glitch, or file <path>" >&2; exit 1; }
-    case "$1" in
-      real) set_feed_real ;;
-      black) set_feed_black ;;
-      glitch) set_feed_glitch ;;
-      file) shift; set_feed_file "${1:-}" ;;
-      *) echo "Unknown feed '$1'" >&2; exit 1 ;;
-    esac
-    ;;
-  mic)
-    shift
-    [ $# -eq 0 ] && { echo "Error: specify real, stub, crt, video [path], or mute" >&2; exit 1; }
-    case "$1" in
-      real) set_mic_real ;;
-      stub) set_mic_stub ;;
-      crt) set_mic_crt ;;
-      video) shift; set_mic_video "${1:-}" ;;
-      mute) set_mic_mute ;;
-      *) echo "Unknown mic mode '$1'" >&2; exit 1 ;;
-    esac
-    ;;
-  preset)
-    shift
-    [ $# -eq 0 ] && { echo "Error: specify live, stealth, playback, privacy, glitch, or off" >&2; exit 1; }
-    apply_preset "$1" "${2:-}"
-    ;;
-  hw)
-    shift
-    [ $# -eq 0 ] && { echo "Error: specify enable, disable, or toggle" >&2; exit 1; }
-    case "$1" in
-      enable) hw_enable ;;
-      disable) hw_disable ;;
-      toggle) hw_toggle ;;
-      *) echo "Unknown hw command '$1'" >&2; exit 1 ;;
-    esac
-    ;;
-  daemon)
-    shift
-    [ $# -eq 0 ] && { echo "Error: specify start, stop, restart, or log" >&2; exit 1; }
-    case "$1" in
-      start|stop|restart) systemctl --user "$1" "$UNIT" ;;
-      log) journalctl --user -fu "$UNIT" ;;
-      *) echo "Unknown daemon command '$1'" >&2; exit 1 ;;
-    esac
-    ;;
-  -h|--help|help)
-    usage
-    ;;
-  *)
-    echo "Unknown command '$1'. Run 'vcam --help' for usage." >&2
-    exit 1
-    ;;
-esac
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -g|--gui|gui|menu)
+      shift
+      sub="${1:-}"
+      case "$sub" in
+        presets|preset) gui_menu_presets ;;
+        feed|feeds|camera) gui_menu_feeds ;;
+        mic|mics|microphone) gui_menu_mics ;;
+        *) gui_main ;;
+      esac
+      exit 0
+      ;;
+    -s|--status|status)
+      send_ipc "status"
+      exit 0
+      ;;
+    -f|--feed|feed)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify feed (real|black|glitch|crt|smpte|file <path>)" >&2; exit 1; }
+      case "$1" in
+        real) set_feed_real ;;
+        black) set_feed_black ;;
+        glitch) set_feed_glitch ;;
+        crt) set_feed_crt ;;
+        smpte) set_feed_smpte ;;
+        file) shift; set_feed_file "${1:-}" ;;
+        *) echo "unknown feed '$1'" >&2; exit 1 ;;
+      esac
+      exit 0
+      ;;
+    -m|--mic|mic)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify mic mode (real|stub|crt|video <path>|mute)" >&2; exit 1; }
+      case "$1" in
+        real) set_mic_real ;;
+        stub) set_mic_stub ;;
+        crt) set_mic_crt ;;
+        video) shift; set_mic_video "${1:-}" ;;
+        mute) set_mic_mute ;;
+        *) echo "unknown mic mode '$1'" >&2; exit 1 ;;
+      esac
+      exit 0
+      ;;
+    -p|--preset|preset)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify preset name" >&2; exit 1; }
+      apply_preset "$1" "${2:-}"
+      exit 0
+      ;;
+    --hw|hw)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify toggle, enable, or disable" >&2; exit 1; }
+      case "$1" in
+        toggle) hw_toggle ;;
+        enable) hw_enable ;;
+        disable) hw_disable ;;
+        *) echo "unknown hw action '$1'" >&2; exit 1 ;;
+      esac
+      exit 0
+      ;;
+    -d|--daemon|daemon)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify start, stop, restart, or log" >&2; exit 1; }
+      case "$1" in
+        start|stop|restart) systemctl --user "$1" "$UNIT" ;;
+        log) journalctl --user -fu "$UNIT" ;;
+        *) echo "unknown daemon action '$1'" >&2; exit 1 ;;
+      esac
+      exit 0
+      ;;
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "unknown option '$1'. run 'vcam --help' for usage." >&2
+      exit 1
+      ;;
+  esac
+done

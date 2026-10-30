@@ -6,11 +6,6 @@
     text = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
   };
 
-  cam-toggle = pkgs.writeShellApplication {
-    name = "cam-toggle";
-    runtimeInputs = with pkgs; [ kmod psmisc libnotify systemd ];
-    text = builtins.readFile ./cam-toggle.sh;
-  };
 
   screenshot = pkgs.writeShellApplication {
     name = "screenshot";

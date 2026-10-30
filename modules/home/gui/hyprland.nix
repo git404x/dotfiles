@@ -14,7 +14,6 @@ in
 
   home.packages = with pkgs.sysUtils; [
     start-polkit-agent
-    cam-toggle
     screenshot
     record-screen
     clipboard
@@ -212,8 +211,8 @@ in
         # Clipboard & screen & camera
         [ "mainMod" "V" "exec_cmd('clipboard --manage')" ]
         [ "mainMod" "C" "exec_cmd('clipboard --clear')" ]
-        [ "shiftMod" "V" "exec_cmd('vcam')" ]
-        [ "shiftMod" "C" "exec_cmd('vcam hw toggle')" ]
+        [ "shiftMod" "V" "exec_cmd('vcam --gui')" ]
+        [ "shiftMod" "C" "exec_cmd('vcam --hw toggle')" ]
         [ "mainMod" "PRINT" "exec_cmd('screenshot --region')" ]
         [ "" "PRINT" "exec_cmd('screenshot --full')" ]
         [ "shiftMod" "R" "exec_cmd('record-screen --region')" ]
