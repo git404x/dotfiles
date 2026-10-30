@@ -94,14 +94,14 @@ set_mic_real() {
 
 set_mic_stub() {
   kill_audio
-  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.001" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "anoisesrc=c=pink:r=48000:a=0.001" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - ) >/dev/null 2>&1 &
   echo $! > "$PID_FILE"
   notify low "Microphone" "Silent Stub"
 }
 
 set_mic_crt() {
   kill_audio
-  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "sine=frequency=60:sample_rate=48000[s];anoisesrc=c=white:r=48000:a=0.3[n];[s][n]amix=inputs=2:duration=first" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+  ( ffmpeg -loglevel error -nostdin -re -f lavfi -i "sine=frequency=60:sample_rate=48000[s];anoisesrc=c=white:r=48000:a=0.3[n];[s][n]amix=inputs=2:duration=first" -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - ) >/dev/null 2>&1 &
   echo $! > "$PID_FILE"
   notify low "Microphone" "CRT Hum & Static"
 }
@@ -115,7 +115,7 @@ set_mic_video() {
 
   if ffprobe -v error -select_streams a:0 -show_entries stream=codec_type -of default=noprint_wrappers=1 "$file" 2>/dev/null | grep "codec_type=audio" >/dev/null 2>&1; then
     kill_audio
-    ( ffmpeg -loglevel error -nostdin -re -stream_loop -1 -i "$file" -vn -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - >/dev/null 2>&1 ) &
+    ( ffmpeg -loglevel error -nostdin -re -stream_loop -1 -i "$file" -vn -f s16le -ar 48000 -ac 2 pipe:1 2>/dev/null | pw-cat -p -a --rate=48000 --channels=2 --format=s16 --target="$MIC_SINK" - ) >/dev/null 2>&1 &
     echo $! > "$PID_FILE"
     notify low "Microphone" "Video Soundtrack"
   else

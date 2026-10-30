@@ -72,7 +72,6 @@ static void send_response(int fd, int code, const char *status, const char *cont
 }
 
 static void handle_cli_request(int client_fd, const char *body) {
-    /* extract "cmd" value from simple JSON: {"cmd":"..."} */
     char cmd_arg[512] = {0};
     const char *key = strstr(body, "\"cmd\"");
     if (key) {
@@ -98,51 +97,90 @@ static void handle_cli_request(int client_fd, const char *body) {
         return;
     }
 
-    /* execute command via vcam CLI */
-    char full_cmd[1024];
-    snprintf(full_cmd, sizeof(full_cmd), "vcam %s 2>&1", cmd_arg);
-
-    FILE *fp = popen(full_cmd, "r");
-    char out_buf[4096] = {0};
-    size_t out_len = 0;
-
-    if (fp) {
-        out_len = fread(out_buf, 1, sizeof(out_buf) - 1, fp);
-        int status = pclose(fp);
-        int exit_code = WEXITSTATUS(status);
-
-        /* escape output for JSON */
-        char json_escaped[8192] = {0};
-        size_t j = 0;
-        for (size_t i = 0; i < out_len && j < sizeof(json_escaped) - 4; i++) {
-            if (out_buf[i] == '\"') {
-                json_escaped[j++] = '\\';
-                json_escaped[j++] = '\"';
-            } else if (out_buf[i] == '\n') {
-                json_escaped[j++] = '\\';
-                json_escaped[j++] = 'n';
-            } else if (out_buf[i] == '\r') {
-                /* skip */
-            } else if (out_buf[i] == '\\') {
-                json_escaped[j++] = '\\';
-                json_escaped[j++] = '\\';
-            } else {
-                json_escaped[j++] = out_buf[i];
-            }
-        }
-
-        char resp[9216];
-        int rlen = snprintf(resp, sizeof(resp),
-            "{\"ok\":%s,\"stdout\":\"%s\",\"exit\":%d}",
-            (exit_code == 0) ? "true" : "false",
-            json_escaped,
-            exit_code
-        );
-        send_response(client_fd, 200, "OK", "application/json", resp, rlen);
-    } else {
-        const char *err = "{\"ok\":false,\"err\":\"popen failed\"}";
-        send_response(client_fd, 500, "Internal Server Error", "application/json", err, strlen(err));
+    /* split command into arguments for execvp */
+    char *args[32];
+    args[0] = "vcam";
+    int argc = 1;
+    char *p = cmd_arg;
+    while (*p && argc < 30) {
+        while (*p == ' ') p++;
+        if (!*p) break;
+        args[argc++] = p;
+        while (*p && *p != ' ') p++;
+        if (*p) *p++ = '\0';
     }
+    args[argc] = NULL;
+
+    int pipefd[2];
+    if (pipe(pipefd) < 0) {
+        const char *err = "{\"ok\":false,\"err\":\"pipe failed\"}";
+        send_response(client_fd, 500, "Internal Server Error", "application/json", err, strlen(err));
+        return;
+    }
+
+    pid_t pid = fork();
+    if (pid < 0) {
+        close(pipefd[0]);
+        close(pipefd[1]);
+        const char *err = "{\"ok\":false,\"err\":\"fork failed\"}";
+        send_response(client_fd, 500, "Internal Server Error", "application/json", err, strlen(err));
+        return;
+    }
+
+    if (pid == 0) {
+        /* child process */
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        dup2(pipefd[1], STDERR_FILENO);
+        close(pipefd[1]);
+
+        execvp("vcam", args);
+        _exit(127);
+    }
+
+    /* parent process */
+    close(pipefd[1]);
+
+    int status;
+    waitpid(pid, &status, 0);
+    int exit_code = WEXITSTATUS(status);
+
+    fcntl(pipefd[0], F_SETFL, O_NONBLOCK);
+    char out_buf[4096] = {0};
+    ssize_t out_len = read(pipefd[0], out_buf, sizeof(out_buf) - 1);
+    close(pipefd[0]);
+
+    if (out_len < 0) out_len = 0;
+    out_buf[out_len] = '\0';
+
+    /* escape output for valid JSON */
+    char json_escaped[8192] = {0};
+    size_t j = 0;
+    for (ssize_t i = 0; i < out_len && j < sizeof(json_escaped) - 4; i++) {
+        if (out_buf[i] == '\"') {
+            json_escaped[j++] = '\\';
+            json_escaped[j++] = '\"';
+        } else if (out_buf[i] == '\n') {
+            json_escaped[j++] = '\\';
+            json_escaped[j++] = 'n';
+        } else if (out_buf[i] == '\r') {
+            /* skip */
+        } else if (out_buf[i] == '\\') {
+            json_escaped[j++] = '\\';
+            json_escaped[j++] = '\\';
+        } else {
+            json_escaped[j++] = out_buf[i];
+        }
+    }
+
+    char resp[9216];
+    int rlen = snprintf(resp, sizeof(resp),
+        "{\"ok\":%s,\"stdout\":\"%s\",\"exit\":%d}",
+        (exit_code == 0) ? "true" : "false",
+        json_escaped,
+        exit_code
+    );
+    send_response(client_fd, 200, "OK", "application/json", resp, rlen);
 }
 
 int main(int argc, char **argv) {
@@ -152,7 +190,6 @@ int main(int argc, char **argv) {
     if (argc >= 2) port = atoi(argv[1]);
     if (argc >= 3) html_path = argv[2];
 
-    /* fallback search paths for index.html */
     if (!html_path || access(html_path, R_OK) != 0) {
         const char *candidates[] = {
             html_path,
@@ -197,7 +234,6 @@ int main(int argc, char **argv) {
     saddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     saddr.sin_port = htons((uint16_t)port);
 
-    /* bind to port or scan next available ports */
     int bound = 0;
     for (int p = port; p < port + 20; p++) {
         saddr.sin_port = htons((uint16_t)p);
