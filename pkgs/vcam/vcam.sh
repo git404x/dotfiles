@@ -232,9 +232,12 @@ hw_is_active() {
   if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
     return 1
   fi
-  if [ -d "$DRIVER" ] && compgen -G "$DRIVER/*:1.0" >/dev/null; then
-    return 0
-  fi
+  local match
+  for match in "$DRIVER"/*:1.0; do
+    if [ -e "$match" ]; then
+      return 0
+    fi
+  done
   return 1
 }
 
