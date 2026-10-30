@@ -190,9 +190,23 @@ int main(int argc, char **argv) {
     if (argc >= 2) port = atoi(argv[1]);
     if (argc >= 3) html_path = argv[2];
 
+    char env_share_path[512] = {0};
+    const char *env_share = getenv("VCAM_SHARE_DIR");
+    if (env_share) {
+        snprintf(env_share_path, sizeof(env_share_path), "%s/index.html", env_share);
+    }
+
+    char home_profile_path[512] = {0};
+    const char *home = getenv("HOME");
+    if (home) {
+        snprintf(home_profile_path, sizeof(home_profile_path), "%s/.nix-profile/share/vcam/index.html", home);
+    }
+
     if (!html_path || access(html_path, R_OK) != 0) {
         const char *candidates[] = {
             html_path,
+            env_share_path[0] ? env_share_path : NULL,
+            home_profile_path[0] ? home_profile_path : NULL,
             "/home/px/dev/dotfiles/pkgs/vcam/web/index.html",
             "/etc/profiles/per-user/px/share/vcam/index.html",
             "../share/vcam/index.html",

@@ -59,7 +59,8 @@ stdenv.mkDerivation {
       --prefix PATH : "${binPath}"
 
     wrapProgram $out/bin/vcam-web \
-      --prefix PATH : "${binPath}:$out/bin"
+      --prefix PATH : "${binPath}:$out/bin" \
+      --set VCAM_SHARE_DIR "$out/share/vcam"
 
     wrapProgram $out/bin/vcam \
       --prefix PATH : "${binPath}:$out/bin" \

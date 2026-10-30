@@ -6,8 +6,11 @@ set -euo pipefail
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCK="${VCAM_SOCKET:-${RUNTIME_DIR}/vcam.sock}"
 DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
-SHARE_DIR="${VCAM_SHARE_DIR:-/etc/profiles/per-user/px/share/vcam}"
+SHARE_DIR="${VCAM_SHARE_DIR:-$HOME/.nix-profile/share/vcam}"
 HTML_CANDIDATE="${SHARE_DIR}/index.html"
+if [ ! -f "$HTML_CANDIDATE" ]; then
+  HTML_CANDIDATE="/etc/profiles/per-user/${USER:-px}/share/vcam/index.html"
+fi
 if [ ! -f "$HTML_CANDIDATE" ]; then
   HTML_CANDIDATE="/home/px/dev/dotfiles/pkgs/vcam/web/index.html"
 fi
