@@ -12,6 +12,4 @@
     "${dotfiles}/modules/nixos/extra"
   ];
 
-  services.vcam.enable = true;
-
 }

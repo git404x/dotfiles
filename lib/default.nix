@@ -50,6 +50,7 @@ in
       // extraArgs;
       modules = [
         { nixpkgs.pkgs = mkPkgs { inherit system; }; }
+        "${dotfiles}/pkgs/vcam/module.nix"
       ]
       ++ extraModules;
     };
