@@ -11,5 +11,10 @@
     webcamLabel = "HD WebCam";
     micName = "Virtual_Microphone";
     defaultFeed = "privacy";
+
+    hardwareControl = {
+      enable = true;
+      authMode = "polkit";
+    };
   };
 }

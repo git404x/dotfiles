@@ -82,6 +82,31 @@ in
       '';
       example = "privacy";
     };
+
+    hardwareControl = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Whether to enable physical webcam hardware power and driver control (bind/unbind/modprobe).";
+        example = true;
+      };
+
+      authMode = lib.mkOption {
+        type = lib.types.enum [
+          "polkit"
+          "video-group"
+          "sudo-nopasswd"
+        ];
+        default = "polkit";
+        description = ''
+          Authorization mechanism used to manage physical webcam driver binding and unbinding:
+          - "polkit": Delegates authorization to Polkit (pkexec), prompting via native desktop GUI agent in graphical sessions or CLI in terminal. Most secure.
+          - "video-group": Configures systemd.tmpfiles rules granting write permissions on sysfs endpoints (/sys/bus/usb/drivers/uvcvideo/{bind,unbind}) to members of the 'video' group. Requires no password for users in 'video'.
+          - "sudo-nopasswd": Configures minimal NOPASSWD sudoers rules for modprobe and sysfs tee endpoints.
+        '';
+        example = "polkit";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -93,6 +118,29 @@ in
 
     # blacklist physical webcam driver on boot for hardware privacy if configured
     boot.blacklistedKernelModules = lib.mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
+
+    # minimal scope passwordless sudo rules strictly if configured
+    security.sudo.extraRules = lib.mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "sudo-nopasswd") [
+      {
+        groups = [ "wheel" ];
+        commands = [
+          {
+            command = "${pkgs.vcam}/bin/vcam-hw";
+            options = [ "NOPASSWD" ];
+          }
+          {
+            command = "/run/current-system/sw/bin/vcam-hw";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
+
+    # sysfs video group write permissions for hardware unbind/bind if configured
+    systemd.tmpfiles.rules = lib.mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "video-group") [
+      "z /sys/bus/usb/drivers/uvcvideo/bind 0664 root video - -"
+      "z /sys/bus/usb/drivers/uvcvideo/unbind 0664 root video - -"
+    ];
 
     # declarative pipewire virtual microphone source and sink
     services.pipewire.extraConfig.pipewire."99-vcam-mic" = {
