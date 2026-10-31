@@ -240,12 +240,10 @@ hw_control() {
     fi
   fi
 
-  # locate dedicated vcam-hw binary
-  local hw_bin="vcam-hw"
-  if command -v vcam-hw >/dev/null 2>&1; then
-    hw_bin="$(command -v vcam-hw)"
-  elif [ -x "/run/current-system/sw/bin/vcam-hw" ]; then
-    hw_bin="/run/current-system/sw/bin/vcam-hw"
+  # locate dedicated vcam-hw binary (prefer system path for exact polkit policy match)
+  local hw_bin="/run/current-system/sw/bin/vcam-hw"
+  if [ ! -x "$hw_bin" ]; then
+    hw_bin="$(command -v vcam-hw 2>/dev/null || echo "vcam-hw")"
   fi
 
   # 2. passwordless sudo check

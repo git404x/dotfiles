@@ -48,6 +48,9 @@ int main(int argc, char **argv) {
         close(fd);
         return 0;
     } else if (strcmp(argv[1], "modprobe") == 0) {
+        if (access("/run/current-system/sw/bin/modprobe", X_OK) == 0) {
+            execl("/run/current-system/sw/bin/modprobe", "modprobe", "uvcvideo", NULL);
+        }
         execlp("modprobe", "modprobe", "uvcvideo", NULL);
         perror("vcam-hw: exec modprobe");
         return 1;

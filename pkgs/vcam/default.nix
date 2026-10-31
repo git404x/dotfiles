@@ -55,7 +55,7 @@ stdenv.mkDerivation {
     install -Dm755 src/vcam-hw $out/bin/vcam-hw
     install -Dm755 vcam.sh $out/bin/vcam
     install -Dm644 web/index.html $out/share/vcam/index.html
-    install -Dm644 org.nixos.vcam.policy $out/share/polkit-1/actions/org.nixos.vcam.policy
+    install -Dm644 vcam.policy $out/share/polkit-1/actions/vcam.policy
 
     wrapProgram $out/bin/vcamd \
       --prefix PATH : "${binPath}"

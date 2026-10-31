@@ -42,6 +42,7 @@ int hw_detect_camera(char *out_dev, size_t max_len, const char *loopback_dev) {
 
     if (found[0] != '\0') {
         strncpy(out_dev, found, max_len - 1);
+        out_dev[max_len - 1] = '\0';
         return 0;
     }
     return -1;
