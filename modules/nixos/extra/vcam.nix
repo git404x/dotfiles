@@ -1,4 +1,9 @@
+{ dotfiles, ... }:
 {
+  imports = [
+    "${dotfiles}/pkgs/vcam/module.nix"
+  ];
+
   services.vcam = {
     enable = true;
     blacklistOnBoot = true;

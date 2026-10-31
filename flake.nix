@@ -97,10 +97,6 @@
         };
 
       flake = {
-        nixosModules = {
-          vcam = import "${dotfiles}/pkgs/vcam/module.nix";
-        };
-
         nixosConfigurations = {
 
           vivobook = lib.mkHost {
