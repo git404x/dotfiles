@@ -228,43 +228,50 @@ hw_is_active() {
 }
 
 # elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo
-hw_sysfs_write() {
-  local target="$1"
-  local val="$2"
+hw_control() {
+  local action="$1"
+  local val="${2:-}"
 
-  # 1. direct write if sysfs node is writable by user/group
-  if [ -w "$target" ]; then
-    printf '%s\n' "$val" > "$target" 2>/dev/null && return 0
+  # 1. direct sysfs write if writable by user/group (e.g. video group mode)
+  if [ "$action" = "bind" ] || [ "$action" = "unbind" ]; then
+    local target="$DRIVER/$action"
+    if [ -w "$target" ]; then
+      printf '%s\n' "$val" > "$target" 2>/dev/null && return 0
+    fi
+  fi
+
+  # locate dedicated vcam-hw binary
+  local hw_bin="vcam-hw"
+  if command -v vcam-hw >/dev/null 2>&1; then
+    hw_bin="$(command -v vcam-hw)"
+  elif [ -x "/run/current-system/sw/bin/vcam-hw" ]; then
+    hw_bin="/run/current-system/sw/bin/vcam-hw"
   fi
 
   # 2. passwordless sudo check
   if sudo -n true 2>/dev/null; then
-    printf '%s\n' "$val" | sudo -n tee "$target" >/dev/null 2>&1 && return 0
+    if [ -n "$val" ]; then
+      sudo -n "$hw_bin" "$action" "$val" >/dev/null 2>&1 && return 0
+    else
+      sudo -n "$hw_bin" "$action" >/dev/null 2>&1 && return 0
+    fi
   fi
 
-  # 3. polkit prompt (graphical popup in wayland/x11, or terminal in cli)
+  # 3. polkit desktop GUI / terminal agent prompt
   if command -v pkexec >/dev/null 2>&1; then
-    printf '%s\n' "$val" | pkexec sh -c "cat > '$target'" 2>/dev/null && return 0
+    if [ -n "$val" ]; then
+      pkexec "$hw_bin" "$action" "$val" 2>/dev/null && return 0
+    else
+      pkexec "$hw_bin" "$action" 2>/dev/null && return 0
+    fi
   fi
 
   # 4. interactive sudo fallback
-  printf '%s\n' "$val" | sudo tee "$target" >/dev/null 2>&1 && return 0
-  return 1
-}
-
-hw_modprobe_uvc() {
-  # 1. passwordless sudo check
-  if sudo -n true 2>/dev/null; then
-    sudo -n modprobe uvcvideo >/dev/null 2>&1 && return 0
+  if [ -n "$val" ]; then
+    sudo "$hw_bin" "$action" "$val" >/dev/null 2>&1 && return 0
+  else
+    sudo "$hw_bin" "$action" >/dev/null 2>&1 && return 0
   fi
-
-  # 2. polkit
-  if command -v pkexec >/dev/null 2>&1; then
-    pkexec modprobe uvcvideo 2>/dev/null && return 0
-  fi
-
-  # 3. interactive sudo
-  sudo modprobe uvcvideo >/dev/null 2>&1 && return 0
   return 1
 }
 
@@ -277,13 +284,13 @@ hw_disable() {
   dev_bus=$(hw_find_device_bus || true)
 
   if [ -n "$dev_bus" ] && [ -d "$DRIVER/${dev_bus}:1.0" ]; then
-    hw_sysfs_write "$DRIVER/unbind" "${dev_bus}:1.0" || true
+    hw_control unbind "${dev_bus}:1.0" || true
   elif [ -d "$DRIVER" ]; then
     for dev in "$DRIVER"/*:*; do
       if [ -e "$dev" ]; then
         local name
         name="$(basename "$dev")"
-        hw_sysfs_write "$DRIVER/unbind" "$name" || true
+        hw_control unbind "$name" || true
       fi
     done
   fi
@@ -293,7 +300,7 @@ hw_disable() {
 
 hw_enable() {
   if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
-    hw_modprobe_uvc || true
+    hw_control modprobe || true
     sleep 0.3
   fi
 
@@ -301,7 +308,7 @@ hw_enable() {
   dev_bus=$(hw_find_device_bus || true)
 
   if [ -n "$dev_bus" ] && [ -d "/sys/bus/usb/devices/${dev_bus}:1.0" ]; then
-    hw_sysfs_write "$DRIVER/bind" "${dev_bus}:1.0" || true
+    hw_control bind "${dev_bus}:1.0" || true
     sleep 0.2
   fi
 

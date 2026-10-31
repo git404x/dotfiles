@@ -125,27 +125,11 @@ in
         groups = [ "wheel" ];
         commands = [
           {
-            command = "${pkgs.kmod}/bin/modprobe uvcvideo";
+            command = "${pkgs.vcam}/bin/vcam-hw";
             options = [ "NOPASSWD" ];
           }
           {
-            command = "/run/current-system/sw/bin/modprobe uvcvideo";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "${pkgs.coreutils}/bin/tee /sys/bus/usb/drivers/uvcvideo/bind";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "${pkgs.coreutils}/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/bind";
-            options = [ "NOPASSWD" ];
-          }
-          {
-            command = "/run/current-system/sw/bin/tee /sys/bus/usb/drivers/uvcvideo/unbind";
+            command = "/run/current-system/sw/bin/vcam-hw";
             options = [ "NOPASSWD" ];
           }
         ];

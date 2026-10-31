@@ -10,7 +10,11 @@ TEST_SRCS = test_bench.c web_server.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)
 TEST_TARGET = vcam-test
 
-TARGETS = $(DAEMON_TARGET) $(TEST_TARGET)
+HW_SRCS = vcam-hw.c
+HW_OBJS = $(HW_SRCS:.c=.o)
+HW_TARGET = vcam-hw
+
+TARGETS = $(DAEMON_TARGET) $(TEST_TARGET) $(HW_TARGET)
 
 all: $(TARGETS)
 
@@ -32,6 +36,9 @@ $(DAEMON_TARGET): $(DAEMON_OBJS)
 $(TEST_TARGET): $(TEST_OBJS)
 	$(CC) $(TEST_OBJS) -o $@
 
+$(HW_TARGET): $(HW_OBJS)
+	$(CC) $(HW_OBJS) -o $@
+
 %.o: %.c common.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -41,7 +48,10 @@ web_server.o: web_server.c web_server.h
 test_bench.o: test_bench.c web_server.h web_assets.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
+vcam-hw.o: vcam-hw.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(DAEMON_OBJS) $(TEST_OBJS) $(TARGETS) web_assets.h
+	rm -f $(DAEMON_OBJS) $(TEST_OBJS) $(HW_OBJS) $(TARGETS) web_assets.h
 
 .PHONY: all clean
