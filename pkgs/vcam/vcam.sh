@@ -10,7 +10,9 @@ DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
 MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
 MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
 PID_FILE="${RUNTIME_DIR}/vcam-audio.pid"
+HW_LOCK_FILE="${RUNTIME_DIR}/vcam-hw.lock"
 UNIT="vcam.service"
+DRIVER="/sys/bus/usb/drivers/uvcvideo"
 
 notify() {
   local urgency="${1:-low}"
@@ -125,6 +127,11 @@ set_mic_mute() {
 # video feed management
 
 set_feed_real() {
+  if ! hw_is_active; then
+    hw_enable
+    sleep 0.5
+  fi
+
   local resp
   resp=$(send_ipc "feed real")
   local ok
@@ -187,6 +194,129 @@ set_feed_file() {
     err=$(printf '%s' "$resp" | field '.err')
     notify critical "Virtual Camera Failed" "${err:-unknown error}"
   fi
+}
+
+# hardware webcam unbind / bind toggle
+
+hw_is_active() {
+  if ! lsmod | grep -q "uvcvideo"; then
+    return 1
+  fi
+  local match
+  for match in "$DRIVER"/*:*; do
+    if [ -e "$match" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo (terminal only)
+hw_control() {
+  local action="$1"
+
+  # locate dedicated vcam-hw binary
+  local hw_bin="/run/current-system/sw/bin/vcam-hw"
+  if [ ! -x "$hw_bin" ]; then
+    hw_bin="$(command -v vcam-hw 2>/dev/null || echo "vcam-hw")"
+  fi
+
+  # 1. direct sysfs write if writable by video group
+  if [ -w "$DRIVER/bind" ] && [ -w "$DRIVER/unbind" ]; then
+    "$hw_bin" "$action" && return 0
+  fi
+
+  # 2. passwordless sudo check
+  if sudo -n true 2>/dev/null; then
+    sudo -n "$hw_bin" "$action" && return 0
+  fi
+
+  # 3. polkit desktop GUI / terminal agent prompt
+  if command -v pkexec >/dev/null 2>&1; then
+    pkexec "$hw_bin" "$action"
+    return $?
+  fi
+
+  # 4. interactive sudo fallback strictly if a terminal is attached
+  if [ -t 0 ]; then
+    sudo "$hw_bin" "$action" && return 0
+  fi
+  return 1
+}
+
+hw_disable() {
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    exec 9>&-
+    return 0
+  fi
+
+  # switch virtual camera to privacy noise first so hardware node is released
+  send_ipc "feed privacy" >/dev/null 2>&1 || true
+  sleep 0.1
+
+  local res=0
+  if hw_control disable; then
+    notify low "Camera" "Hardware Disabled"
+  else
+    notify critical "Camera" "Failed to disable hardware"
+    res=1
+  fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
+}
+
+hw_enable() {
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    exec 9>&-
+    return 0
+  fi
+
+  local res=0
+  if hw_control enable; then
+    notify low "Camera" "Hardware Enabled"
+  else
+    notify critical "Camera" "Failed to enable hardware"
+    res=1
+  fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
+}
+
+hw_toggle() {
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    exec 9>&-
+    return 0
+  fi
+
+  local res=0
+  if hw_is_active; then
+    send_ipc "feed privacy" >/dev/null 2>&1 || true
+    sleep 0.1
+    if hw_control disable; then
+      notify low "Camera" "Hardware Disabled"
+    else
+      notify critical "Camera" "Failed to disable hardware"
+      res=1
+    fi
+  else
+    if hw_control enable; then
+      notify low "Camera" "Hardware Enabled"
+    else
+      notify critical "Camera" "Failed to enable hardware"
+      res=1
+    fi
+  fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
 }
 
 # preset combinations
@@ -333,14 +463,14 @@ gui_menu_presets() {
 
 gui_menu_feeds() {
   local opts=(
-    "real: hardware camera"
-    "privacy: analog sensor noise"
-    "glitch: digital macroblock noise"
-    "crt: retro scanline pattern"
-    "bars: standard smpte color bars"
-    "shapes: animated retro shapes"
-    "black: blackout feed"
-    "file: loop video from disk"
+    "real camera"
+    "privacy noise"
+    "digital glitch"
+    "crt scanlines"
+    "color bars"
+    "retro shapes"
+    "video file loop..."
+    "blackout"
     "< back"
   )
   local sel
@@ -348,24 +478,25 @@ gui_menu_feeds() {
   [ -z "$sel" ] && exit 0
 
   case "$sel" in
-    "real:"*) set_feed_real ;;
-    "privacy:"*) set_feed_privacy ;;
-    "glitch:"*) set_feed_glitch ;;
-    "crt:"*) set_feed_crt ;;
-    "bars:"*) set_feed_bars ;;
-    "shapes:"*) set_feed_shapes ;;
-    "black:"*) set_feed_black ;;
-    "file:"*) gui_select_video "feed" ;;
+    "real camera") set_feed_real ;;
+    "privacy noise") set_feed_privacy ;;
+    "digital glitch") set_feed_glitch ;;
+    "crt scanlines") set_feed_crt ;;
+    "color bars") set_feed_bars ;;
+    "retro shapes") set_feed_shapes ;;
+    "video file loop...") gui_select_video "feed" ;;
+    "blackout") set_feed_black ;;
     "< back") gui_main ;;
   esac
 }
 
 gui_menu_mics() {
   local opts=(
-    "real: loopback physical input"
-    "crt: 60hz mains hum + filtered static"
-    "stub: imperceptible pink noise"
-    "mute: silence"
+    "real microphone"
+    "crt hum & static"
+    "silent stub (vad active)"
+    "video soundtrack..."
+    "mute"
     "< back"
   )
   local sel
@@ -373,10 +504,30 @@ gui_menu_mics() {
   [ -z "$sel" ] && exit 0
 
   case "$sel" in
-    "real:"*) set_mic_real ;;
-    "crt:"*) set_mic_crt ;;
-    "stub:"*) set_mic_stub ;;
-    "mute:"*) set_mic_mute ;;
+    "real microphone") set_mic_real ;;
+    "crt hum & static") set_mic_crt ;;
+    "silent stub"*) set_mic_stub ;;
+    "video soundtrack...") gui_select_video "playback" ;;
+    "mute") set_mic_mute ;;
+    "< back") gui_main ;;
+  esac
+}
+
+gui_menu_hw() {
+  local opts=(
+    "toggle hardware power"
+    "enable hardware power"
+    "disable hardware power"
+    "< back"
+  )
+  local sel
+  sel=$(printf '%s\n' "${opts[@]}" | fuzzel --dmenu --prompt "hardware > " || true)
+  [ -z "$sel" ] && exit 0
+
+  case "$sel" in
+    "toggle hardware power") hw_toggle ;;
+    "enable hardware power") hw_enable ;;
+    "disable hardware power") hw_disable ;;
     "< back") gui_main ;;
   esac
 }
@@ -386,6 +537,7 @@ gui_main() {
     "presets"
     "camera feeds"
     "microphone feeds"
+    "hardware power"
     "diagnostic test bench"
     "status"
   )
@@ -397,6 +549,7 @@ gui_main() {
     "presets") gui_menu_presets ;;
     "camera feeds") gui_menu_feeds ;;
     "microphone feeds") gui_menu_mics ;;
+    "hardware power") gui_menu_hw ;;
     "diagnostic test bench") launch_test_bench ;;
     "status")
       local st
@@ -429,6 +582,10 @@ Virtual Microphone:
   Source:     $MIC_SOURCE
   Sink:       $MIC_SINK
   Mode:       $([ -f "$PID_FILE" ] && echo "Streaming" || echo "Idle/Muted")
+
+Hardware Camera:
+  Driver:     $(lsmod | grep "uvcvideo" >/dev/null 2>&1 && echo "Loaded" || echo "Unloaded")
+  Interface:  $(hw_is_active && echo "Active" || echo "Disabled/Unbound")
 EOF
 }
 
@@ -439,13 +596,14 @@ usage() {
 usage: vcam [options] [command] [args]
 
 options:
-  -g, --gui [category]       launch categorized menu (presets|feeds|mics)
+  -g, --gui [category]       launch categorized menu (presets|feeds|mics|hw)
   -s, --status               show human-readable status
   -f, --feed <target>        switch video feed (real|privacy|glitch|crt|bars|shapes|black|file <path>)
   -m, --mic <mode>           switch microphone (real|crt|stub|video <path>|mute)
   -p, --preset <name>        apply preset (live|stealth|playback|privacy|crt|glitch|shapes|off)
   -t, --test                 launch web diagnostic test bench (default: http://localhost:8090)
   --test-stop                stop diagnostic test bench server
+  --hw <action>              hardware camera control (toggle|enable|disable)
   -d, --daemon <action>      daemon management (start|stop|restart|log)
   -h, --help                 show this help
 EOF
@@ -465,6 +623,7 @@ while [ $# -gt 0 ]; do
         presets|preset) gui_menu_presets ;;
         feed|feeds|camera) gui_menu_feeds ;;
         mic|mics|microphone) gui_menu_mics ;;
+        hw|hardware) gui_menu_hw ;;
         *) gui_main ;;
       esac
       exit 0
@@ -519,6 +678,24 @@ while [ $# -gt 0 ]; do
       shift
       [ $# -eq 0 ] && { echo "error: specify preset name" >&2; exit 1; }
       apply_preset "$1" "${2:-}"
+      exit 0
+      ;;
+    --hw|hw)
+      shift
+      [ $# -eq 0 ] && { echo "error: specify toggle, enable, disable, or status" >&2; exit 1; }
+      case "$1" in
+        toggle) hw_toggle ;;
+        enable) hw_enable ;;
+        disable) hw_disable ;;
+        status)
+          if hw_is_active; then
+            echo "Hardware Camera: Active"
+          else
+            echo "Hardware Camera: Disabled"
+          fi
+          ;;
+        *) echo "unknown hw action '$1'" >&2; exit 1 ;;
+      esac
       exit 0
       ;;
     -d|--daemon|daemon)
