@@ -6,14 +6,6 @@ set -euo pipefail
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCK="${VCAM_SOCKET:-${RUNTIME_DIR}/vcam.sock}"
 DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
-SHARE_DIR="${VCAM_SHARE_DIR:-$HOME/.nix-profile/share/vcam}"
-HTML_CANDIDATE="${SHARE_DIR}/index.html"
-if [ ! -f "$HTML_CANDIDATE" ]; then
-  HTML_CANDIDATE="/etc/profiles/per-user/${USER:-px}/share/vcam/index.html"
-fi
-if [ ! -f "$HTML_CANDIDATE" ]; then
-  HTML_CANDIDATE="/home/px/dev/dotfiles/pkgs/vcam/web/index.html"
-fi
 
 MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
 MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
@@ -341,51 +333,27 @@ apply_preset() {
 # lightweight native test bench server launcher
 
 launch_test_bench() {
-  if [ ! -f "$HTML_CANDIDATE" ]; then
-    notify critical "VCAM Test Bench" "index.html not found in package"
-    echo "error: index.html not found at $HTML_CANDIDATE" >&2
-    exit 1
+  local out
+  out=$(vcam-test -d 2>&1)
+  echo "$out"
+
+  local port=8090
+  if [ -f "${RUNTIME_DIR}/vcam-test.port" ]; then
+    port=$(cat "${RUNTIME_DIR}/vcam-test.port" 2>/dev/null || echo "8090")
   fi
 
-  if pgrep -f "vcam-web" >/dev/null 2>&1 || (command -v systemctl >/dev/null 2>&1 && systemctl --user is-active --quiet vcam-web.service 2>/dev/null); then
-    notify low "Test Bench" "Server running on http://localhost:8080"
-    echo "Test bench server running at: http://localhost:8080"
-  else
-    if command -v systemd-run >/dev/null 2>&1; then
-      systemd-run --user --unit=vcam-web vcam-web 8080 "$HTML_CANDIDATE" >/dev/null 2>&1
-    else
-      nohup vcam-web 8080 "$HTML_CANDIDATE" >/dev/null 2>&1 &
-      disown || true
-    fi
-    sleep 0.4
-    notify low "Test Bench" "Server started on http://localhost:8080"
-    echo "Started test bench server at: http://localhost:8080"
-  fi
+  notify low "Test Bench" "Server active on http://localhost:$port"
 
   if command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "http://localhost:8080" >/dev/null 2>&1 || true
+    xdg-open "http://localhost:$port" >/dev/null 2>&1 || true
   fi
 }
 
 stop_test_bench() {
-  local stopped=0
-  if command -v systemctl >/dev/null 2>&1; then
-    if systemctl --user is-active --quiet vcam-web.service 2>/dev/null; then
-      systemctl --user stop vcam-web.service 2>/dev/null || true
-      stopped=1
-    fi
-  fi
-  if pgrep -f "vcam-web" >/dev/null 2>&1; then
-    pkill -f "vcam-web" 2>/dev/null || true
-    stopped=1
-  fi
-
-  if [ "$stopped" -eq 1 ]; then
-    notify low "Test Bench" "Server stopped"
-    echo "Test bench server stopped."
-  else
-    echo "Test bench server is not running."
-  fi
+  local out
+  out=$(vcam-test -s 2>&1)
+  echo "$out"
+  notify low "Test Bench" "$out"
 }
 
 # fine-tuned categorized fuzzel gui menu
@@ -589,7 +557,7 @@ options:
   -f, --feed <target>        switch video feed (real|privacy|glitch|crt|bars|shapes|black|file <path>)
   -m, --mic <mode>           switch microphone (real|crt|stub|video <path>|mute)
   -p, --preset <name>        apply preset (live|stealth|playback|privacy|crt|glitch|shapes|off)
-  -t, --test                 launch web diagnostic test bench (http://localhost:8080)
+  -t, --test                 launch web diagnostic test bench (default: http://localhost:8090)
   --test-stop                stop diagnostic test bench server
   --hw <action>              hardware camera control (toggle|enable|disable)
   -d, --daemon <action>      daemon management (start|stop|restart|log)
