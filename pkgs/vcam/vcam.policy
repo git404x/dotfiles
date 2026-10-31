@@ -2,17 +2,17 @@
 <!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <policyconfig>
-  <vendor>vcam</vendor>
+  <vendor>VCAM</vendor>
 
   <action id="vcam.hardware">
-    <description>Toggle camera hardware</description>
-    <message>Authentication required to control webcam hardware</message>
+    <description>Run VCAM Hardware Controller as root</description>
+    <message>Authentication is required to toggle physical webcam hardware</message>
     <defaults>
       <allow_any>no</allow_any>
       <allow_inactive>no</allow_inactive>
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/run/current-system/sw/bin/vcam-hw</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">@out@/bin/vcam-hw</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 </policyconfig>

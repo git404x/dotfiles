@@ -10,6 +10,7 @@ DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
 MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
 MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
 PID_FILE="${RUNTIME_DIR}/vcam-audio.pid"
+HW_LOCK_FILE="${RUNTIME_DIR}/vcam-hw.lock"
 UNIT="vcam.service"
 DRIVER="/sys/bus/usb/drivers/uvcvideo"
 
@@ -197,29 +198,12 @@ set_feed_file() {
 
 # hardware webcam unbind / bind toggle
 
-hw_find_device_bus() {
-  local dev
-  for dev in /sys/bus/usb/devices/*; do
-    if [ -f "$dev/idVendor" ] && [ "$(cat "$dev/idVendor" 2>/dev/null)" = "13d3" ]; then
-      basename "$dev"
-      return 0
-    fi
-  done
-  for dev in /sys/bus/usb/devices/*; do
-    if [ -f "$dev/product" ] && grep -qi "webcam\|camera" "$dev/product" 2>/dev/null; then
-      basename "$dev"
-      return 0
-    fi
-  done
-  return 1
-}
-
 hw_is_active() {
-  if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
+  if ! lsmod | grep -q "uvcvideo"; then
     return 1
   fi
   local match
-  for match in "$DRIVER"/*:1.0; do
+  for match in "$DRIVER"/*:*; do
     if [ -e "$match" ]; then
       return 0
     fi
@@ -230,94 +214,86 @@ hw_is_active() {
 # elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo
 hw_control() {
   local action="$1"
-  local val="${2:-}"
 
-  # 1. direct sysfs write if writable by user/group (e.g. video group mode)
-  if [ "$action" = "bind" ] || [ "$action" = "unbind" ]; then
-    local target="$DRIVER/$action"
-    if [ -w "$target" ]; then
-      printf '%s\n' "$val" > "$target" 2>/dev/null && return 0
-    fi
-  fi
-
-  # locate dedicated vcam-hw binary (prefer system path for exact polkit policy match)
+  # locate dedicated vcam-hw binary
   local hw_bin="/run/current-system/sw/bin/vcam-hw"
   if [ ! -x "$hw_bin" ]; then
     hw_bin="$(command -v vcam-hw 2>/dev/null || echo "vcam-hw")"
   fi
 
+  # 1. direct sysfs write if writable by video group
+  if [ -w "$DRIVER/bind" ] && [ -w "$DRIVER/unbind" ]; then
+    "$hw_bin" "$action" && return 0
+  fi
+
   # 2. passwordless sudo check
   if sudo -n true 2>/dev/null; then
-    if [ -n "$val" ]; then
-      sudo -n "$hw_bin" "$action" "$val" >/dev/null 2>&1 && return 0
-    else
-      sudo -n "$hw_bin" "$action" >/dev/null 2>&1 && return 0
-    fi
+    sudo -n "$hw_bin" "$action" && return 0
   fi
 
   # 3. polkit desktop GUI / terminal agent prompt
   if command -v pkexec >/dev/null 2>&1; then
-    if [ -n "$val" ]; then
-      pkexec "$hw_bin" "$action" "$val" 2>/dev/null && return 0
-    else
-      pkexec "$hw_bin" "$action" 2>/dev/null && return 0
-    fi
+    pkexec "$hw_bin" "$action" && return 0
   fi
 
   # 4. interactive sudo fallback
-  if [ -n "$val" ]; then
-    sudo "$hw_bin" "$action" "$val" >/dev/null 2>&1 && return 0
-  else
-    sudo "$hw_bin" "$action" >/dev/null 2>&1 && return 0
-  fi
+  sudo "$hw_bin" "$action" && return 0
   return 1
 }
 
 hw_disable() {
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    return 0
+  fi
+
   # switch virtual camera to privacy noise first so hardware node is released
   send_ipc "feed privacy" >/dev/null 2>&1 || true
   sleep 0.1
 
-  local dev_bus
-  dev_bus=$(hw_find_device_bus || true)
-
-  if [ -n "$dev_bus" ] && [ -d "$DRIVER/${dev_bus}:1.0" ]; then
-    hw_control unbind "${dev_bus}:1.0" || true
-  elif [ -d "$DRIVER" ]; then
-    for dev in "$DRIVER"/*:*; do
-      if [ -e "$dev" ]; then
-        local name
-        name="$(basename "$dev")"
-        hw_control unbind "$name" || true
-      fi
-    done
+  if hw_control disable; then
+    notify low "Camera" "Hardware Disabled"
+  else
+    notify critical "Camera" "Failed to disable hardware"
   fi
-
-  notify low "Camera" "Hardware Disabled"
 }
 
 hw_enable() {
-  if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
-    hw_control modprobe || true
-    sleep 0.3
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    return 0
   fi
 
-  local dev_bus
-  dev_bus=$(hw_find_device_bus || true)
-
-  if [ -n "$dev_bus" ] && [ -d "/sys/bus/usb/devices/${dev_bus}:1.0" ]; then
-    hw_control bind "${dev_bus}:1.0" || true
-    sleep 0.2
+  if hw_control enable; then
+    notify low "Camera" "Hardware Enabled"
+  else
+    notify critical "Camera" "Failed to enable hardware"
   fi
-
-  notify low "Camera" "Hardware Enabled"
 }
 
 hw_toggle() {
+  exec 9>"$HW_LOCK_FILE"
+  if ! flock -n 9; then
+    notify low "Camera" "Hardware action in progress"
+    return 0
+  fi
+
   if hw_is_active; then
-    hw_disable
+    send_ipc "feed privacy" >/dev/null 2>&1 || true
+    sleep 0.1
+    if hw_control disable; then
+      notify low "Camera" "Hardware Disabled"
+    else
+      notify critical "Camera" "Failed to disable hardware"
+    fi
   else
-    hw_enable
+    if hw_control enable; then
+      notify low "Camera" "Hardware Enabled"
+    else
+      notify critical "Camera" "Failed to enable hardware"
+    fi
   fi
 }
 
@@ -684,11 +660,18 @@ while [ $# -gt 0 ]; do
       ;;
     --hw|hw)
       shift
-      [ $# -eq 0 ] && { echo "error: specify toggle, enable, or disable" >&2; exit 1; }
+      [ $# -eq 0 ] && { echo "error: specify toggle, enable, disable, or status" >&2; exit 1; }
       case "$1" in
         toggle) hw_toggle ;;
         enable) hw_enable ;;
         disable) hw_disable ;;
+        status)
+          if hw_is_active; then
+            echo "Hardware Camera: Active"
+          else
+            echo "Hardware Camera: Disabled"
+          fi
+          ;;
         *) echo "unknown hw action '$1'" >&2; exit 1 ;;
       esac
       exit 0

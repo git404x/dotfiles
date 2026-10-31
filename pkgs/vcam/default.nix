@@ -55,7 +55,10 @@ stdenv.mkDerivation {
     install -Dm755 src/vcam-hw $out/bin/vcam-hw
     install -Dm755 vcam.sh $out/bin/vcam
     install -Dm644 web/index.html $out/share/vcam/index.html
-    install -Dm644 vcam.policy $out/share/polkit-1/actions/vcam.policy
+
+    mkdir -p $out/share/polkit-1/actions
+    substitute vcam.policy $out/share/polkit-1/actions/vcam.policy \
+      --subst-var out
 
     wrapProgram $out/bin/vcamd \
       --prefix PATH : "${binPath}"
