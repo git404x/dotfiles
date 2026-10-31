@@ -5,82 +5,111 @@
   ...
 }:
 
-with lib;
-
 let
   cfg = config.services.vcam;
 in
 {
   options.services.vcam = {
-    enable = mkEnableOption "Virtual webcam and privacy microphone suite";
+    enable = lib.mkEnableOption "Virtual webcam and privacy microphone suite";
 
-    deviceNr = mkOption {
-      type = types.int;
+    deviceNr = lib.mkOption {
+      type = lib.types.int;
       default = 10;
-      description = "Loopback video device number (/dev/videoX).";
+      description = "Video loopback device node index number allocated under /dev/videoX.";
+      example = 10;
     };
 
-    webcamLabel = mkOption {
-      type = types.str;
+    webcamLabel = lib.mkOption {
+      type = lib.types.str;
       default = "HD WebCam";
-      description = "Label of the v4l2loopback camera device.";
+      description = "Card label advertised by the v4l2loopback camera to applications and web browsers.";
+      example = "HD WebCam";
     };
 
-    micName = mkOption {
-      type = types.str;
+    micName = lib.mkOption {
+      type = lib.types.str;
       default = "Virtual_Microphone";
-      description = "Name of the PipeWire virtual microphone source.";
+      description = "Node name and description for the PipeWire virtual microphone audio source.";
+      example = "Virtual_Microphone";
     };
 
-    blacklistOnBoot = mkOption {
-      type = types.bool;
+    blacklistOnBoot = lib.mkOption {
+      type = lib.types.bool;
       default = true;
-      description = "Blacklist physical webcam driver on boot for hardware privacy.";
+      description = "Whether to blacklist the physical webcam kernel driver (uvcvideo) on system boot for hardware-level privacy.";
+      example = true;
     };
 
-    width = mkOption {
-      type = types.int;
+    width = lib.mkOption {
+      type = lib.types.int;
       default = 1280;
-      description = "Virtual camera frame width.";
+      description = "Virtual camera frame output width in pixels.";
+      example = 1280;
     };
 
-    height = mkOption {
-      type = types.int;
+    height = lib.mkOption {
+      type = lib.types.int;
       default = 720;
-      description = "Virtual camera frame height.";
+      description = "Virtual camera frame output height in pixels.";
+      example = 720;
     };
 
-    fps = mkOption {
-      type = types.int;
+    fps = lib.mkOption {
+      type = lib.types.int;
       default = 30;
-      description = "Virtual camera framerate.";
+      description = "Virtual camera stream framerate in frames per second.";
+      example = 30;
+    };
+
+    defaultFeed = lib.mkOption {
+      type = lib.types.enum [
+        "privacy"
+        "black"
+        "bars"
+        "crt"
+        "glitch"
+        "shapes"
+      ];
+      default = "privacy";
+      description = ''
+        Default video feed mode initialized when the vcamd daemon starts:
+        - "privacy": Low-level analog thermal sensor noise to prevent software blockage detection.
+        - "black": Pure black frame (Y=16, U=128, V=128 in YUYV).
+        - "bars": Standard SMPTE 7-color test pattern bars.
+        - "crt": Cathode-ray tube raster scanlines with rolling phosphor bar.
+        - "glitch": Digital macroblock chroma and luma packet distortion.
+        - "shapes": Procedural animated retro geometric shapes.
+      '';
+      example = "privacy";
     };
 
     hardwareControl = {
-      enable = mkOption {
-        type = types.bool;
+      enable = lib.mkOption {
+        type = lib.types.bool;
         default = true;
-        description = "Enable physical camera hardware power and driver control.";
+        description = "Whether to enable physical webcam hardware power and driver control (bind/unbind/modprobe).";
+        example = true;
       };
 
-      authMode = mkOption {
-        type = types.enum [
+      authMode = lib.mkOption {
+        type = lib.types.enum [
           "polkit"
           "video-group"
           "sudo-nopasswd"
         ];
         default = "polkit";
         description = ''
-          Authorization mechanism for physical webcam driver binding/unbinding:
-          - "polkit": Prompts for authentication via desktop Polkit GUI dialog or CLI. Most secure.
-          - "video-group": Sets group write permissions for 'video' group on sysfs bind/unbind endpoints. Zero password required for users in the video group.
-          - "sudo-nopasswd": Configures minimal NOPASSWD sudoers rule.
+          Authorization mechanism used to manage physical webcam driver binding and unbinding:
+          - "polkit": Delegates authorization to Polkit (pkexec), prompting via native desktop GUI agent in graphical sessions or CLI in terminal. Most secure.
+          - "video-group": Configures systemd.tmpfiles rules granting write permissions on sysfs endpoints (/sys/bus/usb/drivers/uvcvideo/{bind,unbind}) to members of the 'video' group. Requires no password for users in 'video'.
+          - "sudo-nopasswd": Configures minimal NOPASSWD sudoers rules for modprobe and sysfs tee endpoints.
         '';
+        example = "polkit";
       };
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # kernel loopback camera device
     boot.kernelModules = [ "v4l2loopback" ];
     boot.extraModprobeConfig = ''
@@ -88,10 +117,10 @@ in
     '';
 
     # blacklist physical webcam driver on boot for hardware privacy if configured
-    boot.blacklistedKernelModules = mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
+    boot.blacklistedKernelModules = lib.mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
 
     # minimal scope passwordless sudo rules strictly if configured
-    security.sudo.extraRules = mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "sudo-nopasswd") [
+    security.sudo.extraRules = lib.mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "sudo-nopasswd") [
       {
         groups = [ "wheel" ];
         commands = [
@@ -124,7 +153,7 @@ in
     ];
 
     # sysfs video group write permissions for hardware unbind/bind if configured
-    systemd.tmpfiles.rules = mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "video-group") [
+    systemd.tmpfiles.rules = lib.mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "video-group") [
       "z /sys/bus/usb/drivers/uvcvideo/bind 0664 root video - -"
       "z /sys/bus/usb/drivers/uvcvideo/unbind 0664 root video - -"
     ];
@@ -171,6 +200,7 @@ in
         VCAM_WIDTH = toString cfg.width;
         VCAM_HEIGHT = toString cfg.height;
         VCAM_FPS = toString cfg.fps;
+        VCAM_DEFAULT_FEED = cfg.defaultFeed;
         VCAM_MIC_NAME = cfg.micName;
         VCAM_MIC_SINK = "${cfg.micName}_Sink";
       };

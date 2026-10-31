@@ -66,7 +66,8 @@ int main(int argc, char **argv) {
     }
 
     g_vcam.frame_size = (size_t)g_vcam.width * g_vcam.height * 2;
-    g_vcam.feed = FEED_PRIVACY;
+    const char *feed_env = getenv("VCAM_DEFAULT_FEED");
+    g_vcam.feed = feed_env ? feed_type_from_string(feed_env) : FEED_PRIVACY;
     g_vcam.running = true;
     g_vcam.worker_pipe_fd = -1;
     g_vcam.server_fd = -1;
