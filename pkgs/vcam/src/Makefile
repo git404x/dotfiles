@@ -14,14 +14,14 @@ TARGETS = $(DAEMON_TARGET) $(TEST_TARGET)
 
 all: $(TARGETS)
 
-web_assets.h: ../web/index.html
-	@echo "generating web_assets.h from $<..."
-	@echo "/* auto-generated from ../web/index.html */" > $@
+web_assets.h: ../web/index.html ../web/style.css ../web/app.js
+	@echo "generating web_assets.h from $< and modular web assets..."
+	@echo "/* auto-generated from ../web/index.html, style.css, app.js */" > $@
 	@echo "#ifndef VCAM_WEB_ASSETS_H" >> $@
 	@echo "#define VCAM_WEB_ASSETS_H" >> $@
 	@echo "#include <stddef.h>" >> $@
 	@echo "static const unsigned char g_index_html[] = {" >> $@
-	@od -v -t x1 $< | awk '{for(i=2;i<=NF;i++) printf "0x%s, ", $$i; printf "\n"}' >> $@
+	@awk '/<link rel="stylesheet" href="style.css">/{print "<style>"; while((getline l < "../web/style.css")>0) print l; close("../web/style.css"); print "</style>"; next} /<script src="app.js"><\/script>/{print "<script>"; while((getline l < "../web/app.js")>0) print l; close("../web/app.js"); print "</script>"; next} {print}' $< | od -v -t x1 | awk '{for(i=2;i<=NF;i++) printf "0x%s, ", $$i; printf "\n"}' >> $@
 	@echo "0x00 };" >> $@
 	@echo "static const size_t g_index_html_len = sizeof(g_index_html) - 1;" >> $@
 	@echo "#endif /* VCAM_WEB_ASSETS_H */" >> $@
