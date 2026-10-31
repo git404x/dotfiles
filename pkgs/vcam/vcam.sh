@@ -227,6 +227,47 @@ hw_is_active() {
   return 1
 }
 
+# elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo
+hw_sysfs_write() {
+  local target="$1"
+  local val="$2"
+
+  # 1. direct write if sysfs node is writable by user/group
+  if [ -w "$target" ]; then
+    printf '%s\n' "$val" > "$target" 2>/dev/null && return 0
+  fi
+
+  # 2. passwordless sudo check
+  if sudo -n true 2>/dev/null; then
+    printf '%s\n' "$val" | sudo -n tee "$target" >/dev/null 2>&1 && return 0
+  fi
+
+  # 3. polkit prompt (graphical popup in wayland/x11, or terminal in cli)
+  if command -v pkexec >/dev/null 2>&1; then
+    printf '%s\n' "$val" | pkexec sh -c "cat > '$target'" 2>/dev/null && return 0
+  fi
+
+  # 4. interactive sudo fallback
+  printf '%s\n' "$val" | sudo tee "$target" >/dev/null 2>&1 && return 0
+  return 1
+}
+
+hw_modprobe_uvc() {
+  # 1. passwordless sudo check
+  if sudo -n true 2>/dev/null; then
+    sudo -n modprobe uvcvideo >/dev/null 2>&1 && return 0
+  fi
+
+  # 2. polkit
+  if command -v pkexec >/dev/null 2>&1; then
+    pkexec modprobe uvcvideo 2>/dev/null && return 0
+  fi
+
+  # 3. interactive sudo
+  sudo modprobe uvcvideo >/dev/null 2>&1 && return 0
+  return 1
+}
+
 hw_disable() {
   # switch virtual camera to privacy noise first so hardware node is released
   send_ipc "feed privacy" >/dev/null 2>&1 || true
@@ -236,13 +277,13 @@ hw_disable() {
   dev_bus=$(hw_find_device_bus || true)
 
   if [ -n "$dev_bus" ] && [ -d "$DRIVER/${dev_bus}:1.0" ]; then
-    echo "${dev_bus}:1.0" | sudo -n tee "$DRIVER/unbind" >/dev/null 2>&1 || true
+    hw_sysfs_write "$DRIVER/unbind" "${dev_bus}:1.0" || true
   elif [ -d "$DRIVER" ]; then
     for dev in "$DRIVER"/*:*; do
       if [ -e "$dev" ]; then
         local name
         name="$(basename "$dev")"
-        echo "$name" | sudo -n tee "$DRIVER/unbind" >/dev/null 2>&1 || true
+        hw_sysfs_write "$DRIVER/unbind" "$name" || true
       fi
     done
   fi
@@ -252,7 +293,7 @@ hw_disable() {
 
 hw_enable() {
   if ! lsmod | grep "uvcvideo" >/dev/null 2>&1; then
-    sudo -n modprobe uvcvideo >/dev/null 2>&1 || true
+    hw_modprobe_uvc || true
     sleep 0.3
   fi
 
@@ -260,7 +301,7 @@ hw_enable() {
   dev_bus=$(hw_find_device_bus || true)
 
   if [ -n "$dev_bus" ] && [ -d "/sys/bus/usb/devices/${dev_bus}:1.0" ]; then
-    echo "${dev_bus}:1.0" | sudo -n tee "$DRIVER/bind" >/dev/null 2>&1 || true
+    hw_sysfs_write "$DRIVER/bind" "${dev_bus}:1.0" || true
     sleep 0.2
   fi
 

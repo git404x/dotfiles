@@ -10,5 +10,10 @@
     deviceNr = 10;
     webcamLabel = "HD WebCam";
     micName = "Virtual_Microphone";
+
+    hardwareControl = {
+      enable = true;
+      authMode = "polkit";
+    };
   };
 }

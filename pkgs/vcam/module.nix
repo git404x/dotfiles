@@ -55,6 +55,29 @@ in
       default = 30;
       description = "Virtual camera framerate.";
     };
+
+    hardwareControl = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable physical camera hardware power and driver control.";
+      };
+
+      authMode = mkOption {
+        type = types.enum [
+          "polkit"
+          "video-group"
+          "sudo-nopasswd"
+        ];
+        default = "polkit";
+        description = ''
+          Authorization mechanism for physical webcam driver binding/unbinding:
+          - "polkit": Prompts for authentication via desktop Polkit GUI dialog or CLI. Most secure.
+          - "video-group": Sets group write permissions for 'video' group on sysfs bind/unbind endpoints. Zero password required for users in the video group.
+          - "sudo-nopasswd": Configures minimal NOPASSWD sudoers rule.
+        '';
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -67,8 +90,8 @@ in
     # blacklist physical webcam driver on boot for hardware privacy if configured
     boot.blacklistedKernelModules = mkIf cfg.blacklistOnBoot [ "uvcvideo" ];
 
-    # minimal scope passwordless sudo rules strictly for webcam driver bind/unbind
-    security.sudo.extraRules = [
+    # minimal scope passwordless sudo rules strictly if configured
+    security.sudo.extraRules = mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "sudo-nopasswd") [
       {
         groups = [ "wheel" ];
         commands = [
@@ -98,6 +121,12 @@ in
           }
         ];
       }
+    ];
+
+    # sysfs video group write permissions for hardware unbind/bind if configured
+    systemd.tmpfiles.rules = mkIf (cfg.hardwareControl.enable && cfg.hardwareControl.authMode == "video-group") [
+      "z /sys/bus/usb/drivers/uvcvideo/bind 0664 root video - -"
+      "z /sys/bus/usb/drivers/uvcvideo/unbind 0664 root video - -"
     ];
 
     # declarative pipewire virtual microphone source and sink
