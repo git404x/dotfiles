@@ -244,6 +244,32 @@ apply_preset() {
   esac
 }
 
+# lightweight native test bench server launcher
+
+launch_test_bench() {
+  local out
+  out=$(vcam-test -d 2>&1)
+  echo "$out"
+
+  local port=8090
+  if [ -f "${RUNTIME_DIR}/vcam-test.port" ]; then
+    port=$(cat "${RUNTIME_DIR}/vcam-test.port" 2>/dev/null || echo "8090")
+  fi
+
+  notify low "Test Bench" "Server active on http://localhost:$port"
+
+  if command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "http://localhost:$port" >/dev/null 2>&1 || true
+  fi
+}
+
+stop_test_bench() {
+  local out
+  out=$(vcam-test -s 2>&1)
+  echo "$out"
+  notify low "Test Bench" "$out"
+}
+
 # fine-tuned categorized fuzzel gui menu
 
 gui_select_video() {
@@ -360,6 +386,7 @@ gui_main() {
     "presets"
     "camera feeds"
     "microphone feeds"
+    "diagnostic test bench"
     "status"
   )
   local sel
@@ -370,6 +397,7 @@ gui_main() {
     "presets") gui_menu_presets ;;
     "camera feeds") gui_menu_feeds ;;
     "microphone feeds") gui_menu_mics ;;
+    "diagnostic test bench") launch_test_bench ;;
     "status")
       local st
       st=$(send_ipc "status")
@@ -416,6 +444,8 @@ options:
   -f, --feed <target>        switch video feed (real|privacy|glitch|crt|bars|shapes|black|file <path>)
   -m, --mic <mode>           switch microphone (real|crt|stub|video <path>|mute)
   -p, --preset <name>        apply preset (live|stealth|playback|privacy|crt|glitch|shapes|off)
+  -t, --test                 launch web diagnostic test bench (default: http://localhost:8090)
+  --test-stop                stop diagnostic test bench server
   -d, --daemon <action>      daemon management (start|stop|restart|log)
   -h, --help                 show this help
 EOF
@@ -446,6 +476,14 @@ while [ $# -gt 0 ]; do
       else
         show_status
       fi
+      exit 0
+      ;;
+    -t|--test|test)
+      launch_test_bench
+      exit 0
+      ;;
+    --test-stop)
+      stop_test_bench
       exit 0
       ;;
     -f|--feed|feed)

@@ -34,7 +34,7 @@ let
 in
 stdenv.mkDerivation {
   pname = "vcam";
-  version = "1.0.0";
+  version = "1.1.0";
   src = ./.;
 
   nativeBuildInputs = [
@@ -51,10 +51,15 @@ stdenv.mkDerivation {
     runHook preInstall
 
     install -Dm755 src/vcamd $out/bin/vcamd
+    install -Dm755 src/vcam-test $out/bin/vcam-test
     install -Dm755 vcam.sh $out/bin/vcam
+    install -Dm644 index.html $out/share/vcam/index.html
 
     wrapProgram $out/bin/vcamd \
       --prefix PATH : "${binPath}"
+
+    wrapProgram $out/bin/vcam-test \
+      --prefix PATH : "${binPath}:$out/bin"
 
     wrapProgram $out/bin/vcam \
       --prefix PATH : "${binPath}:$out/bin"
