@@ -27,7 +27,7 @@ static void send_http_response(int fd, const WebResponse *res) {
         "Content-Type: %s\r\n"
         "Content-Length: %zu\r\n"
         "Connection: close\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
+        "X-Content-Type-Options: nosniff\r\n"
         "\r\n",
         res->status_code ? res->status_code : 200,
         res->status_text ? res->status_text : "OK",
@@ -83,9 +83,20 @@ static void handle_client(WebServer *server, int client_fd) {
         body_len = 0;
     }
 
+    /* parse optional Origin header for CSRF verification */
+    char *origin = NULL;
+    char *orig_hdr = strstr(space2 + 1, "\r\nOrigin: ");
+    if (!orig_hdr) orig_hdr = strstr(space2 + 1, "\r\norigin: ");
+    if (orig_hdr && orig_hdr < (body ? body : buf + n)) {
+        origin = orig_hdr + 10;
+        char *eol = strstr(origin, "\r\n");
+        if (eol) *eol = '\0';
+    }
+
     WebRequest req;
     req.method = method;
     req.path = path;
+    req.origin = origin;
     req.body = body;
     req.body_len = body_len;
 

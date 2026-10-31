@@ -108,6 +108,50 @@ static int load_custom_file(const char *path) {
     return 0;
 }
 
+static int is_allowed_cli_cmd(const char *cmd) {
+    if (!cmd || *cmd == '\0') return 0;
+    while (*cmd == ' ') cmd++;
+
+    if (strncmp(cmd, "feed ", 5) == 0) {
+        const char *f = cmd + 5;
+        while (*f == ' ') f++;
+        if (strcmp(f, "privacy") == 0 || strcmp(f, "black") == 0 ||
+            strcmp(f, "bars") == 0 || strcmp(f, "smpte") == 0 ||
+            strcmp(f, "crt") == 0 || strcmp(f, "glitch") == 0 ||
+            strcmp(f, "shapes") == 0 || strcmp(f, "ball") == 0 ||
+            strcmp(f, "real") == 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    if (strncmp(cmd, "mic ", 4) == 0) {
+        const char *m = cmd + 4;
+        while (*m == ' ') m++;
+        if (strcmp(m, "real") == 0 || strcmp(m, "crt") == 0 ||
+            strcmp(m, "stub") == 0 || strcmp(m, "mute") == 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    if (strncmp(cmd, "preset ", 7) == 0) {
+        const char *p = cmd + 7;
+        while (*p == ' ') p++;
+        if (strcmp(p, "live") == 0 || strcmp(p, "stealth") == 0 ||
+            strcmp(p, "playback") == 0 || strcmp(p, "privacy") == 0 ||
+            strcmp(p, "crt") == 0 || strcmp(p, "glitch") == 0 ||
+            strcmp(p, "shapes") == 0 || strcmp(p, "off") == 0) {
+            return 1;
+        }
+        return 0;
+    }
+
+    if (strcmp(cmd, "status") == 0 || strcmp(cmd, "-s") == 0) return 1;
+
+    return 0;
+}
+
 static void handle_cli_request(const char *body, WebResponse *res, char *json_out, size_t json_out_sz) {
     char cmd_arg[512] = {0};
     const char *key = strstr(body, "\"cmd\"");
@@ -132,6 +176,16 @@ static void handle_cli_request(const char *body, WebResponse *res, char *json_ou
         const char *err = "{\"ok\":false,\"err\":\"invalid command JSON\"}";
         res->status_code = 400;
         res->status_text = "Bad Request";
+        res->content_type = "application/json";
+        res->body = err;
+        res->body_len = strlen(err);
+        return;
+    }
+
+    if (!is_allowed_cli_cmd(cmd_arg)) {
+        const char *err = "{\"ok\":false,\"err\":\"command forbidden via web interface\"}";
+        res->status_code = 403;
+        res->status_text = "Forbidden";
         res->content_type = "application/json";
         res->body = err;
         res->body_len = strlen(err);
@@ -233,6 +287,21 @@ static void handle_cli_request(const char *body, WebResponse *res, char *json_ou
 static int test_bench_handler(const WebRequest *req, WebResponse *res, void *user_data) {
     (void)user_data;
     static char s_cli_resp[9216];
+
+    /* CSRF prevention: strictly allow same-origin or local test clients */
+    if (req->origin && *req->origin) {
+        if (strncmp(req->origin, "http://localhost", 16) != 0 &&
+            strncmp(req->origin, "http://127.0.0.1", 16) != 0 &&
+            strcmp(req->origin, "null") != 0) {
+            const char *forbidden = "{\"ok\":false,\"err\":\"cross-origin access forbidden\"}";
+            res->status_code = 403;
+            res->status_text = "Forbidden";
+            res->content_type = "application/json";
+            res->body = forbidden;
+            res->body_len = strlen(forbidden);
+            return 1;
+        }
+    }
 
     if (strcmp(req->path, "/") == 0 || strcmp(req->path, "/index.html") == 0) {
         res->status_code = 200;

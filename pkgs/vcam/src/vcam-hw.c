@@ -47,9 +47,29 @@ static int find_webcam_bus(char *out_bus, size_t max_len) {
 
     while ((entry = readdir(d)) != NULL) {
         if (entry->d_name[0] == '.') continue;
-        if (strchr(entry->d_name, ':')) continue; /* skip interface subdirs */
 
-        /* 1. check vendor id for common camera vendors (e.g. 13d3 Azurewave) */
+        /* 1. Universal USB standard: check for USB Video Class (0e / 14) interface */
+        if (strchr(entry->d_name, ':')) {
+            char ifclass_path[PATH_MAX];
+            snprintf(ifclass_path, sizeof(ifclass_path), "%s/%s/bInterfaceClass", USB_DEV_DIR, entry->d_name);
+            FILE *cf = fopen(ifclass_path, "r");
+            if (cf) {
+                char cls[16] = {0};
+                if (fgets(cls, sizeof(cls), cf)) {
+                    if (strncmp(cls, "0e", 2) == 0 || strncmp(cls, "0E", 2) == 0 || atoi(cls) == 14) {
+                        snprintf(found, sizeof(found), "%s", entry->d_name);
+                        char *colon = strchr(found, ':');
+                        if (colon) *colon = '\0';
+                        fclose(cf);
+                        break;
+                    }
+                }
+                fclose(cf);
+            }
+            continue;
+        }
+
+        /* 2. Fallback heuristic: check vendor id for common camera vendors (e.g. 13d3 Azurewave) */
         char vendor_path[PATH_MAX];
         snprintf(vendor_path, sizeof(vendor_path), "%s/%s/idVendor", USB_DEV_DIR, entry->d_name);
         FILE *vf = fopen(vendor_path, "r");
@@ -65,7 +85,7 @@ static int find_webcam_bus(char *out_bus, size_t max_len) {
             fclose(vf);
         }
 
-        /* 2. check product string */
+        /* 3. Fallback heuristic: check product string */
         char prod_path[PATH_MAX];
         snprintf(prod_path, sizeof(prod_path), "%s/%s/product", USB_DEV_DIR, entry->d_name);
         FILE *pf = fopen(prod_path, "r");

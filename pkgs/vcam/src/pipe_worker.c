@@ -36,8 +36,11 @@ void pipe_worker_stop(void) {
 
     if (g_vcam.worker_pid > 0) {
         kill(g_vcam.worker_pid, SIGTERM);
-        int status;
-        waitpid(g_vcam.worker_pid, &status, WNOHANG);
+        int status = 0;
+        pid_t reaped = waitpid(g_vcam.worker_pid, &status, WNOHANG);
+        if (reaped == g_vcam.worker_pid) {
+            g_vcam.worker_pid = -1;
+        }
     }
 
     if (g_vcam.worker_pipe_fd >= 0) {

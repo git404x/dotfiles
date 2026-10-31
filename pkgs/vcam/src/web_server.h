@@ -10,6 +10,7 @@ extern "C" {
 typedef struct WebRequest {
     const char *method;      /* "GET", "POST", "HEAD", etc. */
     const char *path;        /* e.g. "/", "/api/cli" */
+    const char *origin;      /* "Origin" header value if present */
     const char *body;        /* request body payload */
     size_t body_len;
 } WebRequest;

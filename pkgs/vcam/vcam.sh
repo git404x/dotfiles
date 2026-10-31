@@ -70,15 +70,15 @@ kill_audio() {
   if [ -f "$PID_FILE" ]; then
     local pid
     pid=$(cat "$PID_FILE" 2>/dev/null || true)
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-      kill -9 "$pid" 2>/dev/null || true
+    if [ -n "$pid" ]; then
+      kill -TERM -- "-$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
     fi
     rm -f "$PID_FILE"
   fi
-  pkill -9 -f "pw-cat.*${MIC_SINK}" 2>/dev/null || true
-  pkill -9 -f "pw-loopback.*${MIC_SINK}" 2>/dev/null || true
-  pkill -9 -f "ffmpeg.*anoisesrc" 2>/dev/null || true
-  pkill -9 -f "ffmpeg.*sine" 2>/dev/null || true
+  pkill -u "$UID" -f "pw-cat.*${MIC_SINK}" 2>/dev/null || true
+  pkill -u "$UID" -f "pw-loopback.*${MIC_SINK}" 2>/dev/null || true
+  pkill -u "$UID" -f "ffmpeg.*anoisesrc" 2>/dev/null || true
+  pkill -u "$UID" -f "ffmpeg.*sine" 2>/dev/null || true
 }
 
 set_mic_real() {
@@ -211,7 +211,7 @@ hw_is_active() {
   return 1
 }
 
-# elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo
+# elevated execution hierarchy: 1. direct write -> 2. passwordless sudo -> 3. polkit -> 4. sudo (terminal only)
 hw_control() {
   local action="$1"
 
@@ -233,11 +233,14 @@ hw_control() {
 
   # 3. polkit desktop GUI / terminal agent prompt
   if command -v pkexec >/dev/null 2>&1; then
-    pkexec "$hw_bin" "$action" && return 0
+    pkexec "$hw_bin" "$action"
+    return $?
   fi
 
-  # 4. interactive sudo fallback
-  sudo "$hw_bin" "$action" && return 0
+  # 4. interactive sudo fallback strictly if a terminal is attached
+  if [ -t 0 ]; then
+    sudo "$hw_bin" "$action" && return 0
+  fi
   return 1
 }
 
@@ -245,6 +248,7 @@ hw_disable() {
   exec 9>"$HW_LOCK_FILE"
   if ! flock -n 9; then
     notify low "Camera" "Hardware action in progress"
+    exec 9>&-
     return 0
   fi
 
@@ -252,34 +256,47 @@ hw_disable() {
   send_ipc "feed privacy" >/dev/null 2>&1 || true
   sleep 0.1
 
+  local res=0
   if hw_control disable; then
     notify low "Camera" "Hardware Disabled"
   else
     notify critical "Camera" "Failed to disable hardware"
+    res=1
   fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
 }
 
 hw_enable() {
   exec 9>"$HW_LOCK_FILE"
   if ! flock -n 9; then
     notify low "Camera" "Hardware action in progress"
+    exec 9>&-
     return 0
   fi
 
+  local res=0
   if hw_control enable; then
     notify low "Camera" "Hardware Enabled"
   else
     notify critical "Camera" "Failed to enable hardware"
+    res=1
   fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
 }
 
 hw_toggle() {
   exec 9>"$HW_LOCK_FILE"
   if ! flock -n 9; then
     notify low "Camera" "Hardware action in progress"
+    exec 9>&-
     return 0
   fi
 
+  local res=0
   if hw_is_active; then
     send_ipc "feed privacy" >/dev/null 2>&1 || true
     sleep 0.1
@@ -287,14 +304,19 @@ hw_toggle() {
       notify low "Camera" "Hardware Disabled"
     else
       notify critical "Camera" "Failed to disable hardware"
+      res=1
     fi
   else
     if hw_control enable; then
       notify low "Camera" "Hardware Enabled"
     else
       notify critical "Camera" "Failed to enable hardware"
+      res=1
     fi
   fi
+  flock -u 9 2>/dev/null || true
+  exec 9>&-
+  return $res
 }
 
 # preset combinations

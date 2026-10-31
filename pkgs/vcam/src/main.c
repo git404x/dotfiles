@@ -50,12 +50,15 @@ int main(int argc, char **argv) {
 
     const char *w_env = getenv("VCAM_WIDTH");
     g_vcam.width = w_env ? atoi(w_env) : DEFAULT_WIDTH;
+    if (g_vcam.width < 160 || g_vcam.width > 3840) g_vcam.width = DEFAULT_WIDTH;
 
     const char *h_env = getenv("VCAM_HEIGHT");
     g_vcam.height = h_env ? atoi(h_env) : DEFAULT_HEIGHT;
+    if (g_vcam.height < 120 || g_vcam.height > 2160) g_vcam.height = DEFAULT_HEIGHT;
 
     const char *fps_env = getenv("VCAM_FPS");
     g_vcam.fps = fps_env ? atoi(fps_env) : DEFAULT_FPS;
+    if (g_vcam.fps < 1 || g_vcam.fps > 120) g_vcam.fps = DEFAULT_FPS;
 
     const char *sock_env = getenv("VCAM_SOCKET");
     if (sock_env) {

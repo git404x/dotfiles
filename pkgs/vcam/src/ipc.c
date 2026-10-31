@@ -153,6 +153,8 @@ int ipc_init(void) {
         return -1;
     }
 
+    chmod(g_vcam.socket_path, 0600);
+
     if (listen(fd, 8) < 0) {
         perror("[vcamd] listen");
         close(fd);
