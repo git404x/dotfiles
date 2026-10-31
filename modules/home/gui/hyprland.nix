@@ -20,8 +20,6 @@ in
     powermenu
     cage-run
     cage-launcher
-  ] ++ [
-    pkgs.vcam
   ];
 
   wayland.windowManager.hyprland = {
