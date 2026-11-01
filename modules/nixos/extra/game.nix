@@ -131,8 +131,8 @@ in
         desiredgov = "default";
       };
       custom = {
-        start = "${pkgs.bin.gamerun}/bin/gamerun power max";
-        end = "${pkgs.bin.gamerun}/bin/gamerun power default";
+        start = "${pkgs.bin.gamerun}/bin/gamerun power performance";
+        end = "${pkgs.bin.gamerun}/bin/gamerun power balanced";
       };
     };
   };

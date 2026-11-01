@@ -1,101 +1,114 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-IS_WINDOWS=false
-if [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "cygwin"* ]]; then
-  IS_WINDOWS=true
-fi
+# gamerun - game launcher wrapper with continuous power management for ryzen mobile
 
-# catch empty execution before evaluating arguments
 if [ $# -eq 0 ]; then
-  echo "[-] Usage: gamerun [install | power | base | goldberg | fixed] <executable>"
+  cat <<'EOF'
+Usage: gamerun [power | base | goldberg | fixed] <executable> [args...]
+
+Commands:
+  power <profile>     Apply hardware power profile (cool | balanced | performance)
+  base <command>      Run command with MangoHud and GameMode
+  goldberg <command>  Run command with Goldberg steam_api overrides
+  fixed <command>     Run command with OnlineFix DLL overrides
+EOF
   exit 1
-fi
-
-# INSTALLER
-if [ "${1:-}" = "install" ]; then
-  echo "gamerun installer"
-
-  if [ "$IS_WINDOWS" = true ]; then
-    mkdir -p ~/bin
-    cp "$0" ~/bin/gamerun
-    echo "[+] Installed to ~/bin/gamerun"
-    echo "    (Ensure ~/bin is in your Windows environment PATH variables)"
-    exit 0
-  else
-    mkdir -p ~/.local/bin
-    cp "$0" ~/.local/bin/gamerun
-    chmod +x ~/.local/bin/gamerun
-    echo "[+] Installed to ~/.local/bin/gamerun"
-    exit 0
-  fi
 fi
 
 if [ -x "/run/wrappers/bin/ryzenadj" ]; then
   RYZENADJ="/run/wrappers/bin/ryzenadj"
 else
-  RYZENADJ="ryzenadj"
+  RYZENADJ="$(command -v ryzenadj 2>/dev/null || echo "ryzenadj")"
 fi
 
-# POWER MANAGEMENT
-if [ "${1:-}" = "power" ]; then
-  if [ -z "${2:-}" ]; then
-    echo "Usage: gamerun power [default | cool | balanced | max | hyper]"
-    exit 1
+apply_power_profile() {
+  local profile="$1"
+  if [ ! -x "$RYZENADJ" ]; then
+    echo "[-] ryzenadj binary not found or not executable" >&2
+    return 1
   fi
 
-  PROFILE=$2
-
-  case "$PROFILE" in
-  default)
-    $RYZENADJ --stapm-limit=15000 --fast-limit=15000 --slow-limit=15000 --tctl-temp=75
-    echo "[+] Power profile reset to DEFAULT (15W / 75C)"
-    ;;
-  cool)
-    $RYZENADJ --stapm-limit=10000 --fast-limit=12000 --slow-limit=10000 --tctl-temp=70
-    echo "[+] Power profile set to COOL (10W Limit)"
-    ;;
-  balanced)
-    $RYZENADJ --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --tctl-temp=80
-    echo "[+] Power profile set to BALANCED (15W Limit)"
-    ;;
-  max)
-    $RYZENADJ --stapm-limit=20000 --fast-limit=20000 --slow-limit=20000 --tctl-temp=85
-    echo "[+] Power profile set to MAX (20W Limit / 85C)"
-    ;;
-  hyper)
-    $RYZENADJ --stapm-limit=25000 --fast-limit=25000 --slow-limit=25000 --tctl-temp=95
-    echo "[+] Power profile set to HYPER (25W Limit / 95C)"
-    ;;
-  *)
-    echo "[-] Invalid power mode: $PROFILE"
-    exit 1
-    ;;
+  case "$profile" in
+    cool|battery)
+      "$RYZENADJ" --stapm-limit=12000 --fast-limit=15000 --slow-limit=12000 --vrm-current=30000 --vrmmax-current=35000 --tctl-temp=75 >/dev/null 2>&1 || true
+      echo "[+] Power profile: COOL (12W sustained / 75°C max)"
+      ;;
+    balanced|default)
+      "$RYZENADJ" --stapm-limit=15000 --fast-limit=18000 --slow-limit=15000 --vrm-current=35000 --vrmmax-current=40000 --tctl-temp=80 >/dev/null 2>&1 || true
+      echo "[+] Power profile: BALANCED (15W sustained / 80°C max)"
+      ;;
+    performance|max|turbo)
+      "$RYZENADJ" --stapm-limit=18000 --fast-limit=22000 --slow-limit=18000 --stapm-time=300 --vrm-current=35000 --vrmmax-current=45000 --tctl-temp=88 >/dev/null 2>&1 || true
+      echo "[+] Power profile: PERFORMANCE (18W sustained / 22W burst / 88°C max)"
+      ;;
+    *)
+      echo "[-] Invalid power profile: '$profile'. Available: cool, balanced, performance" >&2
+      return 1
+      ;;
   esac
+}
+
+# Standalone power command
+if [ "${1:-}" = "power" ]; then
+  shift
+  if [ $# -eq 0 ]; then
+    echo "Usage: gamerun power [cool | balanced | performance]" >&2
+    exit 1
+  fi
+  apply_power_profile "$1"
   exit 0
 fi
 
-# GAME WRAPPER
-MODE=${1:-}
+# Game execution mode
+MODE="$1"
 shift
 
 case "$MODE" in
-base)
-  # no overrides
-  ;;
-
-goldberg)
-  export WINEDLLOVERRIDES="steam_api=n,steam_api64=n"
-  ;;
-
-fixed)
-  export WINEDLLOVERRIDES="OnlineFix=n;OnlineFix64=n;SteamOverlay=n;SteamOverlay64=n;winmm=n,b;dnet=n;steam_api=n;steam_api64=n;winhttp=n,b"
-  ;;
-
-*)
-  echo "[-] Invalid mode: $MODE. Use base, goldberg, fixed, or power."
-  exit 1
-  ;;
+  base)
+    # Standard launcher without DLL overrides
+    ;;
+  goldberg)
+    export WINEDLLOVERRIDES="steam_api=n,steam_api64=n"
+    ;;
+  fixed)
+    export WINEDLLOVERRIDES="OnlineFix=n;OnlineFix64=n;SteamOverlay=n;SteamOverlay64=n;winmm=n,b;dnet=n;steam_api=n;steam_api64=n;winhttp=n,b"
+    ;;
+  *)
+    echo "[-] Invalid mode '$MODE'. Use base, goldberg, fixed, or power." >&2
+    exit 1
+    ;;
 esac
 
 export MANGOHUD=1
-exec gamemoderun "$@"
+
+# Apply performance profile and launch periodic watchdog to prevent Asus EC from resetting limits to 12W
+apply_power_profile performance || true
+
+WATCHDOG_PID=""
+cleanup() {
+  if [ -n "$WATCHDOG_PID" ]; then
+    kill -TERM "$WATCHDOG_PID" 2>/dev/null || true
+  fi
+  apply_power_profile balanced >/dev/null 2>&1 || true
+}
+trap cleanup EXIT INT TERM
+
+# Run game process
+if command -v gamemoderun >/dev/null 2>&1; then
+  gamemoderun "$@" &
+else
+  "$@" &
+fi
+GAME_PID=$!
+
+# Watchdog loop running every 6 seconds to reinforce 18W power against EC override
+(
+  while kill -0 "$GAME_PID" 2>/dev/null; do
+    sleep 6
+    apply_power_profile performance >/dev/null 2>&1 || true
+  done
+) &
+WATCHDOG_PID=$!
+
+wait "$GAME_PID"
