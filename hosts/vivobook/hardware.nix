@@ -17,19 +17,7 @@
     "sd_mod"
   ];
   boot.initrd.kernelModules = [ "amdgpu" ];
-  boot.kernelModules = [
-    "kvm-amd"
-    "ryzen_smu"
-  ];
-
-  # Workaround for upstream nixpkgs #575192 (aggregateModules fails when out-of-tree modules lack .ko.cer)
-  boot.extraModulePackages = with config.boot.kernelPackages; [
-    (ryzen-smu.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + ''
-        find $out/lib/modules -name "ryzen_smu.ko" -execdir touch {}.cer \;
-      '';
-    }))
-  ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.blacklistedKernelModules = [
     "asus_armoury"
     "tpm"

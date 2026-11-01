@@ -16,4 +16,5 @@ final: prev: {
     src = inputs.prism-launcher;
   };
   vcam = final.callPackage ./vcam/default.nix { };
+  gamerun = final.callPackage ./gamerun/default.nix { };
 }

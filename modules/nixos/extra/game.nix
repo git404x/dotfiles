@@ -20,7 +20,10 @@ in
 {
 
   # imports
-  imports = [ inputs.nix-minecraft.nixosModules.minecraft-servers ];
+  imports = [
+    inputs.nix-minecraft.nixosModules.minecraft-servers
+    "${dotfiles}/pkgs/gamerun/options.nix"
+  ];
   nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
 
   # networking
@@ -121,6 +124,17 @@ in
     ];
   };
 
+  services.gamerun = {
+    enable = true;
+    authMode = "gamemode-group";
+    defaultProfile = "balanced";
+    pollInterval = 5;
+    ryzen-smu = {
+      enable = true;
+      certificate.enable = true;
+    };
+  };
+
   programs.gamemode = {
     enable = true;
     enableRenice = true;
@@ -130,26 +144,16 @@ in
         renice = 0;
         desiredgov = "default";
       };
-      custom = {
-        start = "${pkgs.bin.gamerun}/bin/gamerun power max";
-        end = "${pkgs.bin.gamerun}/bin/gamerun power default";
-      };
     };
   };
 
   users.users.${username}.extraGroups = [ "gamemode" ];
-  security.wrappers.ryzenadj = {
-    source = "${pkgs.ryzenadj}/bin/ryzenadj";
-    owner = "root";
-    group = "root";
-    setuid = true;
-  };
 
   environment.systemPackages = with pkgs; [
     mangohud
     goldberg-emu
     heroic
-    bin.gamerun
+    gamerun
     bin.mc-bak
     mcrcon
     packwiz
