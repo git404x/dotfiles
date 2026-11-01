@@ -6,8 +6,7 @@
 }:
 
 {
-  # kernel
-  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  # kernel sysctl
   boot.kernel.sysctl = {
     "kernel.sysrq" = 176;
   };
