@@ -8,7 +8,7 @@
 }:
 let
   serverConfig = {
-    minRam = "1024M";
+    minRam = "512M";
     maxRam = "2048M";
     regionSize = "8M";
   };
@@ -54,7 +54,7 @@ in
           "-Xmx${serverConfig.maxRam}"
           "-XX:+UseZGC"
           "-XX:+ZGenerational"
-          "-XX:+AlwaysPreTouch"
+          "-XX:ConcGCThreads=1"
           "-XX:+UseCompactObjectHeaders"
           "-XX:+UseStringDeduplication"
           "-XX:AllocatePrefetchStyle=1"
@@ -86,6 +86,7 @@ in
           "-Xmx${serverConfig.maxRam}"
           "-XX:+UseZGC"
           "-XX:+ZGenerational"
+          "-XX:ConcGCThreads=1"
           "-XX:+UseCompactObjectHeaders"
           "-XX:+UseStringDeduplication"
           "-XX:AllocatePrefetchStyle=1"

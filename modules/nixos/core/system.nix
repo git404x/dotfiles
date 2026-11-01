@@ -9,6 +9,9 @@
   # kernel sysctl
   boot.kernel.sysctl = {
     "kernel.sysrq" = 176;
+    "vm.swappiness" = 180;
+    "vm.page-cluster" = 0;
+    "vm.watermark_boost_factor" = 0;
   };
 
   # bootloader
@@ -22,7 +25,7 @@
   # memory
   zramSwap = {
     enable = true;
-    memoryPercent = 100;
+    memoryPercent = 150;
     algorithm = "zstd";
   };
 

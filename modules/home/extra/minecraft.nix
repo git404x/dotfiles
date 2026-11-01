@@ -65,12 +65,11 @@ in
       ExecStartPre = "${pkgs.coreutils}/bin/install -m 644 ${serverProperties} %h/${serverDir}/server.properties";
       ExecStart = lib.escapeShellArgs [
         "${serverPkg}/bin/minecraft-server"
-        "-Xms4096M"
-        "-Xmx6144M"
+        "-Xms1024M"
+        "-Xmx2048M"
 
         # dual-core OS lock
         "-XX:ActiveProcessorCount=2"
-        "-XX:+AlwaysPreTouch"
 
         # Aikar's Flags
         "-XX:+UseG1GC"
