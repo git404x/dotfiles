@@ -6,12 +6,14 @@ on:
     - cron: "0 0 * * 0" # Run weekly
   push:
     paths:
-      - "flake.nix"
       - "flake.lock"
 
 jobs:
-  build-and-cache:
+  discover:
+    name: "Discover Targets"
     runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.plan.outputs.targets }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,33 +23,80 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Plan Target Closure
+        id: plan
+        run: |
+          nixos=$(nix eval --json .#nixosConfigurations --apply builtins.attrNames --accept-flake-config)
+          homes=$(nix eval --json .#homeConfigurations --apply builtins.attrNames --accept-flake-config)
+
+          targets=$(jq -nc --argjson nixos "$nixos" --argjson homes "$homes" '
+            {
+              include: (
+                ($nixos | map({type: "NixOS", name: ., target: ("nixosConfigurations." + . + ".config.system.build.toplevel")})) +
+                ($homes | map({type: "Home", name: ., target: ("homeConfigurations." + . + ".activationPackage")}))
+              )
+            }
+          ')
+
+          echo "Discovered targets: $targets"
+          echo "targets=$targets" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: "${{ matrix.type }} / ${{ matrix.name }}"
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.targets) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
 
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
           name: git404x-dotfiles
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          pushFilter: '(-system$|-initrd.*|-etc.*|-unit-.*\.service$|.*_fish-completions$|.*base16.*|.*untitled.*)'
 
-      - name: Build All Configurations
+      - name: Build Target
         run: |
-          failed=0
+          RED='\033[0;31m'
+          GREEN='\033[0;32m'
+          BLUE='\033[0;34m'
+          YELLOW='\033[1;33m'
+          BOLD='\033[1m'
+          NC='\033[0m'
 
-          echo ">> Discovering NixOS Configurations..."
-          for host in $(nix eval --json .#nixosConfigurations --apply builtins.attrNames --accept-flake-config | jq -r '.[]'); do
-            echo "Building NixOS host: $host"
-            if ! nix build .#nixosConfigurations."$host".config.system.build.toplevel --print-build-logs --accept-flake-config; then
-              echo "::error title=Build Failed::Failed to build NixOS host: $host"
-              failed=1
-            fi
-          done
+          echo -e "${BLUE}${BOLD}==> Building ${{ matrix.type }} [${{ matrix.name }}]...${NC}"
+          echo -e "${YELLOW}Target: .#${{ matrix.target }}${NC}\n"
 
-          echo ">> Discovering Home Manager Configurations..."
-          for user in $(nix eval --json .#homeConfigurations --apply builtins.attrNames --accept-flake-config | jq -r '.[]'); do
-            echo "Building Home Manager profile: $user"
-            if ! nix build .#homeConfigurations."$user".activationPackage --print-build-logs --accept-flake-config; then
-              echo "::error title=Build Failed::Failed to build Home Manager profile: $user"
-              failed=1
-            fi
-          done
+          mkdir -p logs
+          LOG_FILE="logs/${{ matrix.type }}-${{ matrix.name }}.log"
 
-          exit $failed
+          if nix build .#${{ matrix.target }} --print-build-logs --accept-flake-config 2>&1 | tee "$LOG_FILE"; then
+            echo -e "\n${GREEN}${BOLD}✔ Successfully built ${{ matrix.type }} [${{ matrix.name }}]!${NC}"
+          else
+            EXIT_CODE=$?
+            echo -e "\n${RED}${BOLD}✖ FAILED: ${{ matrix.type }} [${{ matrix.name }}] exited with code ${EXIT_CODE}${NC}"
+            echo "::error title=Build Failed::${{ matrix.type }} [${{ matrix.name }}] failed to build (exit code ${EXIT_CODE})"
+            exit $EXIT_CODE
+          fi
+
+      - name: Upload Build Log on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "failure-log-${{ matrix.type }}-${{ matrix.name }}"
+          path: logs/
+          retention-days: 7
