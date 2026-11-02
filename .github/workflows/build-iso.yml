@@ -3,13 +3,14 @@ name: Build NixOS ISO
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 1 * *" # Run monthly
+    - cron: "0 0 1 */4 *" # Run every 4 months (thrice a year)
 
 permissions:
   contents: write
 
 jobs:
   build-iso:
+    name: "Build & Release ISO"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,26 +21,28 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+            accept-flake-config = true
 
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
           name: git404x-dotfiles
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          pushFilter: '(-system$|-initrd.*|-etc.*|-unit-.*\.service$|.*_fish-completions$|.*base16.*|.*untitled.*)'
 
       - name: Build ISO
         run: |
           nix build .#nixosConfigurations.iso.config.system.build.isoImage --print-build-logs --accept-flake-config
 
-      - name: Extract ISO Path and Date
+      - name: Extract ISO Artifacts
         id: iso
         run: |
-          # Dynamically grab the exact generated filename
           ISO_PATH=$(ls result/iso/*.iso | head -n 1)
           ISO_NAME=$(basename "$ISO_PATH")
-          echo "iso_path=$ISO_PATH" >> $GITHUB_ENV
-          echo "iso_name=$ISO_NAME" >> $GITHUB_ENV
-          echo "build_date=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+          BUILD_DATE=$(date +'%Y.%m.%d')
+          echo "iso_path=$ISO_PATH" >> "$GITHUB_ENV"
+          echo "iso_name=$ISO_NAME" >> "$GITHUB_ENV"
+          echo "build_date=$BUILD_DATE" >> "$GITHUB_ENV"
 
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v2
@@ -50,3 +53,16 @@ jobs:
           files: ${{ env.iso_path }}
           draft: false
           prerelease: false
+
+      - name: Prune Older Releases & Tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "==> Pruning older releases to retain only the latest build..."
+          gh release list --limit 50 --json tagName -q '.[1:][].tagName' | while read -r old_tag; do
+            if [ -n "$old_tag" ]; then
+              echo "Deleting old release and tag: $old_tag"
+              gh release delete "$old_tag" --cleanup-tag -y || true
+            fi
+          done
+          echo "✔ Older releases pruned successfully."
