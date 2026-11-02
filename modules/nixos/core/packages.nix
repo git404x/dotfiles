@@ -88,7 +88,7 @@
       proton-vpn
       zathura
       stirling-pdf-desktop
-      onlyoffice-desktopeditors
+      libreoffice-qt
       telegram-desktop
       brave-origin
       qutebrowser

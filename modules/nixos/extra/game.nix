@@ -129,10 +129,7 @@ in
     authMode = "gamemode-group";
     defaultProfile = "balanced";
     pollInterval = 5;
-    ryzen-smu = {
-      enable = true;
-      certificate.enable = true;
-    };
+    ryzen-smu.enable = true;
   };
 
   programs.gamemode = {

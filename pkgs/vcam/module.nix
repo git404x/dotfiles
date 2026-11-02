@@ -111,12 +111,7 @@ in
 
   config = lib.mkIf cfg.enable {
     # kernel loopback camera device
-    boot.extraModulePackages = [
-      (config.boot.kernelPackages.v4l2loopback.overrideAttrs (old: {
-        # disable upstream kbuild depmod execution during out-of-tree package install
-        makeFlags = (old.makeFlags or [ ]) ++ [ "DEPMOD=echo" ];
-      }))
-    ];
+    boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
     boot.kernelModules = [ "v4l2loopback" ];
     boot.extraModprobeConfig = ''
       options v4l2loopback devices=1 video_nr=${toString cfg.deviceNr} card_label="${cfg.webcamLabel}" exclusive_caps=0 max_buffers=2

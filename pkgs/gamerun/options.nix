@@ -55,18 +55,6 @@ in
         description = "Whether to automatically load and configure the out-of-tree ryzen_smu kernel driver.";
         example = true;
       };
-
-      certificate = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = ''
-            Workaround for upstream Nixpkgs issue #575192 where aggregateModules aborts
-            if out-of-tree kernel modules lack a corresponding .ko.cer certificate file.
-          '';
-          example = true;
-        };
-      };
     };
   };
 
@@ -80,21 +68,9 @@ in
     # ryzen-smu kernel module setup
     boot.kernelModules = lib.mkIf cfg.ryzen-smu.enable [ "ryzen_smu" ];
 
-    boot.extraModulePackages = lib.mkIf cfg.ryzen-smu.enable (
-      with config.boot.kernelPackages;
-      [
-        (
-          if cfg.ryzen-smu.certificate.enable then
-            ryzen-smu.overrideAttrs (old: {
-              postInstall = (old.postInstall or "") + ''
-                find $out/lib/modules -name "ryzen_smu.ko" -execdir touch {}.cer \;
-              '';
-            })
-          else
-            ryzen-smu
-        )
-      ]
-    );
+    boot.extraModulePackages = lib.mkIf cfg.ryzen-smu.enable [
+      config.boot.kernelPackages.ryzen-smu
+    ];
 
     # Setuid wrapper for ryzenadj with strict group-scoped permissions (u=rwxs,g=rx,o=)
     security.wrappers.ryzenadj = lib.mkIf (cfg.authMode == "gamemode-group" || cfg.authMode == "setuid") {
