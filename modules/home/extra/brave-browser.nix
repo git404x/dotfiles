@@ -1,8 +1,6 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 
 {
-  imports = [ inputs.brave-browser.homeManagerModules.default ];
-
   programs.brave-browser = {
     enable = true;
     package = pkgs.brave-origin;

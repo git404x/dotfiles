@@ -1,34 +1,32 @@
 {
-  inputs,
   pkgs,
   ...
 }:
-let
-  mkSearchEngine = alias: name: url: {
-    inherit name;
-    value = {
-      urls = [ { template = url; } ];
-      definedAliases = [ alias ];
-    };
-  };
-  mkExtension = name: guid: private: {
-    name = guid;
-    value = {
-      install_url = "https://addons.mozilla.org/firefox/downloads/latest/${name}/latest.xpi";
-      installation_mode = "normal_installed";
-      private_browsing = private;
-    };
-  };
-  mkBookmark = keyword: name: url: { inherit keyword name url; };
-in
 {
-  imports = [ inputs.zen-browser.homeModules.default ];
-
   stylix.targets.zen-browser.profileNames = [ "default" ];
 
   programs.zen-browser = {
     enable = true;
     nativeMessagingHosts = [ pkgs.ff2mpv ];
+
+    extensions = [
+      {
+        slug = "bitwarden-password-manager";
+        id = "{446900e4-71c2-419f-a6a7-df9c091e268b}";
+        privateBrowsing = true;
+      }
+      {
+        slug = "ublock-origin";
+        id = "uBlock0@raymondhill.net";
+        privateBrowsing = true;
+      }
+      {
+        slug = "tampermonkey";
+        id = "firefox@tampermonkey.net";
+        privateBrowsing = false;
+      }
+    ];
+
     profiles.default = {
       name = "default";
       id = 0;
@@ -37,27 +35,46 @@ in
       bookmarks = {
         force = true;
         settings = [
-          (mkBookmark "gh" "GitHub" "https://github.com")
-          (mkBookmark "yt" "YouTube" "https://youtube.com")
+          {
+            keyword = "gh";
+            name = "GitHub";
+            url = "https://github.com";
+          }
+          {
+            keyword = "yt";
+            name = "YouTube";
+            url = "https://youtube.com";
+          }
         ];
       };
 
       search = {
         force = true;
         default = "google";
-        engines = builtins.listToAttrs [
-          (mkSearchEngine "gh" "GitHub" "https://github.com/search?q={searchTerms}")
-          (mkSearchEngine "hm" "Home Manager"
-            "https://home-manager-options.extranix.com?query={searchTerms}&release=master"
-          )
-          (mkSearchEngine "np" "NixOS Packages"
-            "https://search.nixos.org/packages?channel=unstable&query={searchTerms}"
-          )
-          (mkSearchEngine "no" "NixOS Options"
-            "https://search.nixos.org/options?channel=unstable&query={searchTerms}"
-          )
-          (mkSearchEngine "nw" "NixOS Wiki" "https://wiki.nixos.org/w/index.php?search={searchTerms}")
-        ];
+        engines = {
+          "GitHub" = {
+            urls = [ { template = "https://github.com/search?q={searchTerms}"; } ];
+            definedAliases = [ "gh" ];
+          };
+          "Home Manager" = {
+            urls = [
+              { template = "https://home-manager-options.extranix.com?query={searchTerms}&release=master"; }
+            ];
+            definedAliases = [ "hm" ];
+          };
+          "NixOS Packages" = {
+            urls = [ { template = "https://search.nixos.org/packages?channel=unstable&query={searchTerms}"; } ];
+            definedAliases = [ "np" ];
+          };
+          "NixOS Options" = {
+            urls = [ { template = "https://search.nixos.org/options?channel=unstable&query={searchTerms}"; } ];
+            definedAliases = [ "no" ];
+          };
+          "NixOS Wiki" = {
+            urls = [ { template = "https://wiki.nixos.org/w/index.php?search={searchTerms}"; } ];
+            definedAliases = [ "nw" ];
+          };
+        };
       };
 
       settings = {
@@ -71,12 +88,5 @@ in
         "signon.rememberSignons" = false;
       };
     };
-
-    policies.ExtensionSettings = builtins.listToAttrs [
-      (mkExtension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}" true)
-      (mkExtension "ublock-origin" "uBlock0@raymondhill.net" true)
-      (mkExtension "tampermonkey" "firefox@tampermonkey.net" false)
-    ];
   };
-
 }

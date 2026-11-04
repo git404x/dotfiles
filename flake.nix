@@ -50,14 +50,10 @@
       flake = false;
     };
 
-    brave-browser = {
-      url = "github:git404x/brave-browser-flake";
+    zenix = {
+      url = "github:git404x/zenix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     prism-launcher = {
@@ -106,6 +102,7 @@
               inputs.chaotic.nixosModules.default
               inputs.stylix.nixosModules.default
               inputs.nix-flatpak.nixosModules.nix-flatpak
+              inputs.zenix.nixosModules.default
               "${dotfiles}/hosts/vivobook/configuration.nix"
               "${dotfiles}/hosts/vivobook/hardware.nix"
             ];
@@ -127,6 +124,7 @@
             extraModules = [
               inputs.chaotic.homeModules.default
               inputs.stylix.homeModules.default
+              inputs.zenix.homeManagerModules.default
               "${dotfiles}/hosts/vivobook/home.nix"
             ];
           };
