@@ -7,7 +7,7 @@ RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 SOCK="${VCAM_SOCKET:-${RUNTIME_DIR}/vcam.sock}"
 DEFAULT_VIDEO_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/vcam"
 
-MIC_SINK="${VCAM_MIC_SINK:-Virtual_Microphone_Sink}"
+MIC_SINK="${VCAM_MIC_SINK:-Privacy_Audio_Stub}"
 MIC_SOURCE="${VCAM_MIC_NAME:-Virtual_Microphone}"
 PID_FILE="${RUNTIME_DIR}/vcam-audio.pid"
 HW_LOCK_FILE="${RUNTIME_DIR}/vcam-hw.lock"
@@ -75,8 +75,8 @@ kill_audio() {
     fi
     rm -f "$PID_FILE"
   fi
-  pkill -u "$UID" -f "pw-cat.*${MIC_SINK}" 2>/dev/null || true
-  pkill -u "$UID" -f "pw-loopback.*${MIC_SINK}" 2>/dev/null || true
+  pkill -u "$UID" -f "pw-cat.*(Privacy_Audio_Stub|Virtual_Microphone_Sink|${MIC_SINK})" 2>/dev/null || true
+  pkill -u "$UID" -f "pw-loopback.*(Privacy_Audio_Stub|Virtual_Microphone_Sink|${MIC_SINK})" 2>/dev/null || true
   pkill -u "$UID" -f "ffmpeg.*anoisesrc" 2>/dev/null || true
   pkill -u "$UID" -f "ffmpeg.*sine" 2>/dev/null || true
 }

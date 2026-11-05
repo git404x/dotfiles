@@ -29,8 +29,29 @@ in
     micName = lib.mkOption {
       type = lib.types.str;
       default = "Virtual_Microphone";
-      description = "Node name and description for the PipeWire virtual microphone audio source.";
+      description = "Node name for the PipeWire virtual microphone audio source.";
       example = "Virtual_Microphone";
+    };
+
+    micLabel = lib.mkOption {
+      type = lib.types.str;
+      default = "Virtual Microphone";
+      description = "Card label advertised by the PipeWire virtual microphone audio source to recording applications.";
+      example = "Virtual Microphone";
+    };
+
+    sinkName = lib.mkOption {
+      type = lib.types.str;
+      default = "Privacy_Audio_Stub";
+      description = "Node name for the PipeWire virtual microphone internal audio loopback injection sink.";
+      example = "Privacy_Audio_Stub";
+    };
+
+    sinkLabel = lib.mkOption {
+      type = lib.types.str;
+      default = "Privacy Audio Stub";
+      description = "Card label advertised by the PipeWire loopback sink in audio mixers and pavucontrol.";
+      example = "Privacy Audio Stub";
     };
 
     blacklistOnBoot = lib.mkOption {
@@ -143,16 +164,17 @@ in
       "z /sys/bus/usb/drivers/uvcvideo/unbind 0664 root video - -"
     ];
 
-    # declarative pipewire virtual microphone source and sink
+    # declarative pipewire virtual microphone source and privacy stub sink
     services.pipewire.extraConfig.pipewire."99-vcam-mic" = {
       "context.modules" = [
         {
           name = "libpipewire-module-loopback";
           args = {
-            "node.description" = cfg.micName;
             "capture.props" = {
-              "node.name" = "${cfg.micName}_Sink";
+              "node.name" = cfg.sinkName;
+              "node.description" = cfg.sinkLabel;
               "media.class" = "Audio/Sink";
+              "priority.session" = 0;
               "audio.position" = [
                 "FL"
                 "FR"
@@ -160,8 +182,9 @@ in
             };
             "playback.props" = {
               "node.name" = cfg.micName;
-              "node.description" = cfg.micName;
+              "node.description" = cfg.micLabel;
               "media.class" = "Audio/Source";
+              "priority.session" = 0;
               "audio.position" = [
                 "FL"
                 "FR"
@@ -187,7 +210,7 @@ in
         VCAM_FPS = toString cfg.fps;
         VCAM_DEFAULT_FEED = cfg.defaultFeed;
         VCAM_MIC_NAME = cfg.micName;
-        VCAM_MIC_SINK = "${cfg.micName}_Sink";
+        VCAM_MIC_SINK = cfg.sinkName;
       };
       serviceConfig = {
         ExecStart = "${pkgs.vcam}/bin/vcamd";
