@@ -22,7 +22,7 @@ in
   # imports
   imports = [
     inputs.nix-minecraft.nixosModules.minecraft-servers
-    "${dotfiles}/pkgs/gamerun/options.nix"
+    "${dotfiles}/pkgs/gamerun/module.nix"
   ];
   nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
 
@@ -126,10 +126,7 @@ in
 
   services.gamerun = {
     enable = true;
-    authMode = "gamemode-group";
-    defaultProfile = "balanced";
-    pollInterval = 5;
-    ryzen-smu.enable = true;
+    smu = "ryzen";
   };
 
   programs.gamemode = {
@@ -140,6 +137,10 @@ in
         softrealtime = "off";
         renice = 0;
         desiredgov = "default";
+      };
+      custom = {
+        start = "${pkgs.gamerun}/bin/gamerun power start";
+        end = "${pkgs.gamerun}/bin/gamerun power stop";
       };
     };
   };

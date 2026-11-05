@@ -2,6 +2,8 @@
   lib,
   stdenv,
   makeWrapper,
+  jq,
+  procps,
   ryzenadj,
   gamemode,
   util-linux,
@@ -11,7 +13,7 @@
 
 stdenv.mkDerivation {
   pname = "gamerun";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = ./.;
 
@@ -22,13 +24,23 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 gamerun.sh $out/bin/gamerun
-    install -Dm644 profiles.conf $out/share/gamerun/profiles.conf
+    install -Dm755 src/main.sh $out/bin/gamerun
+    install -Dm644 profiles.json $out/share/gamerun/profiles.json
+
+    mkdir -p $out/lib/gamerun
+    install -Dm644 src/config.sh $out/lib/gamerun/config.sh
+    install -Dm644 src/power.sh $out/lib/gamerun/power.sh
+    install -Dm644 src/launch.sh $out/lib/gamerun/launch.sh
+    install -Dm644 src/bench.sh $out/lib/gamerun/bench.sh
 
     wrapProgram $out/bin/gamerun \
+      --set GAMERUN_BIN "$out/bin/gamerun" \
+      --set GAMERUN_LIB_DIR "$out/lib/gamerun" \
       --set GAMERUN_DATA_DIR "$out/share/gamerun" \
       --prefix PATH : ${
         lib.makeBinPath [
+          jq
+          procps
           ryzenadj
           gamemode
           util-linux
