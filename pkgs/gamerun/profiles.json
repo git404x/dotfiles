@@ -1,6 +1,7 @@
 {
   "default": "performance",
   "stock": "balanced",
+  "poll_interval": 5,
   "profiles": {
     "cool": {
       "stapm": 10,

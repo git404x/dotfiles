@@ -179,6 +179,7 @@ in
       text = builtins.toJSON {
         default = cfg.profiles.default;
         stock = cfg.profiles.stock;
+        poll_interval = cfg.pollInterval;
         profiles = cfg.profiles.presets;
       };
     };

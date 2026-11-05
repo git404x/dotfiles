@@ -11,9 +11,9 @@
   bash,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "gamerun";
-  version = "1.2.0";
+  version = "1.3.0";
 
   src = ./.;
 
@@ -37,6 +37,7 @@ stdenv.mkDerivation {
       --set GAMERUN_BIN "$out/bin/gamerun" \
       --set GAMERUN_LIB_DIR "$out/lib/gamerun" \
       --set GAMERUN_DATA_DIR "$out/share/gamerun" \
+      --set GAMERUN_VERSION "${version}" \
       --prefix PATH : ${
         lib.makeBinPath [
           jq

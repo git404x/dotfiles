@@ -133,7 +133,7 @@ case "$1" in
     exit 0
     ;;
   -v|--version|version)
-    echo "gamerun version 1.2.0"
+    echo "gamerun version ${GAMERUN_VERSION:-unknown}"
     exit 0
     ;;
   power)
@@ -187,6 +187,10 @@ while [ $# -gt 0 ]; do
     --no-gamemode)
       use_gamemode=0
       shift
+      ;;
+    --)
+      shift
+      break
       ;;
     *)
       if is_valid_profile "$1"; then

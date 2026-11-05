@@ -69,6 +69,20 @@ get_default_profile() {
   fi
 }
 
+get_poll_interval() {
+  local p=""
+  if [ -n "$conf_file" ] && [ -f "$conf_file" ]; then
+    p=$(jq -r '.poll_interval // empty' "$conf_file" 2>/dev/null || true)
+  fi
+  if [ -n "$p" ] && [[ "$p" =~ ^[0-9]+$ ]] && [ "$p" -gt 0 ]; then
+    echo "$p"
+  elif [ -n "${GAMERUN_POLL_INTERVAL:-}" ] && [[ "$GAMERUN_POLL_INTERVAL" =~ ^[0-9]+$ ]] && [ "$GAMERUN_POLL_INTERVAL" -gt 0 ]; then
+    echo "$GAMERUN_POLL_INTERVAL"
+  else
+    echo 5
+  fi
+}
+
 get_idle_profile() {
   local p=""
   if [ -n "$conf_file" ] && [ -f "$conf_file" ]; then

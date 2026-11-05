@@ -16,7 +16,12 @@ run_game() {
       ;;
   esac
 
-  [ "${GAMERUN_MANGOHUD:-1}" = "1" ] && export MANGOHUD=1
+  if [ "${GAMERUN_MANGOHUD:-1}" = "1" ]; then
+    export MANGOHUD=1
+  else
+    export MANGOHUD=0
+    unset MANGOHUD 2>/dev/null || true
+  fi
 
   echo "$prof" > "$target_prof_file" 2>/dev/null || true
 
@@ -24,8 +29,15 @@ run_game() {
     echo "[*] launching game directly with profile '${prof^^}'"
     if can_run_ryzenadj; then
       start_watchdog "$prof" >/dev/null 2>&1 || true
+      cleanup_direct() {
+        stop_watchdog >/dev/null 2>&1 || true
+      }
+      trap cleanup_direct INT TERM EXIT
+      "$@"
+      exit $?
+    else
+      exec "$@"
     fi
-    exec "$@"
   else
     echo "[*] launching game under gamemode with profile '${prof^^}'"
     exec gamemoderun "$@"

@@ -7,7 +7,7 @@ pid_file="${runtime_dir}/watchdog.pid"
 prof_file="${runtime_dir}/profile"
 target_prof_file="${runtime_dir}/target_profile"
 lock_file="${runtime_dir}/lock"
-poll_interval="${GAMERUN_POLL_INTERVAL:-5}"
+poll_interval="$(get_poll_interval)"
 
 find_ryzenadj() {
   if [ -x "/run/wrappers/bin/ryzenadj" ]; then
