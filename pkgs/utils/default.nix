@@ -1,45 +1,74 @@
 { pkgs, ... }:
 
-{
-  start-polkit-agent = pkgs.writeShellApplication {
-    name = "start-polkit-agent";
-    text = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-  };
+let
+  tools = {
+    start-polkit-agent = pkgs.writeShellApplication {
+      name = "start-polkit-agent";
+      text = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+    };
 
+    screenshot = pkgs.writeShellApplication {
+      name = "screenshot";
+      runtimeInputs = with pkgs; [
+        grim
+        slurp
+        wl-clipboard
+        libnotify
+        swappy
+        procps
+        coreutils
+      ];
+      text = builtins.readFile ./screenshot.sh;
+    };
 
-  screenshot = pkgs.writeShellApplication {
-    name = "screenshot";
-    runtimeInputs = with pkgs; [ grim slurp wl-clipboard libnotify swappy ];
-    text = builtins.readFile ./screenshot.sh;
-  };
+    record-screen = pkgs.writeShellApplication {
+      name = "record-screen";
+      runtimeInputs = with pkgs; [
+        pulseaudio
+        procps
+        libnotify
+        wl-screenrec
+        slurp
+        coreutils
+      ];
+      text = builtins.readFile ./record-screen.sh;
+    };
 
-  record-screen = pkgs.writeShellApplication {
-    name = "record-screen";
-    runtimeInputs = with pkgs; [ pulseaudio procps libnotify wl-screenrec slurp ];
-    text = builtins.readFile ./record-screen.sh;
-  };
+    clipboard = pkgs.writeShellApplication {
+      name = "clipboard";
+      runtimeInputs = with pkgs; [
+        cliphist
+        fuzzel
+        wl-clipboard
+        libnotify
+        procps
+        coreutils
+      ];
+      text = builtins.readFile ./clipboard.sh;
+    };
 
-  clipboard = pkgs.writeShellApplication {
-    name = "clipboard";
-    runtimeInputs = with pkgs; [ cliphist fuzzel wl-clipboard libnotify ];
-    text = builtins.readFile ./clipboard.sh;
-  };
+    powermenu = pkgs.writeShellApplication {
+      name = "powermenu";
+      runtimeInputs = with pkgs; [
+        fuzzel
+        hyprlock
+        systemd
+      ];
+      text = builtins.readFile ./powermenu.sh;
+    };
 
-  powermenu = pkgs.writeShellApplication {
-    name = "powermenu";
-    runtimeInputs = with pkgs; [ fuzzel hyprlock systemd ];
-    text = builtins.readFile ./powermenu.sh;
+    cage-run = pkgs.writeShellApplication {
+      name = "cage-run";
+      runtimeInputs = with pkgs; [
+        cage
+        fuzzel
+      ];
+      text = builtins.readFile ./cage-run.sh;
+    };
   };
-
-  cage-run = pkgs.writeShellApplication {
-    name = "cage-run";
-    runtimeInputs = with pkgs; [ cage ];
-    text = builtins.readFile ./cage-run.sh;
-  };
-
-  cage-launcher = pkgs.writeShellApplication {
-    name = "cage-launcher";
-    runtimeInputs = with pkgs; [ fuzzel ];
-    text = builtins.readFile ./cage-launcher.sh;
-  };
-}
+in
+(pkgs.symlinkJoin {
+  name = "sysutils";
+  paths = builtins.attrValues tools;
+})
+// tools

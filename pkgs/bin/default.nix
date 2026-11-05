@@ -17,6 +17,7 @@
       ncurses
       zstd
       pv
+      gnutar
     ];
     text = builtins.readFile ./mc-bak.sh;
   };

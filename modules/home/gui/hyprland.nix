@@ -12,14 +12,8 @@ let
 in
 {
 
-  home.packages = with pkgs.sysUtils; [
-    start-polkit-agent
-    screenshot
-    record-screen
-    clipboard
-    powermenu
-    cage-run
-    cage-launcher
+  home.packages = [
+    pkgs.sysutils
   ];
 
   wayland.windowManager.hyprland = {
@@ -201,7 +195,7 @@ in
         # Applications
         [ "mainMod" "RETURN" "exec_cmd('${cmdTerminal}')" ]
         [ "mainMod" "SPACE" "exec_cmd('${cmdLauncher}')" ]
-        [ "shiftMod" "SPACE" "exec_cmd('cage-launcher')" ]
+        [ "shiftMod" "SPACE" "exec_cmd('cage-run')" ]
         [ "mainMod" "E" "exec_cmd('${cmdFileManager}')" ]
         [ "mainMod" "B" "exec_cmd('${cmdBrowser}')" ]
         [ "mainMod" "P" "exec_cmd('${cmdPowermenu}')" ]

@@ -1,18 +1,33 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-lock="󱅞 Lock"
-suspend="󰒲 Suspend"
-logout="󰍃 Logout"
-reboot="󰜉 Reboot"
-shutdown="󰐥 Shutdown"
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "usage: powermenu"
+  exit 0
+fi
 
-selected=$(echo -e "$lock\n$suspend\n$logout\n$reboot\n$shutdown" | \
-  fuzzel --dmenu --lines 5 --width 20 --prompt "Power > ")
+# Declarative action map: "LABEL|COMMAND"
+actions=(
+  "󱅞  Lock|hyprlock"
+  "󰒲  Suspend|systemctl suspend"
+  "󰍃  Logout|loginctl terminate-user $USER"
+  "󰜉  Reboot|systemctl reboot"
+  "󰐥  Shutdown|systemctl poweroff"
+)
 
-case $selected in
-  "$lock") hyprlock ;;
-  "$suspend") systemctl suspend ;;
-  "$logout") loginctl terminate-user "$USER" ;;
-  "$reboot") systemctl reboot ;;
-  "$shutdown") systemctl poweroff ;;
-esac
+labels=()
+for item in "${actions[@]}"; do
+  labels+=("${item%%|*}")
+done
+
+selected=$(printf '%s\n' "${labels[@]}" | \
+  fuzzel --dmenu --lines "${#actions[@]}" --width 20 --prompt "Power > " || true)
+
+[ -z "$selected" ] && exit 0
+
+for item in "${actions[@]}"; do
+  if [ "$selected" = "${item%%|*}" ]; then
+    cmd="${item#*|}"
+    exec $cmd
+  fi
+done

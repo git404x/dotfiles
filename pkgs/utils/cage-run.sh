@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# cage-run: Run application in an isolated Cage Wayland session
-if [ -z "$1" ]; then
-  echo "Usage: cage-run <command>"
-  echo "Example: cage-run zen-browser"
-  exit 1
+# cage-run: run command in isolated Cage session or open launcher if empty
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  echo "usage: cage-run [cmd | -l]"
+  exit 0
+fi
+
+if [ $# -eq 0 ] || [ "${1:-}" = "-l" ] || [ "${1:-}" = "--launcher" ]; then
+  exec fuzzel --launch-prefix="cage-run" -p "Isolated > "
 fi
 
 exec cage -d -- "$@"
