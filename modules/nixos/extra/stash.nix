@@ -17,6 +17,7 @@ in
 
   networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 9999 ];
   users.users.stash.extraGroups = [ "users" ];
+  users.users.${username}.extraGroups = [ "stash" ];
 
   services.stash = {
     enable = true;
@@ -24,7 +25,7 @@ in
     dataDir = "${nsVault}/config";
 
     username = "admin";
-    passwordFile = "/dev/null";
+    passwordFile = "${nsVault}/secrets/password";
     jwtSecretKeyFile = "${nsVault}/secrets/jwt_secret";
     sessionStoreKeyFile = "${nsVault}/secrets/session_secret";
 
@@ -79,9 +80,14 @@ in
       # auto-stop whenever the drive is unmounted
       BindsTo = [ mountUnit ];
       After = [ mountUnit ];
+      StartLimitIntervalSec = "60s";
+      StartLimitBurst = 3;
     };
 
     serviceConfig = {
+      SupplementaryGroups = [ "root" ];
+      Restart = "on-failure";
+      RestartSec = "5s";
       UMask = "0002";
       TimeoutStopSec = "10s";
       BindPaths = [ "${vaultPath}:${rootVault}" ];
@@ -93,8 +99,8 @@ in
   ];
 
   environment.shellAliases = {
-    stash-start = "sudo systemctl start stash";
+    stash-start = "sudo systemctl reset-failed stash stash.path 2>/dev/null; sudo systemctl start stash";
     stash-stop = "sudo systemctl stop stash";
-    stash-status = "systemctl status stash";
+    stash-status = "systemctl status stash stash.path";
   };
 }
