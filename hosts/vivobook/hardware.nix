@@ -36,6 +36,11 @@
     "iommu=pt"
     "initcall_blacklist=crb_acpi_driver_init,init_tis,tpm_tis_pnp_init"
     "module_blacklist=tpm,tpm_crb,tpm_crb_acpi,tpm_tis,tpm_tis_core"
+
+    # APU shared graphics memory (GTT) safe ceiling
+    # ~3.75GB (983040 * 4K pages) to prevent -ENOMEM context drops
+    "ttm.pages_limit=983040"
+    "ttm.page_pool_size=983040"
   ];
 
   # disable unconfigured power-profiles-daemon to prevent conflicts with ryzenadj
