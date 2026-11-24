@@ -6,6 +6,8 @@
   procps,
   ryzenadj,
   gamemode,
+  gamescope,
+  mangohud,
   util-linux,
   coreutils,
   bash,
@@ -13,7 +15,7 @@
 
 stdenv.mkDerivation rec {
   pname = "gamerun";
-  version = "1.3.0";
+  version = "1.4.0";
 
   src = ./.;
 
@@ -44,6 +46,8 @@ stdenv.mkDerivation rec {
           procps
           ryzenadj
           gamemode
+          gamescope
+          mangohud
           util-linux
           coreutils
           bash

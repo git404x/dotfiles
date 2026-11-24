@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 # launch.sh - Game execution, runtime environment preparation, and DLL overrides
 
+GAMERUN_FALLBACK_WIDTH="${GAMERUN_FALLBACK_WIDTH:-1920}"
+GAMERUN_FALLBACK_HEIGHT="${GAMERUN_FALLBACK_HEIGHT:-1080}"
+
+get_display_geometry() {
+  local mode="" conn
+  for conn in /sys/class/drm/*; do
+    if [ -f "$conn/status" ] && [ "$(<"$conn/status")" = "connected" ] && [ -s "$conn/modes" ]; then
+      mode="$(head -n 1 "$conn/modes")"
+      [ -n "$mode" ] && break
+    fi
+  done
+
+  if [ -n "$mode" ]; then
+    echo "${mode%x*}" "${mode#*x}"
+  else
+    echo "$GAMERUN_FALLBACK_WIDTH" "$GAMERUN_FALLBACK_HEIGHT"
+  fi
+}
+
 run_game() {
   local mode="$1" prof="$2"
   shift 2
@@ -11,6 +30,12 @@ run_game() {
       ;;
     online-fix|fixed)
       export WINEDLLOVERRIDES="OnlineFix=n;OnlineFix64=n;SteamOverlay=n;SteamOverlay64=n;winmm=n,b;dnet=n;steam_api=n;steam_api64=n;winhttp=n,b${WINEDLLOVERRIDES:+;$WINEDLLOVERRIDES}"
+      ;;
+    scope)
+      local res_w res_h
+      read -r res_w res_h < <(get_display_geometry)
+      echo "[*] launching game in gamescope (${res_w}x${res_h})"
+      set -- gamescope -W "$res_w" -H "$res_h" -f ${GAMESCOPE_ARGS:-} -- "$@"
       ;;
     base|default|*)
       ;;

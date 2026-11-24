@@ -147,8 +147,12 @@ in
 
   users.users.${username}.extraGroups = [ "gamemode" ];
 
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
+
   environment.systemPackages = with pkgs; [
-    mangohud
     goldberg-emu
     heroic
     gamerun

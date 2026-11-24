@@ -29,6 +29,7 @@ Usage: gamerun [mode] [profile] <executable> [args...]
 
 Game Execution Modes:
   base, default                              Standard GameMode launch with APU tuning (default)
+  scope, gamescope                           Launch inside isolated Gamescope compositor (workspace safe)
   goldberg                                   Launch with Goldberg Steam emulator overrides
   online-fix, fixed                          Launch with OnlineFix / SteamOverlay overrides
 
@@ -148,6 +149,10 @@ mode="base"
 case "$1" in
   base|default)
     mode="base"
+    shift
+    ;;
+  scope|gamescope)
+    mode="scope"
     shift
     ;;
   goldberg)
