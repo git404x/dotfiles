@@ -48,13 +48,12 @@
       glab
       lazygit
       vscodium
-      neovim
       neovide
 
       # terminal
+      alacritty
       tmux
       yazi
-      foot
 
       # utilities
       yt-dlp
