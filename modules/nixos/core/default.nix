@@ -8,5 +8,6 @@
     "${dotfiles}/modules/nixos/core/audio.nix"
     "${dotfiles}/modules/nixos/core/packages.nix"
     "${dotfiles}/modules/nixos/core/flatpak.nix"
+    "${dotfiles}/modules/nixos/core/security.nix"
   ];
 }
