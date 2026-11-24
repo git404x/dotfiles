@@ -3,6 +3,11 @@
   programs.mangohud = {
     enable = true;
     settings = {
+      # Visibility & toggles
+      no_display = true;
+      toggle_hud = "Shift_R+F12";
+      toggle_fps_limit = "Shift_L+F1";
+
       # Layout
       position = "top-left";
       round_corners = 8;
@@ -37,8 +42,6 @@
 
       # Others
       fps_limit = 60;
-      toggle_hud = "Shift_R+F12";
-      toggle_fps_limit = "Shift_L+F1";
     };
   };
 }
